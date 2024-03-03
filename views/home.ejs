@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- SCRIPTS -->
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <!-- FONTS -->
+    <link href="http://fonts.googleapis.com/css?family=Rock+Salt" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Covered+By+Your+Grace" rel="stylesheet" type="text/css">
+
+    <title>scrumblr</title>
+</head>
+<body>
+    <h1>scrumblr by <a href="http://aliasaria.ca">aliasaria</a>, modified by Jacob Culley</h1>
+
+    <div class="board-outline">
+        <div id="board">
+            <div id="board-doodles"></div>
+
+            <table id="board-table" class="board-table">
+                <tr>
+                    <td>
+                        <h1 class="home">scrumblr.</h1>
+                        <form class="home" onsubmit="return go();">
+                            <label>name your new board:</label><br>
+                            <input class="text" type="text" name="name">
+                            <a id="go" onclick="return go();">&nbsp;go.</a>
+                        </form><br><br>
+                        <p class="home">example board: <a href="<%='http://' + url + '/demo' %>">demo</a></p><br>
+                        <p class="home small">Source code available at <a href="https://github.com/aliasaria/scrumblr">github</a></p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="stickers">
+        <div class="sticker" id="sticker-red"></div>
+        <div class="sticker" id="sticker-blue"></div>
+        <div class="sticker" id="sticker-yellow"></div>
+        <div class="sticker" id="sticker-green"></div><br>
+        <div class="sticker" id="sticker-pink"></div>
+        <div class="sticker" id="sticker-lightblue"></div>
+        <div class="sticker" id="sticker-orange"></div>
+        <div class="sticker" id="sticker-purple"></div><br>
+        <div class="sticker"
