@@ -1,0 +1,73 @@
+<% if (locals.demo) { %>
+    <div class="notice-bar">this is a demo board. to make a private board, go to <a href="/demo">/demo</a></div>
+    <% } %>
+    
+    <!-- The following div and icons are commented out, possibly for future use or development. -->
+    <!--
+    <div class="config">
+        <i class="fa fa-cog fa-lg faded-icon"></i>
+    </div>
+    -->
+    
+    <h1><a href="http://scrumblr.ca">scrumblr</a> by <a href="http://aliasaria.ca">aliasaria</a></h1>
+    
+    <div class="board-outline">
+        <div id="board">
+            <div id="board-doodles"></div>
+            <img id="marker" src="images/marker.png">
+            <img id="eraser" src="images/eraser.png">
+    
+            <table id="board-table" class="board-table">
+                <tr>
+                    <td id="icon-col" width="1%">
+                        <img id="add-col" class="col-icon" width="20" height="20" src="images/icons/iconic/raster/black/plus_alt_32x32.png">
+                        <img id="delete-col" class="col-icon" width="20" height="20" src="images/icons/iconic/raster/black/minus_alt_32x32.png">
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div class="buttons">
+        <i id="create-card" class="fa fa-plus-circle fa-2x bottom-icon"></i><br>
+        <i id="smallify" class="fa fa-expand fa-2x bottom-icon"></i><br>
+        <i id="fontify" class="fa fa-font fa-2x bottom-icon"></i><br>
+        <i id="font-increase" class="fa fa-search-plus fa-2x bottom-icon"></i><br>
+        <i id="font-decrease" class="fa fa-search-minus fa-2x bottom-icon"></i><br>
+        <i id="protect-room" class="fa fa-eye-slash fa-2x bottom-icon"></i>
+    </div>
+    
+    <div class="stickers">
+        <div class="sticker" id="sticker-red"></div>
+        <div class="sticker" id="sticker-blue"></div>
+        <div class="sticker" id="sticker-yellow"></div>
+        <div class="sticker" id="sticker-green"></div><br>
+        <div class="sticker" id="sticker-pink"></div>
+        <div class="sticker" id="sticker-lightblue"></div>
+        <div class="sticker" id="sticker-orange"></div>
+        <div class="sticker" id="sticker-purple"></div>
+        <!-- Stickers or features below are commented out for potential future use -->
+        <!-- <div class="sticker" id="sticker-silverstar"></div>
+        <div id="addsticker"></div> -->
+        <br>
+        <div class="sticker" id="nosticker"></div>
+        <!-- Additional stickers commented out for now
+        <br>
+        <div class="sticker" id="sticker-gold"></div>
+        <img src="/images/stickers/sticker-gold.png">
+        <div class="sticker" id="sticker-bluestar"></div>
+        <img src="/images/stickers/sticker-bluestar.png">
+        <div class="sticker" id="sticker-silverstar"></div>
+        <img src="/images/stickers/sticker-silverstar.png">
+        <div class="sticker" id="sticker-redstar"></div>
+        <img src="/images/stickers/sticker-redstar.png"> -->
+    </div>
+    
+    <div class="names">
+        <p>connected:</p>
+        <img id="user-icon" src="/images/icons/cc/black/png/user_icon&16.png">
+        <input id="yourname-input">
+        <span class="you-text">(you)</span>
+        <ul id="names-ul"></ul>
+    </div>
+    
