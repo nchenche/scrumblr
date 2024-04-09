@@ -5,6 +5,8 @@ const compression = require('compression');
 const express = require('express');
 const socketIo = require('socket.io');
 const db = require('./lib/redis.js');
+const bcrypt = require('bcrypt')
+
 
 
 /**************
@@ -24,6 +26,7 @@ app.set('view engine', 'ejs');
 var router = express.Router();
 
 app.use(compression());
+app.use(express.json());
 app.use(conf.baseurl, router);
 
 
@@ -46,9 +49,7 @@ setupSocketHandlers(io, db);
 
 
 
-/**************
- ROUTES
-**************/
+/* ROUTES */
 router.get('/', function(req, res) {
 	url = req.header('host') + req.baseUrl;
 
@@ -62,6 +63,7 @@ router.get('/', function(req, res) {
 	});
 });
 
+
 router.get('/login', function(req, res) {
 	url = req.header('host') + req.baseUrl;
 
@@ -72,6 +74,7 @@ router.get('/login', function(req, res) {
 		body: 'partials/signin.ejs'
 	});
 });
+
 
 router.get('/register', function(req, res) {
 	url = req.header('host') + req.baseUrl;
@@ -85,6 +88,7 @@ router.get('/register', function(req, res) {
 	});
 });
 
+
 router.get('/demo', function(req, res) {
 	
 	res.render('layout', {
@@ -94,6 +98,7 @@ router.get('/demo', function(req, res) {
 	});
 });
 
+
 router.get('/:id', function(req, res){
 	res.render('layout', {
 		body: 'partials/room.ejs',
@@ -101,23 +106,33 @@ router.get('/:id', function(req, res){
 	});
 });
 
-// router.post('/register', async (req, res) => {
-//     try {
-//         // Hash the password
-//         const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+router.post('/register', async (req, res) => {
+    try {
+		console.log("req.body", req.body);
+		res.send({ message: 'User registered successfully', data: req.body });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: 'Server error' });
+    }	
+	
+    // try {
+    //     // Hash the password
+    //     const hashedPassword = await bcrypt.hash(req.body.password, 10);
         
-//         // Assuming createUser is a method in your dbUtils that saves user info to Redis
-//         db.createUser(req.body.username, hashedPassword, (err, reply) => {
-//             if (err) {
-//                 console.error('Registration error:', err);
-//                 return res.status(500).send({ message: 'Registration failed' });
-//             }
-//             console.log('User registered successfully:', reply);
-//             res.send({ message: 'User registered successfully' });
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).send({ message: 'Server error' });
-//     }
-// });
+    //     // Assuming createUser is a method in your dbUtils that saves user info to Redis
+    //     db.createUser(req.body.username, hashedPassword, (err, reply) => {
+    //         if (err) {
+    //             console.error('Registration error:', err);
+    //             return res.status(500).send({ message: 'Registration failed' });
+    //         }
+    //         console.log('User registered successfully:', reply);
+    //         res.send({ message: 'User registered successfully' });
+    //     });
+    // } catch (error) {
+    //     console.error(error);
+    //     res.status(500).send({ message: 'Server error' });
+    // }
+});
 
