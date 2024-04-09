@@ -27,6 +27,7 @@ function sendAction(a, d) {
 socket.on('connect', function() {
     //console.log('successful socket.io connect');
 
+
     //let the final part of the path be the room name
     var room = location.pathname.substring(location.pathname.lastIndexOf('/'));
 

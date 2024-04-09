@@ -8,15 +8,21 @@ services:
       - "6379:6379"    
     networks:
       - app-network
-
   node:
-    image: scrumblr-protected:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile # Specifies the name of the Dockerfile
     user: "node"
     ports:
       - "1000:1000"
     networks:
       - app-network
     command: node server.js
+    healthcheck:
+      test: ["CMD-SHELL", "cat package.json | grep bcrypt && ls node_modules | grep bcrypt"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   nginx:
     image: nginx:alpine

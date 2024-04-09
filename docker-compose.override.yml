@@ -7,7 +7,6 @@ services:
     environment:
       - NODE_ENV=development
     command: nodemon server.js --server:port=1000 --redis:url=redis://redis-dock:6379 --inspect=0.0.0.0:9229
-
   nginx:
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf

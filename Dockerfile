@@ -1,14 +1,12 @@
-FROM node:13.11.0-slim
+FROM node:20.12.1-slim
 
 ENV NODE_ENV=development
 
 WORKDIR /app
-
-COPY package*.json ./
+COPY . .
 
 RUN npm install -g nodemon
 RUN npm install
 
-COPY . .
 
 EXPOSE 1000
