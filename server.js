@@ -4,6 +4,7 @@
 const compression = require('compression');
 const express = require('express');
 const socketIo = require('socket.io');
+const db = require('./lib/redis.js');
 
 
 /**************
@@ -41,7 +42,7 @@ console.log('Server running at http://127.0.0.1:' + conf.port + '/');
 const io = socketIo(server, {
 	path: conf.baseurl == '/' ? '' : conf.baseurl + "/socket.io"
 });
-setupSocketHandlers(io);
+setupSocketHandlers(io, db);
 
 
 
@@ -79,7 +80,8 @@ router.get('/register', function(req, res) {
 	clientsCount = Object.keys(connected).length;
 
 	res.render('layout', {
-		body: 'partials/register.ejs'
+		body: 'partials/register.ejs',
+		pageScripts: ['js/userHandler.js']
 	});
 });
 
@@ -99,4 +101,23 @@ router.get('/:id', function(req, res){
 	});
 });
 
+// router.post('/register', async (req, res) => {
+//     try {
+//         // Hash the password
+//         const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        
+//         // Assuming createUser is a method in your dbUtils that saves user info to Redis
+//         db.createUser(req.body.username, hashedPassword, (err, reply) => {
+//             if (err) {
+//                 console.error('Registration error:', err);
+//                 return res.status(500).send({ message: 'Registration failed' });
+//             }
+//             console.log('User registered successfully:', reply);
+//             res.send({ message: 'User registered successfully' });
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send({ message: 'Server error' });
+//     }
+// });
 
