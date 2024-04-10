@@ -1,5 +1,5 @@
 <% if (typeof pageScripts !== 'undefined') { %>
     <% pageScripts.forEach(function(script) { %>
-        <script src="<%= script %>"></script>
+        <script type="module" src="<%= script %>"></script>
     <% }); %>
 <% } %>

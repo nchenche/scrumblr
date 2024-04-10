@@ -1,3 +1,10 @@
+import {setUpForm} from "./registerFormHandler.js"
+
+setUpForm()
+
+
+
+
 const accountManager = {
     register: function(userData) {
         fetch('/register', {
@@ -9,12 +16,10 @@ const accountManager = {
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Registration successful:', data);
-            // Handle successful registration, e.g., redirect or display a message
+            console.log(data.message);
         })
         .catch(error => {
             console.error('Registration error:', error);
-            // Handle registration errors, e.g., display an error message
         });
     },
 
@@ -29,20 +34,19 @@ const accountManager = {
     // Additional account-related functions...
 };
 
+document.getElementById("btn-submit").addEventListener("click", function(event) {
+    event.preventDefault(); // Prevent form from submitting traditionally
 
-// Example usage
-document.getElementById("btn-register").addEventListener("click", function(event) {
-    event.preventDefault();
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
-    
     var userData = {
-        username: document.getElementById("username").value,
-        email: document.getElementById("email").value,
-        password: document.getElementById("password").value,
+        username: username,
+        email: email,
+        password: password,
     };
 
-    console.log(userData);
-
-    
+    // If validation passes, proceed to register
     accountManager.register(userData);
 });
