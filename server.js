@@ -72,7 +72,7 @@ router.get('/login', function(req, res) {
 
 	res.render('layout', {
 		body: 'partials/signin.ejs',
-		pageScripts: ['']
+		pageScripts: ['js/forms/login/login.js']
 	});
 });
 
@@ -85,7 +85,7 @@ router.get('/register', function(req, res) {
 
 	res.render('layout', {
 		body: 'partials/register.ejs',
-		pageScripts: ['js/forms/registration/userHandler.js']
+		pageScripts: ['js/forms/registration/register.js']
 	});
 });
 
@@ -108,22 +108,34 @@ router.get('/:id', function(req, res){
 });
 
 
-router.post('/register', async (req, res) => {
-    try {
-	        
-        // Assuming createUser is a method in your dbUtils that saves user info to Redis
-        db.createUser(req.body.username, req.body.email, req.body.password, (err, reply) => {
-            if (err) {
-                console.error('Registration error:', err);
-                return res.status(500).send({ message: 'Registration failed' });
+router.post('/register', (req, res) => {
+    const { username, email, password } = req.body;
+    db.createUser(username, email, password, (result) => {
+        res.status(result.success ? 200 : 400).json(result);
+    });
+});
+
+
+router.post('/login', async (req, res) => {
+	// res.json({ message: "Processing successful", redirectTo: '/another-page' });
+    const { username, password } = req.body;
+    db.authenticateUser(username, password, (result) => {
+        if (!result.success) {
+            console.log(result.message); // Log the error or user feedback message
+            if (result.message === 'User does not exist.') {
+                res.status(404).json(result);  // Not Found
+            } else {
+                res.status(401).json(result);  // Unauthorized for other errors
             }
-            console.log('User registered successfully:', reply);
-            res.send({ message: 'User registered successfully' });
+            return;
+        }
+        // Respond with JSON for successful login, including redirect information
+        res.json({
+            message: result.message,
+            success: result.success,
+            redirectTo: '/'
         });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send({ message: 'Server error' });
-    }
+    });
 });
 
 
