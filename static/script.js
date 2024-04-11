@@ -1000,7 +1000,7 @@ $(function() {
     $(".board-outline").resizable({
         ghost: false,
         minWidth: 700,
-        minHeight: 400,
+        minHeight: 500,
         maxWidth: 3200,
         maxHeight: 1800,
     });

@@ -5,7 +5,6 @@ const compression = require('compression');
 const express = require('express');
 const socketIo = require('socket.io');
 const { db, redisClient } = require('./lib/redis');
-const bcrypt = require('bcrypt')
 
 
 
@@ -23,12 +22,37 @@ var app = express();
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'ejs');
 
-var router = express.Router();
+// SETUP SESSIONS
+const session = require('express-session');
+const RedisStore = require("connect-redis").default
 
+// Initialize store.
+let redisStore = new RedisStore({
+  client: redisClient,
+})
+
+// Configure session middleware
+app.use(
+	session(
+	{
+		store: redisStore,
+		secret: 'your_secret_key',
+		saveUninitialized: false,
+		resave: false,
+		cookie: {
+			secure: 'auto', // set to true if using https
+			httpOnly: false,
+			maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
+		}
+	}
+));
+
+
+// SETUP ROUTER
+var router = express.Router();
 app.use(compression());
 app.use(express.json());
 app.use(conf.baseurl, router);
-
 
 
 router.use(express.static(__dirname + '/static'));
@@ -108,16 +132,23 @@ router.get('/:id', function(req, res){
 });
 
 
+router.get('/session', (req, res) => {
+	console.log("session:", req.session)
+	res.json({ user: req.session.user, id: req.session.id });
+});
+
+
+// SET USEFUL API ENDPOINTS
 router.post('/register', (req, res) => {
     const { username, email, password } = req.body;
     db.createUser(username, email, password, (result) => {
+		req.session.user = result.user;
         res.status(result.success ? 200 : 400).json(result);
     });
 });
 
 
 router.post('/login', async (req, res) => {
-	// res.json({ message: "Processing successful", redirectTo: '/another-page' });
     const { username, password } = req.body;
     db.authenticateUser(username, password, (result) => {
         if (!result.success) {
@@ -130,16 +161,29 @@ router.post('/login', async (req, res) => {
             return;
         }
         // Respond with JSON for successful login, including redirect information
+		req.session.user = result.user;
         res.json({
             message: result.message,
             success: result.success,
-            redirectTo: '/'
+            redirectTo: '/',
+			user: req.session.user
         });
     });
 });
 
 
-// API
+app.get('/logout', (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return console.error('Error logging out', err);
+        }
+        res.send("Logged out successfully!");
+    });
+});
+
+
+
+
 // Endpoint to check username availability
 router.get('/users/exists/username/:username', async (req, res) => {
 	const username = req.params.username

@@ -16,7 +16,6 @@ document.getElementById("btn-submit").addEventListener("click", function(event) 
 
     // If validation passes, proceed to register
     accountManager.login(userData, (response) => {
-        console.log(response)
 
         if (!response.success) {
             if (response.type) {
@@ -27,7 +26,8 @@ document.getElementById("btn-submit").addEventListener("click", function(event) 
                 alert("Error:", response.message);
             }
         } else {
-            window.location.href = response.redirectTo;
+            console.log(response);
+            // window.location.href = response.redirectTo;
         }
     } );
 });
