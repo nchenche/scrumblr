@@ -26,8 +26,8 @@ document.getElementById("btn-submit").addEventListener("click", function(event) 
                 alert("Error:", response.message);
             }
         } else {
-            console.log(response);
-            // window.location.href = response.redirectTo;
+            // console.log(response);
+            window.location.href = response.redirectTo;
         }
     } );
 });

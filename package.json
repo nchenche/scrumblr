@@ -18,6 +18,7 @@
     "bcrypt": "5.0.1",
     "compression": "^1.1.0",
     "connect-redis": "^7.1.1",
+    "cookie-parser": "^1.4.6",
     "ejs": "^3.1.9",
     "express": "4.x",
     "express-session": "^1.18.0",
