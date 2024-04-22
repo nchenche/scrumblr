@@ -26,35 +26,12 @@ app.set('view engine', 'ejs');
 app.use(cookieParser())
 
 
-// SETUP SESSIONS
-// const session = require('express-session');
-// const RedisStore = require("connect-redis").default
-
-// // Initialize store.
-// let redisStore = new RedisStore({
-//   client: redisClient,
-// })
-
-// // Configure session middleware
-// app.use(
-// 	session(
-// 	{
-// 		store: redisStore,
-// 		secret: 'your_secret_key',
-// 		saveUninitialized: false,
-// 		resave: false,
-// 		cookie: {
-// 			secure: 'auto', // set to true if using https
-// 			httpOnly: false,
-// 			maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
-// 		}
-// 	}
-// ));
-
-
 // SETUP ROUTER
 var router = express.Router();
-router.use(express.static(__dirname + '/static'));
+const path = require('path');
+
+router.use(express.static(path.join(__dirname, 'static')));
+// router.use(express.static(__dirname + '/static'));
 
 app.use(compression());
 app.use(express.json());
@@ -127,9 +104,53 @@ router.get('/', routeProtection.loggedIn, function(req, res) {
 			body: 'partials/home.ejs',
 			url: url,
 			connected: clientsCount,
-			username: result.success ? result.username : null
+			username: result.success ? result.username : null,
+			pageScripts: ['/js/utils.js'],
 		});
 	})
+});
+
+
+router.get('/room/:id', routeProtection.loggedIn, function(req, res){
+
+	const sessionId = req.cookies.session_id;
+	db.getUserBySession(sessionId, (response) => {
+		const user = response.username;
+		db.setRoomOwner(req.params.id, user, (response) => {
+			if ("owner" in response) {
+				const owner = response.owner;
+				res.render('layout', {
+					body: 'partials/room.ejs',
+					pageTitle: ('Scrumblr - ' + req.params.id),
+					pageScripts: ['/script.js'],
+					username: user,
+					is_owner: owner === user
+				});
+			} else {
+				console.log('from server:', response);
+			}
+		})
+	})
+
+	// db.getRoomOwner(req.params.id, (response) => {
+	// 	if (response.success) {
+	// 		const owner = response.owner;
+	// 		const sessionId = req.cookies.session_id;
+	// 		db.getUserBySession(sessionId, (response) => {
+	// 			const is_owner = owner === response.username ? true : false;
+	// 			res.render('layout', {
+	// 				body: 'partials/room.ejs',
+	// 				pageTitle: ('Scrumblr - ' + req.params.id),
+	// 				pageScripts: ['/script.js'],
+	// 				username: response.success ? response.username : null,
+	// 				is_owner: is_owner
+	// 			});
+	// 		});
+	// 	} else {
+	// 		console.log('from server:', response);
+	// 	}
+	// });
+
 });
 
 
@@ -139,27 +160,13 @@ router.get('/demo', routeProtection.loggedIn, function(req, res) {
 		res.render('layout', {
 			body: 'partials/room.ejs',
 			pageTitle: 'Scrumblr - demo',
-			username: result.success ? result.username : null
+			pageScripts: ['script.js'],
+			username: result.success ? result.username : null,
+			is_owner: null
 		});
 	})
 });
 
-
-router.get('/:id', routeProtection.loggedIn, function(req, res){
-	url = req.header('host') + req.baseUrl;
-
-	var connected = io.sockets.connected;
-	clientsCount = Object.keys(connected).length;
-
-	const sessionId = req.cookies.session_id;
-	db.getUserBySession(sessionId, (result) => {
-		res.render('layout', {
-			body: 'partials/room.ejs',
-			pageTitle: ('Scrumblr - ' + req.params.id),
-			username: result.success ? result.username : null
-		});
-	})
-});
 
 
 
@@ -191,7 +198,8 @@ router.post('/login', async (req, res) => {
         }
 
 		// store cookie session
-		res.cookie('session_id', result.session, { httpOnly: true, secure: false });
+		res.cookie('session_id', result.session, { httpOnly: false, secure: false });
+		res.cookie('username', result.user, { httpOnly: false, secure: false });
 
 		res.json({
             message: result.message,

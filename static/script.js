@@ -8,8 +8,11 @@ var currentFont = null;
 var boardInitialized = false;
 var keyTrap = null;
 
+// const baseurl = location.origin;
 var baseurl = location.pathname.substring(0, location.pathname.lastIndexOf('/'));
-var socket = io.connect({path: baseurl + "/socket.io"});
+var socket = io.connect({path: "/socket.io"});
+// var socket = io.connect({path: baseurl + "/socket.io"});
+
 
 //an action has happened, send it to the
 //server
@@ -25,14 +28,17 @@ function sendAction(a, d) {
 }
 
 socket.on('connect', function() {
-    //console.log('successful socket.io connect');
-
-
     //let the final part of the path be the room name
-    var room = location.pathname.substring(location.pathname.lastIndexOf('/'));
+    const parts = location.pathname.split('/').filter(Boolean);
+    const user = getCookie("username");
+
+    const data = {
+        room: parts.pop(),
+        user: user
+    }
 
     //imediately join the room which will trigger the initializations
-    sendAction('joinRoom', room);
+    sendAction('joinRoom', data);
 });
 
 socket.on('disconnect', function() {
@@ -116,9 +122,17 @@ function getMessage(m) {
             );
             break;
 
-        case 'editCard':
-            $("#" + data.id).children('.content:first').text(data.value);
-            break;
+        // case 'editCard':
+        //     console.log("editing card")
+        //     var $container = $("#" + data.id).empty();  // Get the container by ID and empty it
+        //     var texts = data.text.split('\n');
+        //     $.each(texts, function(index, text) {
+        //         if (text.trim() !== '') {  // Check if the text is not just whitespace
+        //             $('<div></div>').text(text).appendTo($container);  // Create a div, set its text, and append it
+        //         }
+        //     });
+        //     // $("#" + data.id).children('.content:first').text(data.value);
+        //     break;
 
         case 'initColumns':
             initColumns(data);
@@ -257,18 +271,14 @@ function validatePassword(passwrd) {
 // card functions
 function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed) {
     //cards[id] = {id: id, text: text, x: x, y: y, rot: rot, colour: colour};
+    // const textDivs = text.split('\n').map(line => `<div>${line.trim()}</div>`).join('');
 
-    var h = '<div id="' + id + '" class="card ' + colour +
-        ' draggable" style="-webkit-transform:rotate(' + rot +
-        'deg);\
+    var h = `<div id="${id}" class="card ${colour} draggable" style="-webkit-transform:rotate(${rot}deg);\
 	">\
-	<img src="images/icons/token/Xion.png" class="card-icon delete-card-icon" />\
-	<img class="card-image" src="images/' +
-        colour + '-card.png">\
-	<div id="content:' + id +
-        '" class="content stickertarget droppable">' +
-        text + '</div><span class="filler"></span>\
-	</div>';
+	<img src="/images/icons/token/Xion.png" class="card-icon delete-card-icon" />\
+	<img class="card-image" src="/images/${colour}-card.png">\
+	<div id="content:${id}" class="content stickertarget droppable">${text}</div><span class="filler"></span>\
+	</div>`;
 
     var card = $(h);
     card.appendTo('#board');
@@ -429,12 +439,12 @@ function addSticker(cardId, stickerId) {
 
     if (Array.isArray(stickerId)) {
         for (var i in stickerId) {
-            stickerContainer.prepend('<img src="images/stickers/' + stickerId[i] +
+            stickerContainer.prepend('<img src="/images/stickers/' + stickerId[i] +
                 '.png">');
         }
     } else {
         if (stickerContainer.html().indexOf(stickerId) < 0)
-            stickerContainer.prepend('<img src="images/stickers/' + stickerId +
+            stickerContainer.prepend('<img src="/images/stickers/' + stickerId +
                 '.png">');
     }
 
@@ -478,7 +488,7 @@ function initCards(cardArray) {
     cards = cardArray;
 
     for (var i in cardArray) {
-        card = cardArray[i];
+        let card = cardArray[i];
 
         drawNewCard(
             card.id,
@@ -522,11 +532,11 @@ function drawNewColumn(columnName) {
         onblur: 'submit',
         width: '',
         height: '',
-        xindicator: '<img src="images/ajax-loader.gif">',
+        xindicator: '<img src="/images/ajax-loader.gif">',
         event: 'dblclick', //event: 'mouseover'
     });
 
-    $('.col:last').fadeIn(1500);
+    $('.col:last').fadeIn(250);
 
     totalcolumns++;
 }
@@ -613,7 +623,7 @@ function initColumns(columnArray) {
     $('.col').remove();
 
     for (var i in columnArray) {
-        column = columnArray[i];
+        let column = columnArray[i];
 
         drawNewColumn(
             column
@@ -624,7 +634,7 @@ function initColumns(columnArray) {
 
 function changeThemeTo(theme) {
     currentTheme = theme;
-    $("link[title=cardsize]").attr("href", "css/" + theme + ".css");
+    $("link[title=cardsize]").attr("href", "/css/" + theme + ".css");
 }
 
 function changeFontTo(font) {
@@ -648,23 +658,47 @@ function setCookie(c_name, value, exdays) {
     document.cookie = c_name + "=" + c_value;
 }
 
-function getCookie(c_name) {
-    var i, x, y, ARRcookies = document.cookie.split(";");
-    for (i = 0; i < ARRcookies.length; i++) {
-        x = ARRcookies[i].substr(0, ARRcookies[i].indexOf("="));
-        y = ARRcookies[i].substr(ARRcookies[i].indexOf("=") + 1);
-        x = x.replace(/^\s+|\s+$/g, "");
-        if (x == c_name) {
-            return unescape(y);
-        }
-    }
+// function getCookie(c_name) {
+//     var i, x, y, ARRcookies = document.cookie.split(";");
+//     for (i = 0; i < ARRcookies.length; i++) {
+//         x = ARRcookies[i].substr(0, ARRcookies[i].indexOf("="));
+//         y = ARRcookies[i].substr(ARRcookies[i].indexOf("=") + 1);
+//         x = x.replace(/^\s+|\s+$/g, "");
+//         if (x == c_name) {
+//             return unescape(y);
+//         }
+//     }
+// }
+
+function getCookie(name) {
+    let value = `; ${document.cookie}`;
+    let parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
 }
 
 
-function setName(name) {
-    sendAction('setUserName', name);
+// function setCookie(name, value, days, path, secure, sameSite) {
+//     let expires = "";
+//     if (days) {
+//         const date = new Date();
+//         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+//         expires = `; expires=${date.toUTCString()}`;
+//     }
 
-    setCookie('scrumscrum-username', name, 365);
+//     const pathValue = path ? `; path=${path}` : '; path=/'; // Default path is root
+//     const secureFlag = secure ? '; secure' : '';
+//     const sameSitePolicy = sameSite ? `; samesite=${sameSite}` : '; samesite=Lax'; // Default samesite is Lax
+
+//     document.cookie = `${name}=${encodeURIComponent(value)}${expires}${pathValue}${secureFlag}${sameSitePolicy}`;
+// }
+
+
+function setName(name) {
+    let username = getCookie("username");
+    // sendAction('setUserName', name);
+    sendAction('setUserName', username);
+
+    // setCookie('username', name, 365);
 }
 
 function displayInitialUsers(users) {
@@ -791,7 +825,7 @@ $(function() {
 
 
     if (boardInitialized === false)
-        blockUI('<img src="images/ajax-loader.gif" width=43 height=11/>');
+        blockUI('<img src="/images/ajax-loader.gif" width=43 height=11/>');
 
     //setTimeout($.unblockUI, 2000);
 
@@ -799,7 +833,7 @@ $(function() {
     $("#create-card")
         .click(function() {
             var rotation = Math.random() * 10 - 5; //add a bit of random rotation (+/- 10deg)
-            uniqueID = Math.round(Math.random() * 99999999); //is this big enough to assure uniqueness?
+            let uniqueID = Math.round(Math.random() * 99999999); //is this big enough to assure uniqueness?
 			var x = (window.innerWidth / 2) + $(window).scrollLeft();
 			var y = (window.innerHeight / 2) + $(window).scrollTop();
 			
@@ -955,24 +989,23 @@ $(function() {
     // );
     //
 
-    var user_name = getCookie('scrumscrum-username');
+    var user_name = getCookie('username');
 
 
+    // $("#yourname-input").focus(function() {
+    //     if ($(this).val() == 'unknown') {
+    //         $(this).val("");
+    //     }
 
-    $("#yourname-input").focus(function() {
-        if ($(this).val() == 'unknown') {
-            $(this).val("");
-        }
+    //     $(this).addClass('focused');
 
-        $(this).addClass('focused');
-
-    });
+    // });
 
     $("#yourname-input").blur(function() {
         if ($(this).val() === "") {
             $(this).val('unknown');
         }
-        $(this).removeClass('focused');
+        // $(this).removeClass('focused');
 
         setName($(this).val());
     });
@@ -982,12 +1015,12 @@ $(function() {
 
     $("#yourname-li").hide();
 
-    $("#yourname-input").keypress(function(e) {
-        code = (e.keyCode ? e.keyCode : e.which);
-        if (code == 10 || code == 13) {
-            $(this).blur();
-        }
-    });
+    // $("#yourname-input").keypress(function(e) {
+    //     code = (e.keyCode ? e.keyCode : e.which);
+    //     if (code == 10 || code == 13) {
+    //         $(this).blur();
+    //     }
+    // });
 
 
 
