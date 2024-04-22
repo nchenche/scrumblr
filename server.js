@@ -31,7 +31,6 @@ var router = express.Router();
 const path = require('path');
 
 router.use(express.static(path.join(__dirname, 'static')));
-// router.use(express.static(__dirname + '/static'));
 
 app.use(compression());
 app.use(express.json());
@@ -42,6 +41,22 @@ var server = require('http').Server(app);
 server.listen(conf.port);
 console.log('Server running at http://127.0.0.1:' + conf.port + '/');
 
+
+// Middleware to add the user object to req for easy access
+router.use((req, res, next) => {
+	console.log("** cookies **", req.cookies)
+    if (req.cookies.session_id) {
+
+		db.getUserBySession(req.cookies.session_id, (response) => {
+			console.log("from middleware:", response);
+
+			req.user = response.username;
+			next();
+		})
+    } else {
+        next();
+    }
+});
 
 /**************
  SETUP Socket.IO
@@ -98,59 +113,35 @@ router.get('/', routeProtection.loggedIn, function(req, res) {
 	var connected = io.sockets.connected;
 	clientsCount = Object.keys(connected).length;
 
-	const sessionId = req.cookies.session_id;
-	db.getUserBySession(sessionId, (result) => {
-		res.render('layout', {
-			body: 'partials/home.ejs',
-			url: url,
-			connected: clientsCount,
-			username: result.success ? result.username : null,
-			pageScripts: ['/js/utils.js'],
-		});
-	})
+	res.render('layout', {
+		body: 'partials/home.ejs',
+		url: url,
+		connected: clientsCount,
+		username: req.user ? req.user : null,
+		pageScripts: ['/js/utils.js'],
+	});
+
+
 });
 
 
 router.get('/room/:id', routeProtection.loggedIn, function(req, res){
-	const sessionId = req.cookies.session_id;
-	db.getUserBySession(sessionId, (response) => {
-		const user = response.username;
-		db.setRoomOwner(req.params.id, user, (response) => {
-			if ("owner" in response) {
-				console.log("response from room access:", response);
-				const owner = response.owner;
-				res.render('layout', {
-					body: 'partials/room.ejs',
-					pageTitle: ('Scrumblr - ' + req.params.id),
-					pageScripts: ['/script.js'],
-					username: user,
-					is_owner: owner === user
-				});
-			} else {
-				console.log('from server:', response);
-			}
-		})
-	})
 
-	// db.getRoomOwner(req.params.id, (response) => {
-	// 	if (response.success) {
-	// 		const owner = response.owner;
-	// 		const sessionId = req.cookies.session_id;
-	// 		db.getUserBySession(sessionId, (response) => {
-	// 			const is_owner = owner === response.username ? true : false;
-	// 			res.render('layout', {
-	// 				body: 'partials/room.ejs',
-	// 				pageTitle: ('Scrumblr - ' + req.params.id),
-	// 				pageScripts: ['/script.js'],
-	// 				username: response.success ? response.username : null,
-	// 				is_owner: is_owner
-	// 			});
-	// 		});
-	// 	} else {
-	// 		console.log('from server:', response);
-	// 	}
-	// });
-
+	db.setRoomOwner(req.params.id, req.user, (response) => {
+		if ("owner" in response) {
+			console.log("response from room access:", response);
+			const owner = response.owner;
+			res.render('layout', {
+				body: 'partials/room.ejs',
+				pageTitle: ('Scrumblr - ' + req.params.id),
+				pageScripts: ['/script.js'],
+				username: req.user,
+				is_owner: owner === req.user
+			});
+		} else {
+			console.log('from server:', response);
+		}
+	});
 });
 
 

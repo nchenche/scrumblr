@@ -122,17 +122,18 @@ function getMessage(m) {
             );
             break;
 
-        // case 'editCard':
-        //     console.log("editing card")
-        //     var $container = $("#" + data.id).empty();  // Get the container by ID and empty it
-        //     var texts = data.text.split('\n');
-        //     $.each(texts, function(index, text) {
-        //         if (text.trim() !== '') {  // Check if the text is not just whitespace
-        //             $('<div></div>').text(text).appendTo($container);  // Create a div, set its text, and append it
-        //         }
-        //     });
-        //     // $("#" + data.id).children('.content:first').text(data.value);
-        //     break;
+        case 'editCard':
+            // console.log("editing card")
+            // var $container = $("#" + data.id).empty();  // Get the container by ID and empty it
+            // var texts = data.text.split('\n');
+            // $.each(texts, function(index, text) {
+            //     if (text.trim() !== '') {  // Check if the text is not just whitespace
+            //         $('<div></div>').text(text).appendTo($container);  // Create a div, set its text, and append it
+            //     }
+            // });
+            
+            $("#" + data.id).children('.content:first').text(data.value);
+            break;
 
         case 'initColumns':
             initColumns(data);
