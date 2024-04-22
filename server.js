@@ -112,12 +112,12 @@ router.get('/', routeProtection.loggedIn, function(req, res) {
 
 
 router.get('/room/:id', routeProtection.loggedIn, function(req, res){
-
 	const sessionId = req.cookies.session_id;
 	db.getUserBySession(sessionId, (response) => {
 		const user = response.username;
 		db.setRoomOwner(req.params.id, user, (response) => {
 			if ("owner" in response) {
+				console.log("response from room access:", response);
 				const owner = response.owner;
 				res.render('layout', {
 					body: 'partials/room.ejs',
@@ -205,7 +205,7 @@ router.post('/login', async (req, res) => {
             message: result.message,
             success: result.success,
             redirectTo: '/',
-			user: null,
+			user: result.user,
 			session: result.session
         });
     });
