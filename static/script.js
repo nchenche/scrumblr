@@ -109,9 +109,7 @@ function getMessage(m) {
             break;
 
         case 'createCard':
-            //console.log(data);
-            drawNewCard(data.id, data.text, data.x, data.y, data.rot, data.colour,
-                null);
+            drawNewCard(data.id, data.text, data.x, data.y, data.rot, data.colour, null);
             break;
 
         case 'deleteCard':
@@ -131,7 +129,7 @@ function getMessage(m) {
             //         $('<div></div>').text(text).appendTo($container);  // Create a div, set its text, and append it
             //     }
             // });
-            
+
             $("#" + data.id).children('.content:first').text(data.value);
             break;
 
@@ -270,19 +268,20 @@ function validatePassword(passwrd) {
 
 
 // card functions
-function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed) {
+function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed, user) {
     //cards[id] = {id: id, text: text, x: x, y: y, rot: rot, colour: colour};
     // const textDivs = text.split('\n').map(line => `<div>${line.trim()}</div>`).join('');
 
-    var h = `<div id="${id}" class="card ${colour} draggable" style="-webkit-transform:rotate(${rot}deg);\
+    var h = `<div id="${id}" class="card ${colour} draggable" style="transform:rotate(${rot}deg);\
 	">\
 	<img src="/images/icons/token/Xion.png" class="card-icon delete-card-icon" />\
 	<img class="card-image" src="/images/${colour}-card.png">\
-	<div id="content:${id}" class="content stickertarget droppable">${text}</div><span class="filler"></span>\
+	<div data-user="${user}" id="content:${id}" class="content stickertarget droppable">${text}</div><span class="filler"></span>\
 	</div>`;
 
     var card = $(h);
     card.appendTo('#board');
+
 	
 	// Initialize any custom room font onto the card
 	changeFontTo(currentFont);
@@ -400,7 +399,7 @@ function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed) {
         return (value);
     }, {
         type: 'textarea',
-        submit: 'OK',
+        multiline: true,
         style: 'inherit',
         cssclass: 'card-edit-form',
         placeholder: 'Double Click to Edit.',
@@ -409,8 +408,8 @@ function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed) {
     });
 
     //add applicable sticker
-    if (sticker !== null)
-        addSticker(id, sticker);
+    if (sticker !== null) addSticker(id, sticker);
+
 }
 
 
@@ -452,11 +451,33 @@ function addSticker(cardId, stickerId) {
 }
 
 
+
+async function fetchCurrentUser() {
+    try {
+        const response = await fetch('/api/current_user');
+        const data = await response.json();
+        if (data.success) {
+            return data.username
+        } else {
+            console.log('Not logged in');
+            return
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+}
+
 //----------------------------------
 // cards
 //----------------------------------
-function createCard(id, text, x, y, rot, colour) {
-    drawNewCard(id, text, x, y, rot, colour, null);
+async function createCard(id, text, x, y, rot, colour) {
+    const user = await fetchCurrentUser();
+    console.log("User creating card:", user);
+
+    const sticker = null;
+    const animationspeed = 250;
+
+    drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed, user);
 
     var action = "createCard";
 
@@ -466,7 +487,8 @@ function createCard(id, text, x, y, rot, colour) {
         x: x,
         y: y,
         rot: rot,
-        colour: colour
+        colour: colour,
+        user: user
     };
 
     sendAction(action, data);
@@ -499,7 +521,8 @@ function initCards(cardArray) {
             card.rot,
             card.colour,
             card.sticker,
-            0
+            0,
+            card.user
         );
     }
 
@@ -537,7 +560,7 @@ function drawNewColumn(columnName) {
         event: 'dblclick', //event: 'mouseover'
     });
 
-    $('.col:last').fadeIn(250);
+    $('.col:last').fadeIn(100);
 
     totalcolumns++;
 }
@@ -652,6 +675,7 @@ function changeFontTo(font) {
 
 
 function setCookie(c_name, value, exdays) {
+    console.log("setting cookie")
     var exdate = new Date();
     exdate.setDate(exdate.getDate() + exdays);
     var c_value = escape(value) + ((exdays === null) ? "" : "; expires=" +
@@ -659,17 +683,6 @@ function setCookie(c_name, value, exdays) {
     document.cookie = c_name + "=" + c_value;
 }
 
-// function getCookie(c_name) {
-//     var i, x, y, ARRcookies = document.cookie.split(";");
-//     for (i = 0; i < ARRcookies.length; i++) {
-//         x = ARRcookies[i].substr(0, ARRcookies[i].indexOf("="));
-//         y = ARRcookies[i].substr(ARRcookies[i].indexOf("=") + 1);
-//         x = x.replace(/^\s+|\s+$/g, "");
-//         if (x == c_name) {
-//             return unescape(y);
-//         }
-//     }
-// }
 
 function getCookie(name) {
     let value = `; ${document.cookie}`;
@@ -710,7 +723,7 @@ function displayInitialUsers(users) {
 }
 
 function displayUserJoined(sid, user_name) {
-    name = '';
+    let name = '';
     if (user_name)
         name = user_name;
     else
@@ -721,7 +734,7 @@ function displayUserJoined(sid, user_name) {
 }
 
 function displayUserLeft(sid) {
-    name = '';
+    let name = '';
     if (name)
         name = user_name;
     else
@@ -831,23 +844,21 @@ $(function() {
     //setTimeout($.unblockUI, 2000);
 
 
-    $("#create-card")
-        .click(function() {
+    $("#create-card").click(function() {
             var rotation = Math.random() * 10 - 5; //add a bit of random rotation (+/- 10deg)
             let uniqueID = Math.round(Math.random() * 99999999); //is this big enough to assure uniqueness?
 			var x = (window.innerWidth / 2) + $(window).scrollLeft();
 			var y = (window.innerHeight / 2) + $(window).scrollTop();
 			
-            //alert(uniqueID);
-            //alert(uniqueID);
             createCard(
                 'card' + uniqueID,
                 '',
                 x, 
 				y,
                 rotation,
-                randomCardColour());
-        });
+                randomCardColour()
+            );
+    });
 
 
 

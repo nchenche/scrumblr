@@ -13,7 +13,7 @@ const { db, redisClient } = require('./lib/redis');
 **************/
 var conf = require('./config.js').server;
 const setupSocketHandlers = require('./lib/socketHandlers.js');
-const { setRouteProtection } = require('./lib/middleware.js');
+const { setCurrentUser, setRouteProtection } = require('./lib/middleware.js');
 const routeProtection = setRouteProtection(redisClient);
 
 
@@ -43,20 +43,29 @@ console.log('Server running at http://127.0.0.1:' + conf.port + '/');
 
 
 // Middleware to add the user object to req for easy access
-router.use((req, res, next) => {
-	console.log("** cookies **", req.cookies)
-    if (req.cookies.session_id) {
-
-		db.getUserBySession(req.cookies.session_id, (response) => {
-			console.log("from middleware:", response);
-
-			req.user = response.username;
-			next();
-		})
-    } else {
-        next();
-    }
-});
+router.use(setCurrentUser);
+// router.use((req, res, next) => {
+// 	console.log("*** APP USE ***");
+//     const sessionId = req.cookies.session_id;
+//     if (sessionId) {
+//         db.getUserBySession(sessionId, (response) => {
+//             if (!response.success) {
+//                 console.log('Invalid or expired session');
+//                 return res.status(401).json({ message: 'Invalid or expired session' });  // Use return here
+//             } else {
+//                 if (response.username) {
+//                     req.user = response.username;
+//                     return next();  // Ensure no more processing after this
+//                 } else {
+//                     console.log('from middleware:', response);
+//                     return next();  // Ensure no further processing after redirect
+//                 }
+//             }
+//         });
+//     } else {
+//         next();
+//     }
+// });
 
 /**************
  SETUP Socket.IO
@@ -112,6 +121,8 @@ router.get('/', routeProtection.loggedIn, function(req, res) {
 
 	var connected = io.sockets.connected;
 	clientsCount = Object.keys(connected).length;
+
+	console.log("home req user:", req.user);
 
 	res.render('layout', {
 		body: 'partials/home.ejs',
@@ -191,6 +202,7 @@ router.post('/login', async (req, res) => {
 		// store cookie session
 		res.cookie('session_id', result.session, { httpOnly: false, secure: false });
 		res.cookie('username', result.user, { httpOnly: false, secure: false });
+		console.log("result login:", result);
 
 		res.json({
             message: result.message,
@@ -254,5 +266,18 @@ router.get('/users/exists/email/:email', async (req, res) => {
     } catch (err) {
         console.error('Error checking email:', err);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+// Server-side: Get current user info
+app.get('/api/current_user',(req, res) => {
+    if (req.user) {  // Assuming req.user is set after successful authentication
+        res.json({ 
+            success: true,
+            username: req.user,
+        });
+    } else {
+        res.status(401).json({ success: false, message: 'Not authenticated' });
     }
 });
