@@ -44,28 +44,7 @@ console.log('Server running at http://127.0.0.1:' + conf.port + '/');
 
 // Middleware to add the user object to req for easy access
 router.use(setCurrentUser);
-// router.use((req, res, next) => {
-// 	console.log("*** APP USE ***");
-//     const sessionId = req.cookies.session_id;
-//     if (sessionId) {
-//         db.getUserBySession(sessionId, (response) => {
-//             if (!response.success) {
-//                 console.log('Invalid or expired session');
-//                 return res.status(401).json({ message: 'Invalid or expired session' });  // Use return here
-//             } else {
-//                 if (response.username) {
-//                     req.user = response.username;
-//                     return next();  // Ensure no more processing after this
-//                 } else {
-//                     console.log('from middleware:', response);
-//                     return next();  // Ensure no further processing after redirect
-//                 }
-//             }
-//         });
-//     } else {
-//         next();
-//     }
-// });
+
 
 /**************
  SETUP Socket.IO
@@ -82,7 +61,6 @@ setupSocketHandlers(io, db);
 **************/
 
 router.get('/register', routeProtection.loggedOut, function(req, res) {
-
 	res.render('layout', {
 		body: 'partials/register.ejs',
 		pageScripts: ['js/forms/registration/register.js'],
@@ -117,12 +95,10 @@ router.get('/logout', routeProtection.loggedIn, (req, res) => {
 
 
 router.get('/', routeProtection.loggedIn, function(req, res) {
-	url = req.header('host') + req.baseUrl;
+	let url = req.header('host') + req.baseUrl;
 
-	var connected = io.sockets.connected;
+	let connected = io.sockets.connected;
 	clientsCount = Object.keys(connected).length;
-
-	console.log("home req user:", req.user);
 
 	res.render('layout', {
 		body: 'partials/home.ejs',
@@ -131,16 +107,12 @@ router.get('/', routeProtection.loggedIn, function(req, res) {
 		username: req.user ? req.user : null,
 		pageScripts: ['/js/utils.js'],
 	});
-
-
 });
 
 
 router.get('/room/:id', routeProtection.loggedIn, function(req, res){
-
 	db.setRoomOwner(req.params.id, req.user, (response) => {
 		if ("owner" in response) {
-			console.log("response from room access:", response);
 			const owner = response.owner;
 			res.render('layout', {
 				body: 'partials/room.ejs',

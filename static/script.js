@@ -109,7 +109,10 @@ function getMessage(m) {
             break;
 
         case 'createCard':
-            drawNewCard(data.id, data.text, data.x, data.y, data.rot, data.colour, null);
+            const sticker = null;
+            const animationspeed = 250;
+
+            drawNewCard(data.id, data.text, data.x, data.y, data.rot, data.colour, sticker, animationspeed, data.user);
             break;
 
         case 'deleteCard':
@@ -268,9 +271,11 @@ function validatePassword(passwrd) {
 
 
 // card functions
-function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed, user) {
+async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed, user) {
     //cards[id] = {id: id, text: text, x: x, y: y, rot: rot, colour: colour};
     // const textDivs = text.split('\n').map(line => `<div>${line.trim()}</div>`).join('');
+    const currentUser = await fetchCurrentUser();
+
 
     var h = `<div id="${id}" class="card ${colour} draggable" style="transform:rotate(${rot}deg);\
 	">\
@@ -366,12 +371,15 @@ function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed, user)
 
     card.hover(
         function() {
-            $(this).addClass('hover');
-            $(this).children('.card-icon').fadeIn(10);
+            var cardOwner = $(this).find('.content').data('user');
+            if (cardOwner === currentUser) {
+                $(this).addClass('hover');
+                $(this).children('.card-icon').fadeIn(0);
+            }
         },
         function() {
             $(this).removeClass('hover');
-            $(this).children('.card-icon').fadeOut(150);
+            $(this).children('.card-icon').fadeOut(0);
         }
     );
 
@@ -402,7 +410,7 @@ function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed, user)
         multiline: true,
         style: 'inherit',
         cssclass: 'card-edit-form',
-        placeholder: 'Double Click to Edit.',
+        placeholder: `Double Click to Edit. From ${user}`,
         onblur: 'submit',
         event: 'dblclick', //event: 'mouseover'
     });
