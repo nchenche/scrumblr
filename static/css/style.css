@@ -86,16 +86,25 @@ body {
 	box-shadow: none;
 }
 
+.card-avatar {
+	position: absolute;
+	top: -4% !important;
+	right: 18% !important;
+	opacity: .4;
+}
 
 .card-icon {
-display:none;
-position: absolute;
-top: 3%; left: 82%;
-opacity: .3;
-width: 16px; height: 16px;
+	display:none;
+	position: absolute;
+	top: 0%;
+	right: 10%;
+	opacity: .3;
+	width: 12px;
+	height: 12px;
 }
 
 .card-icon-hover {
+	cursor: pointer;
 	opacity: .9;
 }
 

@@ -275,13 +275,16 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     //cards[id] = {id: id, text: text, x: x, y: y, rot: rot, colour: colour};
     // const textDivs = text.split('\n').map(line => `<div>${line.trim()}</div>`).join('');
     const currentUser = await fetchCurrentUser();
+    var cardOwner = user;
 
 
-    var h = `<div id="${id}" class="card ${colour} draggable" style="transform:rotate(${rot}deg);\
-	">\
-	<img src="/images/icons/token/Xion.png" class="card-icon delete-card-icon" />\
-	<img class="card-image" src="/images/${colour}-card.png">\
-	<div data-user="${user}" id="content:${id}" class="content stickertarget droppable">${text}</div><span class="filler"></span>\
+    var h = `
+    <div id="${id}" class="card ${colour} draggable" style="transform:rotate(${rot}deg);">
+        <img src="http://0.0.0.0:3000/8.x/identicon/svg?seed=${user}&scale=50&radius=50" class="card-avatar card-icon w-6 h-6 rounded-full z-10" alt="User Avatar" title="${user}" />
+        <img src="/images/icons/token/Xion.png" class="card-icon delete-card-icon z-10" />
+        <img class="card-image" src="/images/${colour}-card.png" />
+        <div data-user="${user}" id="content:${id}" class="content stickertarget droppable">${text}</div>
+        <span class="filler"></span>
 	</div>`;
 
     var card = $(h);
@@ -371,11 +374,13 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 
     card.hover(
         function() {
-            var cardOwner = $(this).find('.content').data('user');
+            // var cardOwner = $(this).find('.content').data('user');
             if (cardOwner === currentUser) {
                 $(this).addClass('hover');
                 $(this).children('.card-icon').fadeIn(0);
             }
+            $(this).children('.card-avatar').fadeIn(0);
+
         },
         function() {
             $(this).removeClass('hover');
@@ -402,18 +407,20 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
         }
     );
 
-    card.children('.content').editable(function(value, settings) {
-        onCardChange(id, value);
-        return (value);
-    }, {
-        type: 'textarea',
-        multiline: true,
-        style: 'inherit',
-        cssclass: 'card-edit-form',
-        placeholder: `Double Click to Edit. From ${user}`,
-        onblur: 'submit',
-        event: 'dblclick', //event: 'mouseover'
-    });
+    if (cardOwner === currentUser) {
+        card.children('.content').editable(function(value, settings) {
+            onCardChange(id, value);
+            return (value);
+        }, {
+            type: 'textarea',
+            multiline: true,
+            style: 'inherit',
+            cssclass: 'card-edit-form',
+            placeholder: `Double Click to Edit. From ${user}`,
+            onblur: 'submit',
+            event: 'dblclick', //event: 'mouseover'
+        });
+    }
 
     //add applicable sticker
     if (sticker !== null) addSticker(id, sticker);
