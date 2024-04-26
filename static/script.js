@@ -416,7 +416,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
             multiline: true,
             style: 'inherit',
             cssclass: 'card-edit-form',
-            placeholder: `Double Click to Edit. From ${user}`,
+            placeholder: `Double Click to Edit`,
             onblur: 'submit',
             event: 'dblclick', //event: 'mouseover'
         });

@@ -1,7 +1,7 @@
 import {setUpForm} from "./loginFormHandler.js"
 import {accountManager} from "../../userAccount.js"
 
-setUpForm()
+setUpForm();
 
 document.getElementById("btn-submit").addEventListener("click", function(event) {
     event.preventDefault(); // Prevent form from submitting traditionally

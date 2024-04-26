@@ -23,9 +23,5 @@ function joinRoomHandler() {
         if (input.value === '') return
         const path = `${location.origin}/room/${input.value}`;
         window.location.href = path;
-        // console.log(path);
-        // console.log(input.value)
-
-
     })
 }

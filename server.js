@@ -6,6 +6,7 @@ const express = require('express');
 var cookieParser = require('cookie-parser')
 const socketIo = require('socket.io');
 const { db, redisClient } = require('./lib/redis');
+const { sendEmail } = require("./lib/mailer.js");
 
 
 /**************
@@ -56,6 +57,9 @@ setupSocketHandlers(io, db);
 
 
 
+
+
+
 /**************
  SETUP ROUTES
 **************/
@@ -63,7 +67,7 @@ setupSocketHandlers(io, db);
 router.get('/register', routeProtection.loggedOut, function(req, res) {
 	res.render('layout', {
 		body: 'partials/register.ejs',
-		pageScripts: ['js/forms/registration/register.js'],
+		pageScripts: ['/js/forms/registration/register.js'],
 		username: null
 	});
 });
@@ -72,7 +76,7 @@ router.get('/register', routeProtection.loggedOut, function(req, res) {
 router.get('/login', routeProtection.loggedOut, function(req, res) {
 	res.render('layout', {
 		body: 'partials/signin.ejs',
-		pageScripts: ['js/forms/login/login.js'],
+		pageScripts: ['/js/forms/login/login.js'],
 		username: null
 	});
 });
@@ -94,16 +98,19 @@ router.get('/logout', routeProtection.loggedIn, (req, res) => {
 });
 
 
-router.get('/', routeProtection.loggedIn, function(req, res) {
-	let url = req.header('host') + req.baseUrl;
-
-	let connected = io.sockets.connected;
-	clientsCount = Object.keys(connected).length;
+router.get('/forgot-password', routeProtection.loggedOut, function(req, res) {
 
 	res.render('layout', {
+		body: 'partials/forgotpass.ejs',
+		username: null,
+		pageScripts: ['/js/forms/reset/forgotPass.js'],
+	});
+});
+
+
+router.get('/', routeProtection.loggedIn, function(req, res) {
+	res.render('layout', {
 		body: 'partials/home.ejs',
-		url: url,
-		connected: clientsCount,
 		username: req.user ? req.user : null,
 		pageScripts: ['/js/utils.js'],
 	});
@@ -140,10 +147,6 @@ router.get('/demo', routeProtection.loggedIn, function(req, res) {
 		});
 	})
 });
-
-
-
-
 
 
 /**************
@@ -187,6 +190,37 @@ router.post('/login', async (req, res) => {
 });
 
 
+router.post('/forgot-password', (req, res) => {
+	const { username } = req.body;
+	const expiresIn = 60; // in seconds
+
+	db.getEmailFromUser(username, (response) => {
+		if (!response.success) {
+			return res.json(response);
+		}
+		const email = response.email;
+
+		db.storeToken(username, expiresIn, (response) => {
+			// sendEmail(email, response.token);
+
+
+			if (response.success) {
+				return res.json({
+					message: "A reset email has been sent.",
+					success: response.success,
+					redirectTo: '/',
+					user: username,
+					token: response.token,
+					email: email
+				});
+			}	
+			return res.status(401).json(response);
+		});
+	});
+});
+
+// sendEmail("gabriel.tourillon@u-paris.fr", null);
+
 router.get('/session', (req, res) => {
 	const sessionId = req.cookies.session_id;
 
@@ -200,7 +234,6 @@ router.get('/session', (req, res) => {
 
 	res.send(req.cookies);
 });
-
 
 
 // Endpoint to check username availability
@@ -221,6 +254,7 @@ router.get('/users/exists/username/:username', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 // Endpoint to check email availability
 router.get('/users/exists/email/:email', async (req, res) => {

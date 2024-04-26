@@ -16,7 +16,7 @@ export function setUpForm() {
 
     // Checks and updates the state of registration fields
     function handleFieldInput(event) {
-        event.target.nextElementSibling.textContent = '';
+        event.target.nextElementSibling.textContent = '';  // delete span error message
 
         const { id, value } = event.target;
         fieldValidity[id] = value.trim() !== '';

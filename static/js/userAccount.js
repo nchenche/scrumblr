@@ -1,11 +1,11 @@
 export const accountManager = {
-    register: function(userData) {
+    register: function(data) {
         fetch('/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(userData),
+            body: JSON.stringify(data),
         })
         .then(response => response.json())
         .then(result => {
@@ -15,15 +15,13 @@ export const accountManager = {
             console.error('Registration error:', error);
         });
     },
-    login: function(userData, callback) {
-        // Login functionality here
-        // window.location.href = data.redirectTo; // Redirect the user
+    login: function(data, callback) {
         fetch('/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(userData),
+            body: JSON.stringify(data),
         })
         .then(response => response.json())
         .then(result => callback(result))
@@ -34,6 +32,18 @@ export const accountManager = {
     resetPassword: function(email) {
         // Password reset functionality here
     },
-
-    // Additional account-related functions...
+    sendToken: function(data, callback) {
+        fetch('/forgot-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(result => callback(result))
+        .catch(error => {
+            console.error('Login error:', error);
+        });
+    },
 };
