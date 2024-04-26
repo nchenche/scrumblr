@@ -108,6 +108,18 @@ router.get('/forgot-password', routeProtection.loggedOut, function(req, res) {
 });
 
 
+router.get('/reset-password', routeProtection.loggedOut, function(req, res) {
+	const { user, token} = req.query;
+
+	res.render('layout', {
+		body: 'partials/resetpass.ejs',
+		username: user,
+		token: token,
+		pageScripts: ['/js/forms/reset/resetPass.js'],
+	});
+});
+
+
 router.get('/', routeProtection.loggedIn, function(req, res) {
 	res.render('layout', {
 		body: 'partials/home.ejs',
@@ -220,6 +232,25 @@ router.post('/forgot-password', (req, res) => {
 });
 
 // sendEmail("gabriel.tourillon@u-paris.fr", null);
+
+router.post('/reset-password', (req, res) => {
+	const { userId, token } = req.body;
+	const key = `reset_token:${userId}`;
+  
+	redisClient.get(key, (err, result) => {
+	  if (err) return res.status(500).json({ message: "Error accessing token." });
+	  if (result === token) {
+		// Proceed with resetting the password
+		res.json({ message: "Token is valid. Proceed with password reset." });
+	  } else {
+		res.status(401).json({ message: "Invalid or expired token." });
+	  }
+	});
+  });
+  
+
+
+
 
 router.get('/session', (req, res) => {
 	const sessionId = req.cookies.session_id;
