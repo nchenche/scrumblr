@@ -56,15 +56,11 @@ const io = socketIo(server, {
 setupSocketHandlers(io, db);
 
 
-
-
-
-
 /**************
  SETUP ROUTES
 **************/
 
-router.get('/register', routeProtection.loggedOut, function(req, res) {
+router.get('/register', routeProtection.loggedOut, function (req, res) {
 	res.render('layout', {
 		body: 'partials/register.ejs',
 		pageScripts: ['/js/forms/registration/register.js'],
@@ -73,7 +69,7 @@ router.get('/register', routeProtection.loggedOut, function(req, res) {
 });
 
 
-router.get('/login', routeProtection.loggedOut, function(req, res) {
+router.get('/login', routeProtection.loggedOut, function (req, res) {
 	res.render('layout', {
 		body: 'partials/signin.ejs',
 		pageScripts: ['/js/forms/login/login.js'],
@@ -83,22 +79,22 @@ router.get('/login', routeProtection.loggedOut, function(req, res) {
 
 
 router.get('/logout', routeProtection.loggedIn, (req, res) => {
-    const sessionId = req.cookies.session_id;
+	const sessionId = req.cookies.session_id;
 
-    redisClient.del(sessionId, (err, reply) => {
-        if (err) {
-            console.error("Logout Error:", err);
-            // Optionally, redirect even in case of error to avoid dead-ends
-            return res.redirect('/login?error=logout_failed');
-        }
-        res.clearCookie('session_id');  // Clear the session cookie
-        // Redirect to the login page after successful logout
-        res.redirect('/login');
-    });
+	redisClient.del(sessionId, (err, reply) => {
+		if (err) {
+			console.error("Logout Error:", err);
+			// Optionally, redirect even in case of error to avoid dead-ends
+			return res.redirect('/login?error=logout_failed');
+		}
+		res.clearCookie('session_id');  // Clear the session cookie
+		// Redirect to the login page after successful logout
+		res.redirect('/login');
+	});
 });
 
 
-router.get('/forgot-password', routeProtection.loggedOut, function(req, res) {
+router.get('/forgot-password', routeProtection.loggedOut, function (req, res) {
 
 	res.render('layout', {
 		body: 'partials/forgotpass.ejs',
@@ -108,8 +104,8 @@ router.get('/forgot-password', routeProtection.loggedOut, function(req, res) {
 });
 
 
-router.get('/reset-password', routeProtection.loggedOut, function(req, res) {
-	const { user, token} = req.query;
+router.get('/reset-password', routeProtection.loggedOut, function (req, res) {
+	const { user, token } = req.query;
 
 	res.render('layout', {
 		body: 'partials/resetpass.ejs',
@@ -120,7 +116,7 @@ router.get('/reset-password', routeProtection.loggedOut, function(req, res) {
 });
 
 
-router.get('/', routeProtection.loggedIn, function(req, res) {
+router.get('/', routeProtection.loggedIn, function (req, res) {
 	res.render('layout', {
 		body: 'partials/home.ejs',
 		username: req.user ? req.user : null,
@@ -129,7 +125,7 @@ router.get('/', routeProtection.loggedIn, function(req, res) {
 });
 
 
-router.get('/room/:id', routeProtection.loggedIn, function(req, res){
+router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
 	db.setRoomOwner(req.params.id, req.user, (response) => {
 		if ("owner" in response) {
 			const owner = response.owner;
@@ -147,7 +143,7 @@ router.get('/room/:id', routeProtection.loggedIn, function(req, res){
 });
 
 
-router.get('/demo', routeProtection.loggedIn, function(req, res) {
+router.get('/demo', routeProtection.loggedIn, function (req, res) {
 	const sessionId = req.cookies.session_id;
 	db.getUserBySession(sessionId, (result) => {
 		res.render('layout', {
@@ -165,26 +161,25 @@ router.get('/demo', routeProtection.loggedIn, function(req, res) {
  SETUP USEFUL APIS
 **************/
 router.post('/register', (req, res) => {
-    const { username, email, password } = req.body;
-    db.createUser(username, email, password, (result) => {
-
+	const { username, email, password } = req.body;
+	db.createUser(username, email, password, (result) => {
 		res.status(result.success ? 200 : 400).json(result);
-    });
+	});
 });
 
 
 router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    db.authenticateUser(username, password, (result) => {
-        if (!result.success) {
-            console.log(result.message); // Log the error or user feedback message
-            if (result.message === 'User does not exist.') {
-                res.status(404).json(result);  // Not Found
-            } else {
-                res.status(401).json(result);  // Unauthorized for other errors
-            }
-            return;
-        }
+	const { username, password } = req.body;
+	db.authenticateUser(username, password, (result) => {
+		if (!result.success) {
+			console.log(result.message); // Log the error or user feedback message
+			if (result.message === 'User does not exist.') {
+				res.status(404).json(result);  // Not Found
+			} else {
+				res.status(401).json(result);  // Unauthorized for other errors
+			}
+			return;
+		}
 
 		// store cookie session
 		res.cookie('session_id', result.session, { httpOnly: false, secure: false });
@@ -192,17 +187,17 @@ router.post('/login', async (req, res) => {
 		console.log("result login:", result);
 
 		res.json({
-            message: result.message,
-            success: result.success,
-            redirectTo: '/',
+			message: result.message,
+			success: result.success,
+			redirectTo: '/',
 			user: result.user,
 			session: result.session
-        });
-    });
+		});
+	});
 });
 
 
-router.post('/forgot-password', (req, res) => {
+router.post('/forgot-password', async (req, res) => {
 	const { username } = req.body;
 	const expiresIn = 60; // in seconds
 
@@ -212,56 +207,63 @@ router.post('/forgot-password', (req, res) => {
 		}
 		const email = response.email;
 
-		db.storeToken(username, expiresIn, (response) => {
-			// sendEmail(email, response.token);
+		db.storeToken(username, expiresIn, async (tokenResponse) => {
+			if (tokenResponse.success) {
 
+				const mailResponse = await sendEmail("nicolas.chevrollier@inserm.fr", username, tokenResponse.token);
+				if (!mailResponse.success) {
+					return res.status(401).json(mailResponse);
+				}
 
-			if (response.success) {
-				return res.json({
-					message: "A reset email has been sent.",
-					success: response.success,
-					redirectTo: '/',
-					user: username,
-					token: response.token,
-					email: email
-				});
-			}	
-			return res.status(401).json(response);
+				return res.status(200).json(
+					{
+						message: "A reset email has been sent.",
+						success: mailResponse.success,
+						redirectTo: '/',
+						user: username,
+						token: tokenResponse.token,
+						email: email
+					}
+				)
+			}
+			console.error(tokenResponse.message);
+			return res.status(401).json(tokenResponse);
 		});
 	});
 });
 
-// sendEmail("gabriel.tourillon@u-paris.fr", null);
 
 router.post('/reset-password', (req, res) => {
-	const { userId, token } = req.body;
-	const key = `reset_token:${userId}`;
-  
-	redisClient.get(key, (err, result) => {
-	  if (err) return res.status(500).json({ message: "Error accessing token." });
-	  if (result === token) {
+	const { username, token, password } = req.body;
+	const key = `reset_token:${username}`;
+
+	db.checkToken(username, token, (checkRes) => {
+		if (!checkRes.status) {
+			console.error("Error accessing token:", checkRes);
+			return res.status(401).json(checkRes);
+		}
 		// Proceed with resetting the password
-		res.json({ message: "Token is valid. Proceed with password reset." });
-	  } else {
-		res.status(401).json({ message: "Invalid or expired token." });
-	  }
+		db.resetPassword(username, password, (response) => {
+			if (!checkRes.status) {
+				console.error("Error resetting password:", response);
+				return res.status(401).json(response);
+			}			
+			return res.status(200).json(checkRes);
+		});
 	});
-  });
-  
-
-
+});
 
 
 router.get('/session', (req, res) => {
 	const sessionId = req.cookies.session_id;
 
-    redisClient.get(sessionId, (err, result) => {
-        if (err || result === null) {
-            console.log({ message: "Invalid or expired session" });
-        }
-        const username = JSON.parse(result);
-        console.log("user:", username);
-    });
+	redisClient.get(sessionId, (err, result) => {
+		if (err || result === null) {
+			console.log({ message: "Invalid or expired session" });
+		}
+		const username = JSON.parse(result);
+		console.log("user:", username);
+	});
 
 	res.send(req.cookies);
 });
@@ -273,17 +275,17 @@ router.get('/users/exists/username/:username', async (req, res) => {
 	try {
 		redisClient.hexists("users", username, (err, exists) => {
 			if (err) {
-			console.error('Error checking username existence:', err);
-			return res.status(500).send({ message: 'Checking username existence failed' });
+				console.error('Error checking username existence:', err);
+				return res.status(500).send({ message: 'Checking username existence failed' });
 			}
 
 			console.log(username, { exists: exists });
 			res.json({ exists: exists });
 		});
-    } catch (err) {
-        console.error('Error checking username:', err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+	} catch (err) {
+		console.error('Error checking username:', err);
+		res.status(500).json({ error: 'Internal server error' });
+	}
 });
 
 
@@ -293,28 +295,28 @@ router.get('/users/exists/email/:email', async (req, res) => {
 	try {
 		redisClient.hexists("emails", email, (err, exists) => {
 			if (err) {
-			console.error('Error checking email existence:', err);
-			return res.status(500).send({ message: 'Checking email existence failed' });
+				console.error('Error checking email existence:', err);
+				return res.status(500).send({ message: 'Checking email existence failed' });
 			}
 
 			console.log(email, { is_available: !exists });
 			res.json({ is_available: !exists });
 		});
-    } catch (err) {
-        console.error('Error checking email:', err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+	} catch (err) {
+		console.error('Error checking email:', err);
+		res.status(500).json({ error: 'Internal server error' });
+	}
 });
 
 
 // Server-side: Get current user info
-app.get('/api/current_user',(req, res) => {
-    if (req.user) {  // Assuming req.user is set after successful authentication
-        res.json({ 
-            success: true,
-            username: req.user,
-        });
-    } else {
-        res.status(401).json({ success: false, message: 'Not authenticated' });
-    }
+app.get('/api/current_user', (req, res) => {
+	if (req.user) {  // Assuming req.user is set after successful authentication
+		res.json({
+			success: true,
+			username: req.user,
+		});
+	} else {
+		res.status(401).json({ success: false, message: 'Not authenticated' });
+	}
 });

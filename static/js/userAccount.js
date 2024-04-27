@@ -29,8 +29,19 @@ export const accountManager = {
             console.error('Login error:', error);
         });
     },
-    resetPassword: function(email) {
-        // Password reset functionality here
+    resetPassword: function(data) {
+        fetch('/reset-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(result => callback(result))
+        .catch(error => {
+            console.error('Login error:', error);
+        });
     },
     sendToken: function(data, callback) {
         fetch('/forgot-password', {

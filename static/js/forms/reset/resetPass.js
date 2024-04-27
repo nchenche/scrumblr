@@ -1,3 +1,5 @@
+import {accountManager} from "../../userAccount.js"
+
 const input = document.getElementById('password');
 const submitButton = document.getElementById('btn-submit');
 
@@ -28,12 +30,21 @@ function handleSubmit() {
     document.getElementById("btn-submit").addEventListener("click", async function(event) {
         event.preventDefault(); // Prevent form from submitting traditionally
     
-        const password = document.getElementById("password").value.trim();
-        
-    
+        const data = {
+            username: document.getElementById("username").value.trim(),
+            token: document.getElementById("token").value.trim(),
+            password: document.getElementById("password").value.trim()
+        }
+
+        if (!data.password) return;
+
+        accountManager.resetPassword(data, (response) => {
+
+        });
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     setUpForm();
-    handleSubmit()
+    handleSubmit();
 })

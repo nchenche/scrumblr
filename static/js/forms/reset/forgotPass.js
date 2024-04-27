@@ -16,12 +16,13 @@ document.getElementById("btn-submit").addEventListener("click", async function(e
             return
         }
 
-        accountManager.sendToken(payload, (response) => {
+        accountManager.sendToken(payload, (tokenResponse) => {
             console.log("*** server response ***");
-            if (response.success) {
-                console.log(`Sending token ${response.token} to mail ${response.email}`);
+            if (tokenResponse.success) {
+                console.log(tokenResponse);
+                console.log(`Sending token ${tokenResponse.token} to mail ${tokenResponse.email}`);
             } else {
-                console.log(`Response: ${response}`);
+                console.log(`Response: ${tokenResponse}`);
             }
         } );
     });
