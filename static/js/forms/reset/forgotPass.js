@@ -22,7 +22,10 @@ document.getElementById("btn-submit").addEventListener("click", async function(e
                 console.log(tokenResponse);
                 
                 const responseDiv = document.getElementById("mail-destination");
-                responseDiv.textContent = `Email successfully sent to ${tokenResponse.email}`;
+                responseDiv.innerHTML = `
+                <p>Email successfully sent to <strong>${tokenResponse.email}</strong>.</p>
+                <p class="text-base text-green-800 mt-1">Please check <b>your spam folder</b> if you do not see the email</p>
+                `;
             } else {
                 console.log(`Response: ${tokenResponse}`);
             }
