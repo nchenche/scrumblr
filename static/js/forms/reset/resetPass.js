@@ -31,7 +31,7 @@ function handleSubmit() {
         event.preventDefault(); // Prevent form from submitting traditionally
     
         const data = {
-            username: document.getElementById("username").value.trim(),
+            username: document.getElementById("user").value.trim(),
             token: document.getElementById("token").value.trim(),
             password: document.getElementById("password").value.trim()
         }
@@ -39,6 +39,26 @@ function handleSubmit() {
         if (!data.password) return;
 
         accountManager.resetPassword(data, (response) => {
+            if (!response.success) {
+                const span = document.getElementById("reset-error");
+                span.textContent = response.message;
+                return
+            }
+
+            const responseDiv = document.getElementById("reset-success");
+            let countdown = 3; // Set the countdown starting at 3 seconds
+            responseDiv.textContent = `Password successfully reset! Redirecting to login page in ${countdown}s...`;
+        
+            // Update the countdown every second
+            const intervalId = setInterval(() => {
+                countdown--;
+                responseDiv.textContent = `Password successfully reset! Redirecting to login page in ${countdown}s...`;
+        
+                if (countdown === 0) {
+                    clearInterval(intervalId); // Stop the countdown
+                    window.location.href = "/login"; // Redirect to login page
+                }
+            }, 1000);
 
         });
     });

@@ -20,31 +20,15 @@ document.getElementById("btn-submit").addEventListener("click", async function(e
             console.log("*** server response ***");
             if (tokenResponse.success) {
                 console.log(tokenResponse);
-                console.log(`Sending token ${tokenResponse.token} to mail ${tokenResponse.email}`);
+                
+                const responseDiv = document.getElementById("mail-destination");
+                responseDiv.textContent = `Email successfully sent to ${tokenResponse.email}`;
             } else {
                 console.log(`Response: ${tokenResponse}`);
             }
         } );
     });
 });
-
-
-
-
-
-
-// if (!response.success) {
-//     if (response.type) {
-//         const span = document.getElementById(`${response.type}-error`);
-//         span.textContent = response.message;
-//     }
-//     else {
-//         alert("Error:", response.message);
-//     }
-// } else {
-//     // console.log(response);
-//     window.location.href = response.redirectTo;
-// }
 
 
 // Function to check username existence

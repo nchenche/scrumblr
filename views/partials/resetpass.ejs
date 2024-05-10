@@ -11,10 +11,10 @@
                     <label for="password" class="text-gray-800 w-1/3">New password</label>
                     <div class="flex-1 flex flex-col">
                         <input id="token" type="hidden" name="token" value="<%= token %>">
-                        <input id="username" type="hidden" name="username" value="<%= username %>">
+                        <input id="user" type="hidden" name="user" value="<%= user %>">
                 
                         <input id="password" type="password" name="password" value='' autocomplete="off" class="p-0 focus:outline-none text-gray-600 border-b-2 border-dashed border-gray-500 bg-inherit">
-                        <span id="password-error" class="h-2 error-message text-sm text-red-700 mt-1 opacity-90"></span>
+                        <span id="reset-error" class="h-2 error-message text-sm text-red-700 mt-1 opacity-90"></span>
                     </div>
                 </div>                          
                 
@@ -22,7 +22,10 @@
                     <button disabled id="btn-submit" class="text-gray-500 text-3xl font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline opacity-50 cursor-not-allowed">
                         Submit
                     </button>
-                </div>                
+                </div>
+
+                <div id="reset-success" class="flex items-center justify-center mt-1 mb-20 text-base text-center text-green-700"></div>
+
             </div>
             
         </div>

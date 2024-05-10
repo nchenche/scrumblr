@@ -109,7 +109,8 @@ router.get('/reset-password', routeProtection.loggedOut, function (req, res) {
 
 	res.render('layout', {
 		body: 'partials/resetpass.ejs',
-		username: user,
+		username: null,
+		user: user,
 		token: token,
 		pageScripts: ['/js/forms/reset/resetPass.js'],
 	});
@@ -199,7 +200,7 @@ router.post('/login', async (req, res) => {
 
 router.post('/forgot-password', async (req, res) => {
 	const { username } = req.body;
-	const expiresIn = 60; // in seconds
+	const expiresIn = 60*5; // in seconds
 
 	db.getEmailFromUser(username, (response) => {
 		if (!response.success) {
@@ -235,20 +236,19 @@ router.post('/forgot-password', async (req, res) => {
 
 router.post('/reset-password', (req, res) => {
 	const { username, token, password } = req.body;
-	const key = `reset_token:${username}`;
 
 	db.checkToken(username, token, (checkRes) => {
-		if (!checkRes.status) {
+		if (!checkRes.success) {
 			console.error("Error accessing token:", checkRes);
 			return res.status(401).json(checkRes);
 		}
 		// Proceed with resetting the password
 		db.resetPassword(username, password, (response) => {
-			if (!checkRes.status) {
+			if (!response.success) {
 				console.error("Error resetting password:", response);
 				return res.status(401).json(response);
 			}			
-			return res.status(200).json(checkRes);
+			return res.status(200).json(response);
 		});
 	});
 });

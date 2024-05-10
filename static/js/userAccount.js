@@ -29,7 +29,7 @@ export const accountManager = {
             console.error('Login error:', error);
         });
     },
-    resetPassword: function(data) {
+    resetPassword: function(data, callback) {
         fetch('/reset-password', {
             method: 'POST',
             headers: {
@@ -40,7 +40,7 @@ export const accountManager = {
         .then(response => response.json())
         .then(result => callback(result))
         .catch(error => {
-            console.error('Login error:', error);
+            console.error('Resetting password error:', error);
         });
     },
     sendToken: function(data, callback) {
@@ -54,7 +54,7 @@ export const accountManager = {
         .then(response => response.json())
         .then(result => callback(result))
         .catch(error => {
-            console.error('Login error:', error);
+            console.error('Sending token error:', error);
         });
     },
 };
