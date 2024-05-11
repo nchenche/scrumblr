@@ -23,7 +23,7 @@ export function setUpForm() {
         fieldValidity[id] = value.trim() !== '';
 
         // Additional checks for username and email
-        if (id === 'username' || id === 'email') {
+        if (id === 'username' ) {
             if (value.trim() !== '') {
                 const checkFunction = id === 'username' ? checkUsername : checkEmail;
                 checkFunction(value, data => {
@@ -78,7 +78,6 @@ export function setUpForm() {
         if (opt !== undefined && opt.bool) {
             const span = document.getElementById(`${opt.target}-error`);
             const target = capitalize(opt.target);
-            console.log(opt, target);
             span.textContent = `${target} already exists`;
         }
     }

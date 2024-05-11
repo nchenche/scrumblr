@@ -1,9 +1,23 @@
 import {setUpForm} from "./registerFormHandler.js"
 import {accountManager} from "../../userAccount.js"
 
+function isValidEmailFormat(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+} 
+
 
 function submitForm(event) {
     event.preventDefault(); // Prevent form from submitting traditionally
+
+    // check email format before sending request
+    const mail = document.getElementById('email');
+    const isMailValid = isValidEmailFormat(mail.value.trim());
+    if (!isMailValid) {
+        mail.nextElementSibling.textContent = "Invalid email format";
+        return
+    }
+
 
     var userData = {
         username: document.getElementById("username").value.trim(),
