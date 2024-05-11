@@ -300,7 +300,7 @@ router.get('/users/exists/email/:email', async (req, res) => {
 			}
 
 			console.log(email, { is_available: !exists });
-			res.json({ is_available: !exists });
+			res.json({ exists: exists });
 		});
 	} catch (err) {
 		console.error('Error checking email:', err);

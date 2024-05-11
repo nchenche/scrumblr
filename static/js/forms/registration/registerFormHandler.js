@@ -18,6 +18,7 @@ export function setUpForm() {
 
     // Checks and updates the state of registration fields
     function handleFieldInput(event) {
+        event.target.nextElementSibling.textContent = '';  // delete span error message
         const { id, value } = event.target;
         fieldValidity[id] = value.trim() !== '';
 
@@ -27,7 +28,7 @@ export function setUpForm() {
                 const checkFunction = id === 'username' ? checkUsername : checkEmail;
                 checkFunction(value, data => {
                     fieldValidity[id] = !data.exists;
-                    updateUI({target: id, bool: !data.exists});
+                    updateUI({target: id, bool: Boolean(data.exists)});
                     return
                 });
             }
@@ -51,6 +52,7 @@ export function setUpForm() {
 
     // Function to check email existence
     function checkEmail(email, callback) {
+        console.log("check mail")
         fetch(`/users/exists/email/${email}`)
             .then(response => response.json())
             .then(data => callback(data))
@@ -72,25 +74,19 @@ export function setUpForm() {
             registerButton.classList.remove('text-gray-700', 'hover:text-gray-900', 'opacity-80');
         }
 
-        if (opt !== undefined) {
-            if (opt.bool) {
-                displayError(`${opt.target}-error`, false);
-            } else {
-                displayError(`${opt.target}-error`, true);
-            }
+
+        if (opt !== undefined && opt.bool) {
+            const span = document.getElementById(`${opt.target}-error`);
+            const target = capitalize(opt.target);
+            console.log(opt, target);
+            span.textContent = `${target} already exists`;
         }
     }
 
-    function displayError(target, bool) {
-        const span = document.getElementById(target);
-        if (bool) {
-            span.classList.remove("opacity-0");
-            span.classList.add("opacity-90");
-        } else {
-            span.classList.add("opacity-0");
-            span.classList.remove("opacity-90");
-        }
+    function capitalize(word) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
     }
+
 
     // Check fields initially in case of autofill
     document.addEventListener('DOMContentLoaded', () => {

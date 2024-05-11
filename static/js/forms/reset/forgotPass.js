@@ -1,9 +1,29 @@
 import {setUpForm} from "./forgotPassHandler.js"
 import {accountManager} from "../../userAccount.js"
 
-setUpForm();
 
-document.getElementById("btn-submit").addEventListener("click", async function(event) {
+// Function to check username existence
+function checkUsername(username, callback) {
+    fetch(`/users/exists/username/${username}`)
+        .then(response => response.json())
+        .then(data => callback(data))
+        .catch(error => {
+            console.error('Error checking username:', error);
+            callback(false);
+        });
+}
+
+function activateLoader(bool) {
+    const loader = document.getElementById("loader");
+    if (bool) {
+        loader.classList.remove("hidden");
+        return
+    }
+
+    loader.classList.add("hidden");
+}
+
+function submitForm(event) {
     event.preventDefault(); // Prevent form from submitting traditionally
 
     const username = document.getElementById("username").value.trim();
@@ -33,26 +53,26 @@ document.getElementById("btn-submit").addEventListener("click", async function(e
             }
         } );
     });
-});
-
-
-// Function to check username existence
-function checkUsername(username, callback) {
-    fetch(`/users/exists/username/${username}`)
-        .then(response => response.json())
-        .then(data => callback(data))
-        .catch(error => {
-            console.error('Error checking username:', error);
-            callback(false);
-        });
 }
 
-function activateLoader(bool) {
-    const loader = document.getElementById("loader");
-    if (bool) {
-        loader.classList.remove("hidden");
-        return
-    }
+function handleSubmit() {
+    const submitButton = document.getElementById("btn-submit");
+    const input = document.getElementById('username');
 
-    loader.classList.add("hidden");
+    // Attach event listener to button
+    submitButton.addEventListener("click", submitForm);
+
+    // Attach event listener to each input field for the Enter key
+    input.addEventListener('keypress', function(event) {
+        if (event.key === "Enter" && input.value.trim()) {
+            submitForm(event);
+        }
+        return;
+    });
 }
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    setUpForm();
+    handleSubmit();
+})

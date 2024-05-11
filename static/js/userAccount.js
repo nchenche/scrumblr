@@ -1,5 +1,5 @@
 export const accountManager = {
-    register: function(data) {
+    register: function(data, callback) {
         fetch('/register', {
             method: 'POST',
             headers: {
@@ -8,12 +8,8 @@ export const accountManager = {
             body: JSON.stringify(data),
         })
         .then(response => response.json())
-        .then(result => {
-            console.log(result);
-        })
-        .catch(error => {
-            console.error('Registration error:', error);
-        });
+        .then(result => callback(result))
+        .catch(error => { console.error('Registration error:', error); });
     },
     login: function(data, callback) {
         fetch('/login', {
@@ -25,9 +21,7 @@ export const accountManager = {
         })
         .then(response => response.json())
         .then(result => callback(result))
-        .catch(error => {
-            console.error('Login error:', error);
-        });
+        .catch(error => { console.error('Login error:', error); });
     },
     resetPassword: function(data, callback) {
         fetch('/reset-password', {
@@ -39,9 +33,7 @@ export const accountManager = {
         })
         .then(response => response.json())
         .then(result => callback(result))
-        .catch(error => {
-            console.error('Resetting password error:', error);
-        });
+        .catch(error => { console.error('Resetting password error:', error); });
     },
     sendToken: function(data, callback) {
         fetch('/forgot-password', {
@@ -53,8 +45,6 @@ export const accountManager = {
         })
         .then(response => response.json())
         .then(result => callback(result))
-        .catch(error => {
-            console.error('Sending token error:', error);
-        });
+        .catch(error => { console.error('Sending token error:', error); });
     },
 };

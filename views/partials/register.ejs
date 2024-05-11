@@ -11,7 +11,7 @@
                     <label for="email" class="text-gray-800 w-1/3">Email</label>
                     <div class="flex-1 flex flex-col">
                         <input id="email" type="email" name="email" autocomplete="off" class="p-0 focus:outline-none text-gray-600 border-b-2 border-dashed border-gray-500 bg-inherit">
-                        <span id="email-error" class="error-message text-sm text-red-700 mt-1 opacity-0">Email already exists</span>
+                        <span id="email-error" class="h-2 error-message text-sm text-red-700 mt-1"></span>
                     </div>
                 </div>
 
@@ -19,7 +19,7 @@
                     <label for="email" class="text-gray-800 w-1/3">Username</label>
                     <div class="flex-1 flex flex-col">
                         <input id="username" type="username" name="username" autocomplete="off" class="p-0 focus:outline-none text-gray-600 border-b-2 border-dashed border-gray-500 bg-inherit">
-                        <span id="username-error" class="error-message text-sm text-red-700 mt-1 opacity-0">Username already exists</span>
+                        <span id="username-error" class="h-2 error-message text-sm text-red-700 mt-1"></span>
                     </div>
                 </div>                          
 
@@ -27,21 +27,32 @@
                     <label for="email" class="text-gray-800 w-1/3">Password</label>
                     <div class="flex-1 flex flex-col">
                         <input id="password" type="password" name="username" autocomplete="off" class="p-0 focus:outline-none text-gray-600 border-b-2 border-dashed border-gray-500 bg-inherit">
-                        <span id="password-error" class="error-message text-sm text-red-700 mt-1 opacity-0">Invalid password</span>
+                        <span id="password-error" class="h-2 error-message text-sm text-red-700 mt-1"></span>
                     </div>
                 </div>
                 
                 <div class="flex justify-end">
-                    <button disabled id="btn-submit" class="text-gray-500 text-3xl font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline opacity-50 cursor-not-allowed">                        Submit
-                    </button>
+                    <div class="flex flex-col">
+                        <button disabled id="btn-submit" class="text-gray-500 text-3xl font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline opacity-50 cursor-not-allowed">                        Submit
+                        </button>
+                        <div class="text-gray-500 text-lg font-bold">
+                            Already have an account? <a href="/login" class="text-indigo-900">Sign In</a>
+                        </div>
+                    </div>
+    
                 </div>                
             </div>
 
-            <div class="mt-5 w-full max-w-md flex justify-start">
-                <div class="text-gray-500 text-lg font-bold">
-                    Already have an account? <a href="/login" class="text-indigo-900">Sign In</a>
+            <div id="loader" class="hidden flex items-center justify-center mt-8">
+                <div
+                  class="inline-block h-6 w-6 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-gray-500 motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                  role="status">
                 </div>
-            </div>                 
+            </div>
+
+            <div id="status-message" class="flex flex-col items-center justify-center mt-1 mt-8 text-large text-center text-green-600">
+            </div>
+
         </div>
 
     </div>
