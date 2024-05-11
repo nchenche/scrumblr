@@ -1,9 +1,8 @@
 import {setUpForm} from "./loginFormHandler.js"
 import {accountManager} from "../../userAccount.js"
 
-setUpForm();
 
-document.getElementById("btn-submit").addEventListener("click", function(event) {
+function submitForm(event) {
     event.preventDefault(); // Prevent form from submitting traditionally
 
     const username = document.getElementById("username").value.trim();
@@ -30,6 +29,33 @@ document.getElementById("btn-submit").addEventListener("click", function(event) 
             window.location.href = response.redirectTo;
         }
     } );
-});
+
+}
 
 
+function handleSubmit() {
+    const submitButton = document.getElementById("btn-submit");
+    const inputs = document.querySelectorAll('#username, #password'); // Select all input fields
+
+    // Attach event listener to button
+    submitButton.addEventListener("click", submitForm);
+
+    // Attach event listener to each input field for the Enter key
+    inputs.forEach(input => {
+        input.addEventListener('keypress', function(event) {
+            if (event.key === "Enter" && input.value.trim()) {
+                const allFilled = Array.from(inputs).every(input => input.value.trim() !== '');
+                if (allFilled) {
+                    submitForm(event);
+                }
+            }
+        });
+    });
+}
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    setUpForm();
+    handleSubmit();
+})
