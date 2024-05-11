@@ -16,18 +16,20 @@ document.getElementById("btn-submit").addEventListener("click", async function(e
             return
         }
 
+        // start spin loader
+        activateLoader(true);
+
         accountManager.sendToken(payload, (tokenResponse) => {
-            console.log("*** server response ***");
+            activateLoader(false);
             if (tokenResponse.success) {
-                console.log(tokenResponse);
-                
+                // console.log(tokenResponse);
                 const responseDiv = document.getElementById("mail-destination");
                 responseDiv.innerHTML = `
                 <p>Email successfully sent to <strong>${tokenResponse.email}</strong>.</p>
                 <p class="text-base text-green-800 mt-1">Please check <b>your spam folder</b> if you do not see the email</p>
                 `;
             } else {
-                console.log(`Response: ${tokenResponse}`);
+                console.error(`Response: ${tokenResponse}`);
             }
         } );
     });
@@ -43,4 +45,14 @@ function checkUsername(username, callback) {
             console.error('Error checking username:', error);
             callback(false);
         });
+}
+
+function activateLoader(bool) {
+    const loader = document.getElementById("loader");
+    if (bool) {
+        loader.classList.remove("hidden");
+        return
+    }
+
+    loader.classList.add("hidden");
 }

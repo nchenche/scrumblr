@@ -40,7 +40,7 @@ app.use(conf.baseurl, router);
 
 var server = require('http').Server(app);
 server.listen(conf.port);
-console.log('Server running at http://127.0.0.1:' + conf.port + '/');
+console.log('Server running at http://localhost:' + conf.port + '/');
 
 
 // Middleware to add the user object to req for easy access
