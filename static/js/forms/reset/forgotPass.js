@@ -46,7 +46,7 @@ function submitForm(event) {
                 const responseDiv = document.getElementById("mail-destination");
                 responseDiv.innerHTML = `
                 <p>Email successfully sent to <strong>${tokenResponse.email}</strong>.</p>
-                <p class="text-base text-green-800 mt-1">Please check <b>your spam folder</b> if you do not see the email</p>
+                <p class="text-base text-green-800 mt-1 text-justify max-w-80">Be sure to check <strong>your spam or junk folder</strong> if you do not see the email within few minutes.</p>
                 `;
             } else {
                 console.error(`Response: ${tokenResponse}`);

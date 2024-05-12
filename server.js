@@ -107,12 +107,21 @@ router.get('/forgot-password', routeProtection.loggedOut, function (req, res) {
 router.get('/reset-password', routeProtection.loggedOut, function (req, res) {
 	const { user, token } = req.query;
 
-	res.render('layout', {
-		body: 'partials/resetpass.ejs',
-		username: null,
-		user: user,
-		token: token,
-		pageScripts: ['/js/forms/reset/resetPass.js'],
+	db.checkToken(user, token, (response) => {
+		if (!response.success) {
+			return res.render('layout', {
+				body: 'partials/reset_unauthorized.ejs',
+				username: null,
+			});
+		}
+
+		res.render('layout', {
+			body: 'partials/resetpass.ejs',
+			username: null,
+			user: user,
+			token: token,
+			pageScripts: ['/js/forms/reset/resetPass.js'],
+		});
 	});
 });
 
