@@ -11,7 +11,7 @@ services:
   node:
     build: 
       context: .
-      dockerfile: Dockerfile # Specifies the name of the Dockerfile
+      dockerfile: Dockerfile
     user: "node"
     ports:
       - "1000:1000"
@@ -23,7 +23,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
   nginx:
     image: nginx:alpine
     ports:
@@ -34,7 +33,14 @@ services:
       - node
     networks:
       - app-network
-
+  api:
+    build:
+      context: ./dicebear
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network    
 networks:
   app-network:
     driver: bridge

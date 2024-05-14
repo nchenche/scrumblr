@@ -1,8 +1,3 @@
-document.addEventListener("DOMContentLoaded", function() {
-    joinRoomHandler();
-  });
-
-
 function joinRoomHandler() {
     const button = document.getElementById("btn-submit");
     const input = document.getElementById("board-input");
@@ -18,10 +13,27 @@ function joinRoomHandler() {
         }
     });
 
+    // Attach event listener to each input field for the Enter key
+    input.addEventListener('keypress', function(event) {
+        if ( !event.key === "Enter" && input.value.trim() ) return;
+        submitForm(event, input.value.trim());
+    });
+
 
     button.addEventListener("click", (event) => {
-        if (input.value === '') return
-        const path = `${location.origin}/room/${input.value}`;
-        window.location.href = path;
+        if ( !input.value.trim() ) return;
+        submitForm(event, input.value.trim());
     })
 }
+
+function submitForm(event, value) {
+    event.preventDefault(); // Prevent form from submitting traditionally
+
+    const path = `${location.origin}/room/${value}`;
+    window.location.href = path;
+}
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    joinRoomHandler();
+  });
