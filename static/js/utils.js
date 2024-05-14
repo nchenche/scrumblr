@@ -15,8 +15,10 @@ function joinRoomHandler() {
 
     // Attach event listener to each input field for the Enter key
     input.addEventListener('keypress', function(event) {
-        if ( !event.key === "Enter" && input.value.trim() ) return;
-        submitForm(event, input.value.trim());
+        if ( event.key === "Enter" && input.value.trim() ) {
+            submitForm(event, input.value.trim());
+        };
+        return;
     });
 
 

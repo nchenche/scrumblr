@@ -223,7 +223,7 @@ router.post('/forgot-password', async (req, res) => {
 		db.storeToken(username, expiresIn, async (tokenResponse) => {
 			if (tokenResponse.success) {
 
-				const mailResponse = await sendEmail("nicolas.chevrollier@inserm.fr", username, tokenResponse.token);
+				const mailResponse = await sendEmail(email, username, tokenResponse.token);
 				if (!mailResponse.success) {
 					return res.status(401).json(mailResponse);
 				}
@@ -322,7 +322,7 @@ router.get('/users/exists/email/:email', async (req, res) => {
 
 
 // Server-side: Get current user info
-app.get('/api/current_user', (req, res) => {
+router.get('/api/current_user', (req, res) => {
 	if (req.user) {  // Assuming req.user is set after successful authentication
 		res.json({
 			success: true,
