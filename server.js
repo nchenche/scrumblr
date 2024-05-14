@@ -167,6 +167,9 @@ router.get('/demo', routeProtection.loggedIn, function (req, res) {
 });
 
 
+
+
+
 /**************
  SETUP USEFUL APIS
 **************/
@@ -328,4 +331,10 @@ app.get('/api/current_user', (req, res) => {
 	} else {
 		res.status(401).json({ success: false, message: 'Not authenticated' });
 	}
+});
+
+
+// Catch-all route that redirects to the home page if no other route matches
+router.use((req, res) => {
+    res.redirect('/');
 });
