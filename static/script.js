@@ -275,10 +275,11 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     const currentUser = await fetchCurrentUser();
     var cardOwner = user;
 
+    const dicebearQuery = "scale=50&radius=50&rowColor=00897b,00acc1,039be5,3949ab,43a047,546e7a,5e35b1,6d4c41,757575,7cb342,8e24aa,c0ca33,d81b60,e53935,f4511e,ffb300,1e88e5";
 
     var h = `
     <div id="${id}" class="card ${colour} draggable" style="transform:rotate(${rot}deg);">
-        <img src="http://0.0.0.0:3000/8.x/identicon/svg?seed=${user}&scale=50&radius=50" class="card-avatar card-icon w-6 h-6 rounded-full z-10" alt="User Avatar" title="${user}" />
+        <img src="http://0.0.0.0:3000/8.x/identicon/svg?seed=${user}&${dicebearQuery}" class="card-avatar card-icon w-6 h-6 rounded-full z-10" alt="User Avatar" title="${user}" />
         <img src="/images/icons/token/Xion.png" class="card-icon delete-card-icon z-10" />
         <img class="card-image" src="/images/${colour}-card.png" />
         <div data-user="${user}" id="content:${id}" class="content stickertarget droppable">${text}</div>
@@ -464,7 +465,15 @@ function addSticker(cardId, stickerId) {
 }
 
 
-
+/**
+ * Fetches the current user's information from the server. It returns the username
+ * if the user is logged in. If not, it logs that the user is not logged in but does not return anything.
+ *
+ * @async
+ * @returns {Promise<string|undefined>} A promise that resolves with the username of the currently logged-in user
+ * if they are logged in, or undefined if not logged in.
+ * @throws {Error} Throws an error if there is a problem fetching the user data.
+ */
 async function fetchCurrentUser() {
     try {
         const response = await fetch('/api/current_user');
@@ -480,16 +489,36 @@ async function fetchCurrentUser() {
     }
 }
 
-
-async function setUserAsParticipant() {
-    try {
-        const responsePromise = await fetch('/api/add_room_to_user');
-        const response = await response.json();
-        console.log("setUserAsParticipant response", response)
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-    }
+/**
+ * Adds a user as a participant to a room by sending user and room information to the server.
+ * This function asynchronously posts data to the server and handles the response through a callback.
+ * 
+ * @param {Object} data An object containing the user and room details.
+ * @param {string} data.user The username of the user to add as a participant.
+ * @param {string} data.room The room identifier to which the user is being added.
+ * @param {Function} callback A callback function that processes the result of the request. It takes one argument:
+ *                            the result from the server.
+ * 
+ * @returns {void} This function does not return a value; it handles the result via a callback.
+ * @throws {Error} Throws an error if the network request fails or if the API returns an error.
+ */
+function setUserAsParticipant(data, callback) {
+    console.log('Adding user to room:', data);
+    fetch('/api/add_room_to_user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(result => {callback(result);})
+    .catch(error => {
+        console.error('Error adding room to user:', error);
+        callback({ error: 'Failed to add room to user' });
+    });
 }
+
 
 //----------------------------------
 // cards
@@ -517,6 +546,14 @@ async function createCard(id, text, x, y, rot, colour) {
 
     sendAction(action, data);
 
+    // add user as a participant in the room
+    const obj = {
+        user: user,
+        room: location.pathname.split('/').filter(Boolean).pop()
+    };
+    setUserAsParticipant(obj, (response) => {
+        console.log("setUserAsParticipant response", response);
+    });
 }
 
 function randomCardColour() {

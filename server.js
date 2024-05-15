@@ -135,23 +135,6 @@ router.get('/', routeProtection.loggedIn, function (req, res) {
 });
 
 
-// router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
-// 	db.setRoomOwner(req.params.id, req.user, (response) => {
-// 		if ("owner" in response) {
-// 			const owner = response.owner;
-// 			res.render('layout', {
-// 				body: 'partials/room.ejs',
-// 				pageTitle: ('Scrumblr - ' + req.params.id),
-// 				pageScripts: ['/script.js'],
-// 				username: req.user,
-// 				is_owner: owner === req.user
-// 			});
-// 		} else {
-// 			console.log('setRoomOwner response:', response);
-// 		}
-// 	});
-// });
-
 router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
 	db.setRoomUserRelationship(req.params.id, req.user, (response) => {
 		if (!response.success) {
@@ -349,18 +332,14 @@ router.get('/api/current_user', (req, res) => {
 });
 
 
-// router.get('/api/add_room_to_user', async (req, res) => {
-// 	const { user, room } = req.body;
-// 	try {
-// 		db.addRoomToUser(user, room, "participant", (response) => {
-// 			console.log(response);
-// 		})
+router.post('/api/add_room_to_user', (req, res) => {
+	const { user, room } = req.body;
 
-// 	} catch (err) {
-// 		console.error('Error checking email:', err);
-// 		res.status(500).json({ error: 'Internal server error' });
-// 	}
-// });
+	db.addRoomToUserAsParticipant(user, room, (response) => {
+		console.log(response);
+		return res.status(response.success ? 200 : 400).json(response);
+	})
+});
 
 
 // Catch-all route that redirects to the home page if no other route matches
