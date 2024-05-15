@@ -281,9 +281,11 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     <div id="${id}" class="card ${colour} draggable" style="transform:rotate(${rot}deg);">
         <img src="http://0.0.0.0:3000/8.x/identicon/svg?seed=${user}&${dicebearQuery}" class="card-avatar card-icon w-6 h-6 rounded-full z-10" alt="User Avatar" title="${user}" />
         <img src="/images/icons/token/Xion.png" class="card-icon delete-card-icon z-10" />
+        
         <img class="card-image" src="/images/${colour}-card.png" />
         <div data-user="${user}" id="content:${id}" class="content stickertarget droppable">${text}</div>
-        <span class="filler"></span>
+        <span class="flex space-x-2 filler">
+        </span>
 	</div>`;
 
     var card = $(h);
@@ -422,7 +424,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     }
 
     //add applicable sticker
-    if (sticker !== null) addSticker(id, sticker);
+    if (sticker) addSticker(id, sticker);
 
 }
 
@@ -443,7 +445,8 @@ function moveCard(card, position) {
 
 function addSticker(cardId, stickerId) {
 
-    stickerContainer = $('#' + cardId + ' .filler');
+    const stickerContainer = $('#' + cardId + ' .filler');
+    console.log(stickerContainer);
 
     if (stickerId === "nosticker") {
         stickerContainer.html("");
@@ -453,13 +456,11 @@ function addSticker(cardId, stickerId) {
 
     if (Array.isArray(stickerId)) {
         for (var i in stickerId) {
-            stickerContainer.prepend('<img src="/images/stickers/' + stickerId[i] +
-                '.png">');
+            stickerContainer.prepend(`<img src="/images/stickers/${stickerId[i]}.png">`);
         }
     } else {
         if (stickerContainer.html().indexOf(stickerId) < 0)
-            stickerContainer.prepend('<img src="/images/stickers/' + stickerId +
-                '.png">');
+            stickerContainer.prepend(`<img src="/images/stickers/${stickerId}.png">`);
     }
 
 }
@@ -619,7 +620,8 @@ function drawNewColumn(columnName) {
         height: '',
         xindicator: '<img src="/images/ajax-loader.gif">',
         event: 'dblclick', //event: 'mouseover'
-    });
+        }
+    );
 
     $('.col:last').fadeIn(100);
 
