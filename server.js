@@ -135,23 +135,38 @@ router.get('/', routeProtection.loggedIn, function (req, res) {
 });
 
 
+// router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
+// 	db.setRoomOwner(req.params.id, req.user, (response) => {
+// 		if ("owner" in response) {
+// 			const owner = response.owner;
+// 			res.render('layout', {
+// 				body: 'partials/room.ejs',
+// 				pageTitle: ('Scrumblr - ' + req.params.id),
+// 				pageScripts: ['/script.js'],
+// 				username: req.user,
+// 				is_owner: owner === req.user
+// 			});
+// 		} else {
+// 			console.log('setRoomOwner response:', response);
+// 		}
+// 	});
+// });
+
 router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
-	db.setRoomOwner(req.params.id, req.user, (response) => {
-		if ("owner" in response) {
-			const owner = response.owner;
-			res.render('layout', {
-				body: 'partials/room.ejs',
-				pageTitle: ('Scrumblr - ' + req.params.id),
-				pageScripts: ['/script.js'],
-				username: req.user,
-				is_owner: owner === req.user
-			});
-		} else {
-			console.log('from server:', response);
+	db.setRoomUserRelationship(req.params.id, req.user, (response) => {
+		if (!response.success) {
+			console.error(response.message);
 		}
+
+		res.render('layout', {
+			body: 'partials/room.ejs',
+			pageTitle: ('Scrumblr - ' + req.params.id),
+			pageScripts: ['/script.js'],
+			username: req.user,
+			is_owner: response.is_owner
+		});
 	});
 });
-
 
 router.get('/demo', routeProtection.loggedIn, function (req, res) {
 	const sessionId = req.cookies.session_id;
@@ -332,6 +347,20 @@ router.get('/api/current_user', (req, res) => {
 		res.status(401).json({ success: false, message: 'Not authenticated' });
 	}
 });
+
+
+// router.get('/api/add_room_to_user', async (req, res) => {
+// 	const { user, room } = req.body;
+// 	try {
+// 		db.addRoomToUser(user, room, "participant", (response) => {
+// 			console.log(response);
+// 		})
+
+// 	} catch (err) {
+// 		console.error('Error checking email:', err);
+// 		res.status(500).json({ error: 'Internal server error' });
+// 	}
+// });
 
 
 // Catch-all route that redirects to the home page if no other route matches

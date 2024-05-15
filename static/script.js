@@ -17,8 +17,6 @@ var socket = io.connect({path: "/socket.io"});
 //an action has happened, send it to the
 //server
 function sendAction(a, d) {
-    //console.log('--> ' + a);
-
     var message = {
         action: a,
         data: d
@@ -477,6 +475,17 @@ async function fetchCurrentUser() {
             console.log('Not logged in');
             return
         }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+}
+
+
+async function setUserAsParticipant() {
+    try {
+        const responsePromise = await fetch('/api/add_room_to_user');
+        const response = await response.json();
+        console.log("setUserAsParticipant response", response)
     } catch (error) {
         console.error('Error fetching user data:', error);
     }
