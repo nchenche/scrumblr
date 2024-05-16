@@ -151,6 +151,15 @@ router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
 	});
 });
 
+
+router.get('/rooms/:user', routeProtection.loggedIn, function (req, res) {
+	res.render('layout', {
+		body: 'partials/roomsList.ejs',
+		username: req.user,
+	});
+});
+
+
 router.get('/demo', routeProtection.loggedIn, function (req, res) {
 	const sessionId = req.cookies.session_id;
 	db.getUserBySession(sessionId, (result) => {
@@ -338,7 +347,17 @@ router.post('/api/add_room_to_user', (req, res) => {
 	db.addRoomToUserAsParticipant(user, room, (response) => {
 		console.log(response);
 		return res.status(response.success ? 200 : 400).json(response);
-	})
+	});
+});
+
+
+router.get('/api/rooms/:user', (req, res) => {
+	const user = req.params.user;
+
+	db.getUserRooms(user, (response) => {
+		console.log(response);
+		return res.status(response.success ? 200 : 400).json(response);
+	});
 });
 
 
