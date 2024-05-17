@@ -194,7 +194,7 @@ function initPasswordForm(attempt) {
 
     blockUI(
         `${attempt === true ? '<h1 class="mb-2">Invalid password!</h1>' : '<h1 class="mb-2">Room protected</h1>'}
-        <form id="password-form" class="">
+        <form id="password-form" class="mt-8">
         <input type="password" id="room-password" placeholder="Enter the room password" class="">
         <div class="flex justify-center mt-2">
             <input type="submit" class="ml-2 text-white bg-transparent cursor-default hover:cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg" value="Submit">
@@ -229,7 +229,10 @@ function initLockForm(attempt) {
             <h1 class="mb-2">Unlock your room</h1>
         </div>
         <div id="lock-form" class="flex justify-center mt-8">
-                <button id="lock-remove" class="text-white bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">Unlock</button>
+            <div id="lock-remove" class="flex items-center space-x-2 border border-gray-400 border-solid rounded-lg py-2 px-8 text-white bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">
+                <i class="fa fa-unlock"></i> <!-- FontAwesome Unlock Icon -->
+                <span>Unlock</span>
+            </div>        
         </div>
         `;
     } else {
