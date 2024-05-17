@@ -1,0 +1,63 @@
+.gridjs-tbody {
+    background-color: transparent !important;
+}
+
+.gridjs-pagination .gridjs-pages button:disabled, .gridjs-pagination .gridjs-pages button:hover:disabled, .gridjs-pagination .gridjs-pages button[disabled] {
+    background-color: transparent;
+    border: none;
+}
+
+
+.gridjs-pagination .gridjs-pages button {
+    background-color: transparent;
+    border: none;
+}
+
+.gridjs-pagination .gridjs-pages button.gridjs-currentPage {
+    background-color: transparent;
+}
+
+
+.gridjs-pagination .gridjs-pages button:last-child {
+    border: none;
+}
+
+.gridjs-footer {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.gridjs-wrapper {
+    box-shadow: none;
+    border-radius: 0%;
+    border-color: #bfc1c5;
+    border: none;
+}
+
+td.gridjs-td {
+    border: none;
+    border-right: 1px solid gray;
+    border-bottom: 1px dashed gray;
+}
+
+th.gridjs-th {
+    border-right: 1px solid gray;
+    border-bottom: 3px solid gray; 
+}
+
+.gridjs-head {
+    background-color: transparent;
+}
+
+.gridjs-search {
+    background-color: transparent;
+}
+
+.input.gridjs-input {
+    background-color: transparent !important;
+}
+
+.input.gridjs-search-input {
+    background-color: transparent !important;
+}

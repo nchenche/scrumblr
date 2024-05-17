@@ -64,7 +64,7 @@ function blockUI(message) {
             backgroundColor: '#000',
             '-webkit-border-radius': '10px',
             '-moz-border-radius': '10px',
-            opacity: 0.5,
+            opacity: 0.68,
             color: '#fff',
             fontSize: '20px'
         },
@@ -190,11 +190,28 @@ $(document).bind('keyup', function(event) {
 // password functions
 function initPasswordForm(attempt) {
 	
-	blockUI((attempt === true ? '<h1>Invalid password!</h1><br>' : '' ) 
-		+ '<form id="password-form"><input type="password" id="room-password" placeholder="Enter the room password..."><input type="submit" value="Go!"></form>');
-	
+    // blockUI(
+    //     `${attempt === true ? '<h1>Invalid password!</h1><br>' : ''}
+    //     <form id="password-form">
+    //         <input type="password" id="room-password" placeholder="Enter the room password...">
+    //         <input type="submit" class="text-white bg-transparent cursor-default hover:cursor-pointer hover:shadow-lg transition duration-150 ease-in-out opacity-90 hover:opacity-100" value="Submit">
+    //     </form>`
+    //     );
+
+    blockUI(
+        `${attempt === true ? '<h1 class="mb-2">Invalid password!</h1>' : '<h1 class="mb-2">Room protected</h1>'}
+        <form id="password-form" class="flex items-center justify-around">
+        <input type="password" id="room-password" placeholder="Enter the room password..." class="">
+        <input type="submit" class="ml-2 text-white bg-transparent cursor-default hover:cursor-pointer opacity-70 hover:opacity-100 hover:font-bold" value="Submit">
+      </form>
+        `
+        );
+
+
 	$('#password-form').submit(function(event) {
 		event.preventDefault();
+
+        if (! $('#room-password').val() ) return;
 		
 		if (validatePassword($('#room-password').val()) === true) {
 			sendAction('passwordValidated', null);
@@ -253,7 +270,24 @@ function validatePassword(passwrd) {
 	passwordAttempts++;
 	
 	if (passwordAttempts > 5) {
-		blockUI('<h1>You have attempted to login too many times. Please return to the homepage</h1><br>');
+		// blockUI('<h1>You have attempted to login too many times. Please return to the homepage</h1><br>');
+        const message = 'You have attempted to login too many times.';
+        let countdown = 5;
+        
+        // Initial display with full message
+        blockUI(`${message} You will be redirected to the home page in <span id="countdown">${countdown}</span> seconds.`);
+        
+        const intervalId = setInterval(() => {
+            countdown -= 1;
+            if (countdown < 0) {
+                clearInterval(intervalId);
+                window.location.href = '/home';
+            } else {
+                // Update only the countdown part in the existing displayed message
+                document.getElementById('countdown').textContent = countdown;
+            }
+        }, 1000);
+
 		return false;
 	}
 	

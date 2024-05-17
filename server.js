@@ -135,6 +135,15 @@ router.get('/', routeProtection.loggedIn, function (req, res) {
 });
 
 
+router.get('/rooms', routeProtection.loggedIn, function (req, res) {
+	res.render('layout', {
+		body: 'partials/rooms_list.ejs',
+		username: req.user,
+		pageScripts: ['/js/table/grid.js'],
+	});
+});
+
+
 router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
 	db.setRoomUserRelationship(req.params.id, req.user, (response) => {
 		if (!response.success) {
@@ -148,14 +157,6 @@ router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
 			username: req.user,
 			is_owner: response.is_owner
 		});
-	});
-});
-
-
-router.get('/rooms/:user', routeProtection.loggedIn, function (req, res) {
-	res.render('layout', {
-		body: 'partials/roomsList.ejs',
-		username: req.user,
 	});
 });
 
@@ -351,8 +352,8 @@ router.post('/api/add_room_to_user', (req, res) => {
 });
 
 
-router.get('/api/rooms/:user', (req, res) => {
-	const user = req.params.user;
+router.get('/api/rooms', (req, res) => {
+	const user = req.user;
 
 	db.getUserRooms(user, (response) => {
 		console.log(response);
