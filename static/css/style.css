@@ -84,6 +84,10 @@ body {
 	color: darkslategray;
 }
 
+#lock-password, #lock-password-confirm {
+	color: darkslategray;
+}
+
 .card-avatar {
 	position: absolute;
 	top: -4% !important;
@@ -238,7 +242,7 @@ h2 {
 }
 
 .buttons:hover {
-	opacity: 0.95;
+	opacity: 1;
 }
 
 .names {
@@ -542,11 +546,6 @@ input.text {
 	font-family: 'Covered By Your Grace',"Arial Rounded MT Bold", arial, serif;
 	color: #19ba98;
 	color: black;
-
-	xborder: solid 1px;
-
-
-
 }
 
 .notice-bar {

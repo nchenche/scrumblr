@@ -27,17 +27,32 @@
   </div>
 </div>
 
-<div class="buttons">
-    <i id="create-card" class="fa fa-plus-circle fa-2x bottom-icon"></i><br />
-    <i id="smallify" class="fa fa-expand fa-2x bottom-icon"></i><br />
-    <i id="fontify" class="fa fa-font fa-2x bottom-icon"></i><br />
-    <i id="font-increase" class="fa fa-search-plus fa-2x bottom-icon"></i><br />
-    <i id="font-decrease" class="fa fa-search-minus fa-2x bottom-icon"></i><br />
-    <% if (is_owner) { %>
-      <i id="protect-room" class="fa fa-eye-slash fa-2x bottom-icon"></i>
+<!-- <div class="buttons">
+  <i id="create-card" class="fa fa-plus-circle fa-2x bottom-icon"></i><br />
+  <i id="smallify" class="fa fa-expand fa-2x bottom-icon"></i><br />
+  <i id="fontify" class="fa fa-font fa-2x bottom-icon"></i><br />
+  <i id="font-increase" class="fa fa-search-plus fa-2x bottom-icon"></i><br />
+  <i id="font-decrease" class="fa fa-search-minus fa-2x bottom-icon"></i><br />
+  <% if (is_owner) { %>
+  <i id="protect-room" class="fa fa-eye-slash fa-2x bottom-icon"></i>
+  <% } %>
+</div> -->
+
+<div class="fixed top-4 right-4 z-10 p-2.5 bg-white rounded opacity-50 flex flex-col items-center space-y-2">
+  <i id="create-card" class="fa fa-plus-circle fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Create card"></i>
+  <!-- <i id="smallify" class="fa fa-expand fa-2x bottom-icon cursor-pointer hover:opacity-100"></i> -->
+  <i id="fontify" class="fa fa-font fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Change font family"></i>
+  <i id="font-increase" class="fa fa-search-plus fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Increase font size"></i>
+  <i id="font-decrease" class="fa fa-search-minus fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Decrease font size"></i>
+  <% if (is_owner) { %>
+    <% if (is_room_protected) { %>
+        <i id="protect-room" class="fa fa-unlock fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Unlock room"></i>
+    <% } else { %>
+        <i id="protect-room" class="fa fa-lock fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Lock room"></i>
     <% } %>
-  </div>
-  
+  <% } %>
+</div>
+
 
 <div class="stickers">
   <div class="sticker" id="sticker-red"></div>

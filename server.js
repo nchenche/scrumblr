@@ -150,12 +150,20 @@ router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
 			console.error(response.message);
 		}
 
-		res.render('layout', {
-			body: 'partials/room.ejs',
-			pageTitle: ('Scrumblr - ' + req.params.id),
-			pageScripts: ['/script.js'],
-			username: req.user,
-			is_owner: response.is_owner
+		const key = `#scrumblr#-room:${req.params.id}-password`;
+		redisClient.exists(key, (err, resExists) => {
+			if (err) {
+				console.log(`Error checking room protection existence: ${err}`);
+			}
+
+			res.render('layout', {
+				body: 'partials/room.ejs',
+				pageTitle: ('Scrumblr - ' + req.params.id),
+				pageScripts: ['/script.js'],
+				username: req.user,
+				is_owner: response.is_owner,
+				is_room_protected: resExists === 1 ? true : false
+			});
 		});
 	});
 });
@@ -203,8 +211,8 @@ router.post('/login', async (req, res) => {
 		}
 
 		// store cookie session
-		res.cookie('session_id', result.session, { httpOnly: false, secure: false });
-		res.cookie('username', result.user, { httpOnly: false, secure: false });
+		res.cookie('session_id', result.session, { httpOnly: false, secure: false, maxAge: 1000*60*60*6 });
+		res.cookie('username', result.user, { httpOnly: false, secure: false, maxAge: 1000*60*60*6 });
 		console.log("result login:", result);
 
 		res.json({
