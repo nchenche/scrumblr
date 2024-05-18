@@ -192,15 +192,26 @@ $(document).bind('keyup', function(event) {
 // password functions
 function initPasswordForm(attempt) {
 
+    // blockUI(
+    //     `${attempt === true ? '<h1 class="mb-2">Invalid password</h1>' : '<h1 class="mb-2">Room protected</h1>'}
+    //     <form id="password-form" class="mt-8">
+    //         <input type="password" id="room-password" placeholder="Enter the room password" class="w-3/5 px-4 py-2 rounded shadow focus:outline-none focus:shadow-outline">
+    //         <div class="flex justify-center mt-2 space-x-4">
+    //             <input type="submit" class="text-white font-black bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg px-4 py-2 rounded" value="Submit">
+    //             <button id="exit-form" class="text-red-300 opacity-70 font-bold cursor-pointer hover:opacity-100 hover:shadow-lg px-4 py-2 rounded">Exit</button>
+    //         </div>
+    //     </form>`
+    // );
+
     blockUI(
-        `${attempt === true ? '<h1 class="mb-2">Invalid password!</h1>' : '<h1 class="mb-2">Room protected</h1>'}
+        `${attempt === true ? '<h1 class="mb-2">Invalid password</h1>' : '<h1 class="mb-2">Room protected</h1>'}
         <form id="password-form" class="mt-8">
-        <input type="password" id="room-password" placeholder="Enter the room password" class="">
-        <div class="flex justify-center mt-2">
-            <input type="submit" class="ml-2 text-white bg-transparent cursor-default hover:cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg" value="Submit">
-        </div>
-      </form>
-        `
+            <input type="password" id="room-password" placeholder="Enter the room password" class="w-3/5 px-4 py-2 rounded shadow focus:outline-none focus:shadow-outline">
+            <div class="flex flex-col items-center mt-2 space-y-2">
+                <input type="submit" class="text-white font-black bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg px-4 py-2 rounded" value="Submit">
+                <button id="exit-form" class="text-red-400 opacity-70 font-black cursor-pointer hover:opacity-100 hover:shadow-lg px-4 py-2 rounded">Go back home</button>
+            </div>
+        </form>`
     );
 
 	$('#password-form').submit(function(event) {
@@ -212,6 +223,13 @@ function initPasswordForm(attempt) {
 			sendAction('passwordValidated', null);
 		}
 	});
+
+
+    $('#exit-form').on('click', function(e) {
+        e.preventDefault();  // Prevent default click behavior
+
+        window.location.href = "/rooms"
+    });
 	
 }
 
@@ -229,8 +247,8 @@ function initLockForm(attempt) {
             <h1 class="mb-2">Unlock your room</h1>
         </div>
         <div id="lock-form" class="flex justify-center mt-8">
-            <div id="lock-remove" class="flex items-center space-x-2 border border-gray-400 border-solid rounded-lg py-2 px-8 text-white bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">
-                <i class="fa fa-unlock"></i> <!-- FontAwesome Unlock Icon -->
+            <div id="lock-remove" class="flex items-center mt-2 space-x-2 font-black border border-gray-400 border-solid rounded-lg py-2 px-8 text-white bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">
+                <i class="fa fa-unlock"></i>
                 <span>Unlock</span>
             </div>        
         </div>
@@ -248,7 +266,7 @@ function initLockForm(attempt) {
                 <input type="password" id="lock-password" placeholder="Password">
                 <input type="password" id="lock-password-confirm" placeholder="Confirm Password">
                 <div class="flex justify-center mt-2 ">
-                    <input id="lock-submit" type="submit" value="Submit" class="text-white bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">
+                    <input id="lock-submit" type="submit" value="Submit" class="text-white font-black bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">
                 </div>
             </div>
         `;
@@ -256,55 +274,6 @@ function initLockForm(attempt) {
 
     // Use the determined form content in the blockUI function
     blockUI(formContent);
-
-
-    // blockUI(`
-    // ${attempt ? 
-    //     '<h1 class="mb-2">The passwords do not match!</h1>' : 
-    //     (requiredPassword !== null ? 
-    //         '<h1 class="mb-2">Click to unlock your room</h1>' : 
-    //         '<h1 class="mb-2">Make your room private</h1>')
-    // }
-    // <div id="lock-form">
-    //     <input type="password" id="lock-password" placeholder="Password">
-    //     <input type="password" id="lock-password-confirm" placeholder="Confirm Password">
-    //     <div class="flex justify-center mt-2 space-x-6">
-    //         ${requiredPassword !== null ? `
-    //             <button id="lock-remove" class="text-white bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">Unlock</button>
-    //         ` : `
-    //             <button id="lock-cancel" class="text-white bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">Cancel</button>
-    //             <input id="lock-submit" type="submit" value="Submit" class="text-white bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">
-    //         `}
-    //     </div>
-    // </div>
-    // `);
-
-
-	
-    // blockUI(`
-    // ${attempt === true ? '<h1 class="mb-2">The passwords do not match!</h1>' : '<h1 class="mb-2">Make your room private</h1>'}
-    //     <form id="lock-form" >
-    //         <input type="password" id="lock-password" placeholder="Password"><br>
-    //         <input type="password" id="lock-password-confirm" placeholder="Confirm Password">
-    //         <div class="flex justify-center mt-2 space-x-6">
-    //             ${requiredPassword !== null ? '<button id="lock-remove" class="text-white bg-transparent cursor-default hover:cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">Unlock</button>' : ''}
-    //             <button id="lock-cancel" class="ml-2 text-white bg-transparent cursor-default hover:cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">Cancel</button>
-    //             <input id="lock-submit" type="submit" value="Submit" class="ml-2 text-white bg-transparent cursor-default hover:cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg">
-    //         </div>
-    //     </form>
-    // `);
-		
-	// $('#lock-form').submit(function(event) {
-	// 	event.preventDefault();
-		
-	// 	var passwrd = $('#lock-password').val().trim();
-	// 	var confirmPasswrd = $('#lock-password-confirm').val().trim();
-		
-	// 	if (validateLock(passwrd, confirmPasswrd) === true) {
-	// 		sendAction('setPassword', (passwrd !== null ? window.btoa(passwrd) : null));
-	// 		unblockUI();
-	// 	}
-	// });
 
 	$('#lock-submit').on('click', function(e) {
         e.preventDefault();  // Prevent default click behavior
@@ -347,16 +316,6 @@ function initLockForm(attempt) {
         unblockUI();
     });
 
-
-    // $('#lock-cancel').on('click', function(e) {
-    //     e.preventDefault();  // Prevent default click behavior
-    //     console.log("cancel password setting triggered");
-
-    //     // sendAction('setPassword', null);
-    //     unblockUI();
-    // });
-
-
 	$('#lock-remove').on('click', function(e) {
         e.preventDefault();  // Prevent default click behavior
         console.log("remove password triggered");
@@ -365,23 +324,8 @@ function initLockForm(attempt) {
         unblockUI();
         location.reload();
 	});
-
-    // $('#lock-form').on('click', '#lock-cancel', function(e) {
-    //     e.preventDefault();  // Prevent default click behavior
-    //     console.log("cancel password setting triggered");
-    //     sendAction('setPassword', null);
-    //     unblockUI();
-    // });
-
-	// $('#lock-form').on('click', '#lock-remove', function(e) {
-    //     e.preventDefault();  // Prevent default click behavior
-    //     console.log("remove password triggered");
-
-	// 	sendAction('clearPassword', null);
-    //     unblockUI();
-    //     location.reload();
-	// });
 }
+
 
 function validateLock(passwrd, confirmPasswrd) {
 	

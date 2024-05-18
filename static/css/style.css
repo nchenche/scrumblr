@@ -70,7 +70,7 @@ body {
 	xborder: solid rgba(92, 157, 181,0.5) 3px;
 }
 
-#password-form input, #lock-form input, #lock-form button, #lock-form span {
+#password-form input, #lock-form input, #lock-form button, #lock-form span, #exit-form {
 	font-family: roboto;
 	font-size: 16px;
 	padding: 10px;
