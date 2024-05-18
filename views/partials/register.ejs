@@ -1,9 +1,9 @@
-<div class="board-outline">
+<div class="board-outline" style="height: 60vh;">
     <div id="board">
-        <div id="board-doodles" class="-z-10"></div>
+        <!-- <div id="board-doodles" class="-z-10"></div> -->
 
         <div class="flex flex-col items-center font-customFont">
-            <h1 class="font-customFont text-5xl text-center mb-1 text-gray-400 mb-6">Register to Scrumblr</h1>
+            <h1 class="font-customFont text-5xl text-center mb-1 text-gray-400 mb-24">Register to Scrumblr</h1>
         
             <div class="w-full max-w-md text-2xl">
 
@@ -32,15 +32,15 @@
                 </div>
                 
                 <div class="flex justify-end">
-                    <div class="flex flex-col">
-                        <button disabled id="btn-submit" class="text-gray-500 text-3xl font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline opacity-50 cursor-not-allowed">                        Submit
+                    <div class="flex flex-col items-end">
+                        <button id="btn-submit" class="text-white text-2xl bg-blue-500 hover:bg-blue-700 font-bold py-2 px-4 opacity-90 rounded-xl focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            Submit
                         </button>
-                        <div class="text-gray-500 text-lg font-bold">
+                        <div class="text-gray-500 text-base font-medium mt-4">
                             Already have an account? <a href="/login" class="text-indigo-900">Sign In</a>
                         </div>
                     </div>
-    
-                </div>                
+                </div>
             </div>
 
             <div id="loader" class="hidden flex items-center justify-center mt-8">

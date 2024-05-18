@@ -45,11 +45,14 @@ function submitForm(event) {
                 // console.log(tokenResponse);
                 const responseDiv = document.getElementById("mail-destination");
                 responseDiv.innerHTML = `
-                <p>Email successfully sent to <strong>${tokenResponse.email}</strong>.</p>
-                <p class="text-base text-green-800 mt-1 text-justify max-w-80">Be sure to check <strong>your spam or junk folder</strong> if you do not see the email within few minutes.</p>
+                <div class="text-green-700 px-4 py-3 rounded relative" role="alert">
+                    <span class="block sm:inline">Email successfully sent to <u>${tokenResponse}</u>.</span>
+                    <p class="text-red-500 text-lg mt-4">Be sure to check <strong>your spam or junk folder</strong> if you do not see the email within a few minutes.</p>
+                </div>
                 `;
             } else {
                 console.error(`Response: ${tokenResponse}`);
+                alert(tokenResponse.message);
             }
         } );
     });

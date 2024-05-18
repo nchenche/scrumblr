@@ -2,31 +2,30 @@ function joinRoomHandler() {
     const button = document.getElementById("btn-submit");
     const input = document.getElementById("board-input");
 
+    const toggleButtonState = (isEnabled) => {
+        button.disabled = !isEnabled;
+    };
+
     input.addEventListener("input", (event) => {
-        if (event.target.value === '') {
-            button.classList.add('cursor-not-allowed', 'opacity-50');
-            button.classList.remove('text-gray-700', 'hover:text-gray-900', 'opacity-90');
+        toggleButtonState(event.target.value.trim() !== '');
+    });
+
+    const submitIfValid = (event) => {
+        const value = input.value.trim();
+        if (value) {
+            submitForm(event, value);
         }
-        else {
-            button.classList.remove('cursor-not-allowed', 'opacity-50');
-            button.classList.add('text-gray-700', 'hover:text-gray-900', 'opacity-80');
+    };
+
+    input.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            submitIfValid(event);
         }
     });
 
-    // Attach event listener to each input field for the Enter key
-    input.addEventListener('keypress', function(event) {
-        if ( event.key === "Enter" && input.value.trim() ) {
-            submitForm(event, input.value.trim());
-        };
-        return;
-    });
-
-
-    button.addEventListener("click", (event) => {
-        if ( !input.value.trim() ) return;
-        submitForm(event, input.value.trim());
-    })
+    button.addEventListener("click", submitIfValid);
 }
+
 
 function submitForm(event, value) {
     event.preventDefault(); // Prevent form from submitting traditionally
