@@ -10,9 +10,21 @@ const { sendEmail } = require("./lib/mailer.js");
 
 
 /**************
+ GET CONFIG VARS
+**************/
+const { config } = require('./config');
+console.log('Server configuration:', config.server);
+
+const port = config.server.port;
+const baseUrl = config.server.baseurl;
+
+
+
+/**************
  LOCAL INCLUDES
 **************/
-var conf = require('./config.js').server;
+// var conf = require('./config.js').server;
+
 const setupSocketHandlers = require('./lib/socketHandlers.js');
 const { setCurrentUser, setRouteProtection } = require('./lib/middleware.js');
 const routeProtection = setRouteProtection(redisClient);
@@ -35,12 +47,12 @@ router.use(express.static(path.join(__dirname, 'static')));
 
 app.use(compression());
 app.use(express.json());
-app.use(conf.baseurl, router);
+app.use(baseUrl, router);
 
 
 var server = require('http').Server(app);
-server.listen(conf.port);
-console.log('Server running at http://localhost:' + conf.port + '/');
+server.listen(port);
+console.log('Server running at http://localhost:' + port + '/');
 
 
 // Middleware to add the user object to req for easy access
@@ -51,7 +63,7 @@ router.use(setCurrentUser);
  SETUP Socket.IO
 **************/
 const io = socketIo(server, {
-	path: conf.baseurl == '/' ? '' : conf.baseurl + "/socket.io"
+	path: baseUrl == '/' ? '' : baseUrl + "/socket.io"
 });
 setupSocketHandlers(io, db);
 
@@ -235,11 +247,14 @@ router.post('/forgot-password', async (req, res) => {
 			return res.json(response);
 		}
 		const email = response.email;
+		console.log("Email successfully retrieved:", email)
 
 		db.storeToken(username, expiresIn, async (tokenResponse) => {
 			if (tokenResponse.success) {
 
-				const mailResponse = await sendEmail(email, username, tokenResponse.token);
+				const mailResponse = await sendEmail("nicolas.chevrollier@inserm.fr", username, tokenResponse.token);
+				// const mailResponse = await sendEmail(email, username, tokenResponse.token);
+				console.log("mailResponse", mailResponse);
 				if (!mailResponse.success) {
 					return res.status(401).json(mailResponse);
 				}
@@ -254,9 +269,10 @@ router.post('/forgot-password', async (req, res) => {
 						email: email
 					}
 				)
+			} else {
+				console.error(tokenResponse.message);
+				return res.status(401).json(tokenResponse);
 			}
-			console.error(tokenResponse.message);
-			return res.status(401).json(tokenResponse);
 		});
 	});
 });

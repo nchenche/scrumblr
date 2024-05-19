@@ -6,6 +6,8 @@ function joinRoomHandler() {
         button.disabled = !isEnabled;
     };
 
+    toggleButtonState(false);
+
     input.addEventListener("input", (event) => {
         toggleButtonState(event.target.value.trim() !== '');
     });

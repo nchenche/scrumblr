@@ -17,7 +17,16 @@ services:
       - "1000:1000"
     networks:
       - app-network
-    command: node server.js
+    environment:
+      NODE_ENV: ${NODE_ENV:-development} # Default to development if NODE_ENV is not set
+    command: >
+      sh -c '
+      if [ "$$NODE_ENV" = "production" ]; then
+        npm run start;
+      else
+        npm run dev;
+      fi
+      '
     healthcheck:
       test: ["CMD-SHELL", "cat package.json | grep bcrypt && ls node_modules | grep bcrypt"]
       interval: 30s
