@@ -5,26 +5,24 @@ const submitButton = document.getElementById('btn-submit');
 
 
 function setUpForm() {
-    // Initialize fields on load
-    input.addEventListener('input', (event) => {
-        event.target.nextElementSibling.textContent = '';  // delete span error message
+    const input = document.getElementById('password');
+    const submitButton = document.getElementById('btn-submit');
+
+    // Initialize field on load
+    input.value = '';
+    input.addEventListener('input', handleFieldInput);
+
+    function handleFieldInput(event) {
+        event.target.nextElementSibling.textContent = ''; // Clear any previous error messages
         const isFieldValid = event.target.value.trim() !== '';
 
-        updateUI(isFieldValid);
-    });
+        submitButton.disabled = !isFieldValid;
+    }
+
+    // Check the field initially in case of autofill
+    handleFieldInput({ target: input });
 }
 
-function updateUI(bool) {
-    if (bool) {
-        submitButton.classList.remove('cursor-not-allowed', 'opacity-50');
-        submitButton.classList.add('text-gray-700', 'hover:text-gray-900', 'opacity-80', 'cursor-pointer');
-        submitButton.disabled = false;
-    } else {
-        submitButton.classList.add('cursor-not-allowed', 'opacity-50');
-        submitButton.classList.remove('text-gray-700', 'hover:text-gray-900', 'opacity-80', 'cursor-pointer');
-        submitButton.disabled = true;
-    }
-}
 
 
 // Function to handle form submission
