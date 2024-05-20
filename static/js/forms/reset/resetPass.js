@@ -47,13 +47,21 @@ async function submitForm(event) {
         }
 
         const responseDiv = document.getElementById("reset-success");
-        let countdown = 3; // Set the countdown starting at 3 seconds
-        responseDiv.textContent = `Password successfully reset! Redirecting to login page in ${countdown}s...`;
+        let countdown = 5; // Set the countdown starting at 3 seconds
+        responseDiv.innerHTML = `
+        <div class="text-green-700 px-4 py-3 rounded relative" role="alert">
+            <p class="block sm:inline text-2xl">Password successfully reset!</p>
+            <p class="mt-4 text-[18px] text-gray-800">Redirecting to the login page in <span id="counter" class="text-gray-600 text-[26px] opacity-90">${countdown}s...</span></p>
+        </div>
+        `;
     
         // Update the countdown every second
+        const counter = document.getElementById("counter");
         const intervalId = setInterval(() => {
             countdown--;
-            responseDiv.textContent = `Password successfully reset! Redirecting to login page in ${countdown}s...`;
+            counter.textContent = `
+                ${countdown}s
+            `;
     
             if (countdown === 0) {
                 clearInterval(intervalId); // Stop the countdown
