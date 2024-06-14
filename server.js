@@ -343,7 +343,7 @@ router.get('/users/exists/email/:email', async (req, res) => {
 				return res.status(500).send({ message: 'Checking email existence failed' });
 			}
 
-			console.log(email, { is_available: !exists });
+			// console.log(email, { is_available: !exists });
 			res.json({ exists: exists });
 		});
 	} catch (err) {

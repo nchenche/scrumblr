@@ -4,7 +4,7 @@ import {accountManager} from "../../userAccount.js"
 function isValidEmailFormat(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
-} 
+}
 
 
 function submitForm(event) {
