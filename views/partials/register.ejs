@@ -1,4 +1,4 @@
-<div class="board-outline" style="height: 60vh;">
+<div class="board-outline" style="height: fit-content;">
     <div id="board">
         <!-- <div id="board-doodles" class="-z-10"></div> -->
 
@@ -23,7 +23,7 @@
                     </div>
                 </div>                          
 
-                <div class="flex flex-col mb-8">  <!-- This container is for vertical stacking -->
+                <div class="flex flex-col mb-10">  <!-- This container is for vertical stacking -->
                     <div class="flex items-center">  <!-- This container is for horizontal alignment of label and input -->
                         <label for="password" class="text-gray-800 w-1/3">Password</label>
                         <div class="flex-1 flex flex-col">
@@ -32,14 +32,15 @@
                         </div>
                     </div>
                 
-                    <div id="password-requirements" class="flex flex-col items-center text-sm mt-1">
+                    <div id="password-requirements" class="flex flex-col items-center text-sm ml-2 mt-1">
                         <div>
-                            <div id="lowercase" class="password-requirement">At least 1 lowercase letter <i class="fa fa-times text-red-500"></i></div>
-                            <div id="uppercase" class="password-requirement">At least 1 uppercase letter <i class="fa fa-times text-red-500"></i></div>
-                            <div id="number" class="password-requirement">At least 1 number <i class="fa fa-times text-red-500"></i></div>
-                            <div id="length" class="password-requirement">Minimum 8 characters long <i class="fa fa-times text-red-500"></i></div>
+                            <div id="lowercase" class="password-requirement invalid"><i class="fa fa-check text-green-500"></i> - 1 lowercase letter</div>
+                            <div id="uppercase" class="password-requirement invalid"><i class="fa fa-check text-green-500"></i> - 1 uppercase letter</div>
+                            <div id="number" class="password-requirement invalid"><i class="fa fa-check text-green-500"></i> - 1 number</div>
+                            <div id="length" class="password-requirement invalid"><i class="fa fa-check text-green-500"></i> - 8 characters long</div>
                         </div>
                     </div>
+
                 </div>
                 
                 

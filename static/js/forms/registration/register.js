@@ -18,7 +18,6 @@ function submitForm(event) {
         return
     }
 
-
     var userData = {
         username: document.getElementById("username").value.trim(),
         email: document.getElementById("email").value.trim(),
@@ -43,8 +42,8 @@ function submitForm(event) {
             responseDiv.textContent = `Registration successfull! Redirecting to login page in ${countdown}s...`;
     
             if (countdown === 0) {
-                clearInterval(intervalId); // Stop the countdown
-                window.location.href = "/login"; // Redirect to login page
+                clearInterval(intervalId);  // Stop the countdown
+                window.location.href = "/login";  // Redirect to login page
             }
         }, 1000);
     });

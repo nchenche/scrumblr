@@ -108,6 +108,6 @@ export function setUpForm() {
     }
 
     // Check fields initially in case of autofill
-    inputs.forEach(input => handleFieldInput( { target: input } ));
+    // inputs.forEach(input => handleFieldInput( { target: input } ));
 }
 
