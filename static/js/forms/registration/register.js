@@ -13,37 +13,41 @@ async function submitForm(event) {
     const areFieldsValid = await checkFields(username, email);
     if ( !areFieldsValid ) return
 
+    // Data payload to register
+    var userData = {
+        username: document.getElementById("username").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        password: document.getElementById("password").value.trim(),
+    };
 
+    // If validation passes, proceed to register
+    accountManager.register(userData, (response) => {
+        if (!response.success) {
+            const message = `
+            Error occured during registration process...
 
-    // var userData = {
-    //     username: document.getElementById("username").value.trim(),
-    //     email: document.getElementById("email").value.trim(),
-    //     password: document.getElementById("password").value.trim(),
-    // };
+            Message: ${response.message}
+            `;
+            alert(message);
+            window.location.href = "/register";
+            return;
+        }
 
-    // // If validation passes, proceed to register
-    // accountManager.register(userData, (response) => {
-    //     if (!response.success) {
-    //         const span = document.getElementById(`${response.errorType}-error`);
-    //         span.textContent = response.message;
-    //         return;
-    //     }
-
-    //     const responseDiv = document.getElementById("status-message");
-    //     let countdown = 3; // Set the countdown starting at 3 seconds
-    //     responseDiv.textContent = `Registration successfull! Redirecting to login page in ${countdown}s...`;
+        const responseDiv = document.getElementById("status-message");
+        let countdown = 3; // Set the countdown starting at 3 seconds
+        responseDiv.textContent = `Registration successfull! Redirecting to login page in ${countdown}s...`;
     
-    //     // Update the countdown every second
-    //     const intervalId = setInterval(() => {
-    //         countdown--;
-    //         responseDiv.textContent = `Registration successfull! Redirecting to login page in ${countdown}s...`;
+        // Update the countdown every second
+        const intervalId = setInterval(() => {
+            countdown--;
+            responseDiv.textContent = `Registration successfull, redirecting to login page in ${countdown}s...`;
     
-    //         if (countdown === 0) {
-    //             clearInterval(intervalId);  // Stop the countdown
-    //             window.location.href = "/login";  // Redirect to login page
-    //         }
-    //     }, 1000);
-    // });
+            if (countdown === 0) {
+                clearInterval(intervalId);  // Stop the countdown
+                window.location.href = "/login";  // Redirect to login page
+            }
+        }, 1000);
+    });
 }
 
 

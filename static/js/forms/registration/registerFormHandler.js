@@ -42,9 +42,9 @@ export function setUpForm() {
     function validatePasswordRequirements(password) {
         const validationResults = [
             updateRequirement('lowercase', /[a-z]/.test(password)),
-            // updateRequirement('uppercase', /[A-Z]/.test(password)),
-            // updateRequirement('number', /[0-9]/.test(password)),
-            // updateRequirement('length', password.length >= 8)
+            updateRequirement('uppercase', /[A-Z]/.test(password)),
+            updateRequirement('number', /[0-9]/.test(password)),
+            updateRequirement('length', password.length >= 8)
         ];
 
         // Return true if all requirements are met
@@ -56,46 +56,6 @@ export function setUpForm() {
         element.classList.toggle('invalid', !isValid);
 
         return isValid;
-    }
-
-
-
-
-
-    // Attach submit event listener
-    // registerButton.addEventListener('click', submitForm);
-
-    // Function to handle form submission
-    async function submitForm(event) {
-        event.preventDefault(); // Prevent form from submitting traditionally
-
-        const username = document.getElementById('username').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
-
-
-
-        const userData = {
-            username,
-            email,
-            password,
-        };
-
-        // try {
-        //     loader.classList.remove('hidden');
-        //     const response = await accountManager.register(userData);
-        //     loader.classList.add('hidden');
-            
-        //     if (!response.success) {
-        //         const span = document.getElementById(`${response.type}-error`);
-        //         span.textContent = response.message;
-        //     } else {
-        //         window.location.href = response.redirectTo;
-        //     }
-        // } catch (error) {
-        //     loader.classList.add('hidden');
-        //     console.error('Registration error:', error);
-        // }
     }
 
     // Check fields initially in case of autofill
