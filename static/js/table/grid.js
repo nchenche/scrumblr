@@ -16,7 +16,11 @@ const grid = new gridjs.Grid({
         limit: 5,
         summary: true
     },
-    search: true,
+    search: {
+        selector: (cell, rowIndex, cellIndex) => {
+            if (cellIndex === 0) return cell;
+        }
+      },
     columns: [
         {
             name: 'Room',
