@@ -317,14 +317,14 @@ router.get('/session', (req, res) => {
 router.get('/users/exists/username/:username', async (req, res) => {
 	const username = req.params.username
 	try {
-		redisClient.hexists("users", username, (err, exists) => {
+		redisClient.hexists("users", username, (err, result) => {
 			if (err) {
 				console.error('Error checking username existence:', err);
 				return res.status(500).send({ message: 'Checking username existence failed' });
 			}
 
-			console.log(username, { exists: exists });
-			res.json({ exists: exists });
+			console.log(username, { result: result });
+			res.json({ result: result });
 		});
 	} catch (err) {
 		console.error('Error checking username:', err);
@@ -337,14 +337,14 @@ router.get('/users/exists/username/:username', async (req, res) => {
 router.get('/users/exists/email/:email', async (req, res) => {
 	const email = req.params.email
 	try {
-		redisClient.hexists("emails", email, (err, exists) => {
+		redisClient.hexists("emails", email, (err, result) => {
 			if (err) {
 				console.error('Error checking email existence:', err);
 				return res.status(500).send({ message: 'Checking email existence failed' });
 			}
 
-			// console.log(email, { is_available: !exists });
-			res.json({ exists: exists });
+			console.log("email", { email: email, result: result });
+			res.json({ result: result });
 		});
 	} catch (err) {
 		console.error('Error checking email:', err);

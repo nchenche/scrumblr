@@ -1,52 +1,49 @@
-import {setUpForm} from "./registerFormHandler.js"
+import { setUpForm, checkFields } from "./registerFormHandler.js"
 import {accountManager} from "../../userAccount.js"
 
-function isValidEmailFormat(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
 
-
-function submitForm(event) {
+async function submitForm(event) {
     event.preventDefault(); // Prevent form from submitting traditionally
 
-    // check email format before sending request
-    const mail = document.getElementById('email');
-    const isMailValid = isValidEmailFormat(mail.value.trim());
-    if (!isMailValid) {
-        mail.nextElementSibling.textContent = "Invalid email format";
-        return
-    }
+    const username = document.getElementById('username');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
 
-    var userData = {
-        username: document.getElementById("username").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        password: document.getElementById("password").value.trim(),
-    };
+    // Check username/email fields validity
+    const areFieldsValid = await checkFields(username, email);
+    if ( !areFieldsValid ) return
 
-    // If validation passes, proceed to register
-    accountManager.register(userData, (response) => {
-        if (!response.success) {
-            const span = document.getElementById(`${response.errorType}-error`);
-            span.textContent = response.message;
-            return;
-        }
 
-        const responseDiv = document.getElementById("status-message");
-        let countdown = 3; // Set the countdown starting at 3 seconds
-        responseDiv.textContent = `Registration successfull! Redirecting to login page in ${countdown}s...`;
+
+    // var userData = {
+    //     username: document.getElementById("username").value.trim(),
+    //     email: document.getElementById("email").value.trim(),
+    //     password: document.getElementById("password").value.trim(),
+    // };
+
+    // // If validation passes, proceed to register
+    // accountManager.register(userData, (response) => {
+    //     if (!response.success) {
+    //         const span = document.getElementById(`${response.errorType}-error`);
+    //         span.textContent = response.message;
+    //         return;
+    //     }
+
+    //     const responseDiv = document.getElementById("status-message");
+    //     let countdown = 3; // Set the countdown starting at 3 seconds
+    //     responseDiv.textContent = `Registration successfull! Redirecting to login page in ${countdown}s...`;
     
-        // Update the countdown every second
-        const intervalId = setInterval(() => {
-            countdown--;
-            responseDiv.textContent = `Registration successfull! Redirecting to login page in ${countdown}s...`;
+    //     // Update the countdown every second
+    //     const intervalId = setInterval(() => {
+    //         countdown--;
+    //         responseDiv.textContent = `Registration successfull! Redirecting to login page in ${countdown}s...`;
     
-            if (countdown === 0) {
-                clearInterval(intervalId);  // Stop the countdown
-                window.location.href = "/login";  // Redirect to login page
-            }
-        }, 1000);
-    });
+    //         if (countdown === 0) {
+    //             clearInterval(intervalId);  // Stop the countdown
+    //             window.location.href = "/login";  // Redirect to login page
+    //         }
+    //     }, 1000);
+    // });
 }
 
 
@@ -69,6 +66,27 @@ function handleSubmit() {
         });
     });
 }
+
+
+
+
+
+
+// Updates the UI based on field validity
+function updateUI(opt) {
+    const allFieldsValid = Object.values(fieldValidity).every(Boolean);
+    registerButton.disabled = !allFieldsValid;
+
+    if (opt !== undefined && opt.exists) {
+        const span = document.getElementById(`${opt.target}-error`);
+        span.textContent = `${capitalize(opt.target)} already exists`;
+    }
+}
+
+function capitalize(word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
