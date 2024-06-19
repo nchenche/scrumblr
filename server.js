@@ -157,7 +157,9 @@ router.get('/rooms', routeProtection.loggedIn, function (req, res) {
 
 
 router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
-	db.setRoomUserRelationship(req.params.id, req.user, (response) => {
+	// db.setRoomUserRelationship(req.params.id, req.user, (response) => {
+
+	db.storeRoomDetails(req.params.id, req.user, (response) => {
 		if (!response.success) {
 			console.error(response.message);
 		}
@@ -380,7 +382,7 @@ router.get('/api/rooms', (req, res) => {
 	const user = req.user;
 
 	db.getUserRooms(user, (response) => {
-		console.log(response);
+		console.log("Response from GET request to /api/rooms ", response);
 		return res.status(response.success ? 200 : 400).json(response);
 	});
 });
