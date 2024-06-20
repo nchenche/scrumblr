@@ -393,17 +393,21 @@ router.post('/api/delete_room', async (req, res) => {
 });
 
 
-router.get('/api/rooms', (req, res) => {
-	const user = req.user;
+router.get('/api/rooms', async (req, res) => {
+    const user = req.user;
 
-	db.getUserRooms(user, (response) => {
-		console.log("Response from GET request to /api/rooms ", response);
-		return res.status(response.success ? 200 : 400).json(response);
-	});
+    try {
+        const response = await db.getUserRooms(user);
+        console.log("Response from GET request to /api/rooms", response);
+        res.status(response.success ? 200 : 400).json(response);
+    } catch (error) {
+        console.error("Error handling /api/rooms:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
 });
 
 
-// Catch-all route that redirects to the home page if no other route matches
+// Catch-all route that redirects to the home page if no other route matches | MUST BE AFTER ALL DEFINED ROUTES
 router.use((req, res) => {
     res.redirect('/');
 });
