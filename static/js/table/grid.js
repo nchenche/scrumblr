@@ -113,7 +113,7 @@ grid.render(document.getElementById("wrapper"));
 
 
 // Event delegation for handling button clicks
-document.getElementById('wrapper').addEventListener('click', function (e) {
+document.getElementById('wrapper').addEventListener('click', async function (e) {
     if (e.target && e.target.closest('.show-password')) {
 
         const button = e.target.closest('.show-password');
@@ -141,11 +141,32 @@ document.getElementById('wrapper').addEventListener('click', function (e) {
 
         const room = e.target.closest('#delete-room').getAttribute('data-room');
 
-        console.log(room);
-
+        try {
+            const response = await deleteRoom({ room: room });
+            console.log(response);
+        } catch (error) {
+            console.error('Failed to delete room:', error);
+        }
     }
 });
 
 
+async function deleteRoom(data) {
+    console.log('Removing room:', data);
+    try {
+        const response = await fetch('/api/delete_room', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
 
+        const result = await response.json();  // Make sure to await the parsing of the JSON
+        return result;  // Return the result so it can be awaited and used outside this function
+    } catch (error) {
+        console.error('Error fetching api to remove room:', error);
+        throw error;  // Re-throw the error to be handled or logged by the caller
+    }
+}
 

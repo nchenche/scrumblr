@@ -378,6 +378,21 @@ router.post('/api/add_room_to_user', (req, res) => {
 });
 
 
+router.post('/api/delete_room', async (req, res) => {
+	const { room } = req.body;
+	const user = req.user
+
+	try {
+		response = await db.deleteUserRoom(user, room);
+		return res.status(200).json(response);
+
+	} catch (error) {
+		console.error(`Error in /api/delete_room request: ${error}`)
+		return res.status(400).json({success: false, message: error});
+	}
+});
+
+
 router.get('/api/rooms', (req, res) => {
 	const user = req.user;
 
