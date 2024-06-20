@@ -378,6 +378,22 @@ router.post('/api/add_room_to_user', (req, res) => {
 });
 
 
+router.post('/api/add_room_to_user', async (req, res) => {
+    const { user, room } = req.body;
+	console.log("room passed:", room);
+
+    try {
+        const response = await db.addRoomToUserAsParticipant(user, room);
+        console.log(response);
+        res.status(response.success ? 200 : 400).json(response);
+    } catch (error) {
+        console.error('Failed to add room to user:', error);
+        res.status(500).json({ success: false, message: 'Server error', error: error });
+    }
+});
+
+
+
 router.post('/api/delete_room', async (req, res) => {
 	const { room } = req.body;
 	const user = req.user
