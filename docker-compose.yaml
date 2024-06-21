@@ -22,7 +22,7 @@ services:
     command: >
       sh -c '
       echo "NODE_ENV is $$NODE_ENV"; # Debug line to check the value
-      if [ "$$NODE_ENV" = "production" ]; then
+      if [ "$$NODE_ENV" = "prod" ]; then
         npm run start;
       else
         npm run dev;
