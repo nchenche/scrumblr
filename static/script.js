@@ -614,21 +614,23 @@ async function fetchCurrentUser() {
  * @returns {void} This function does not return a value; it handles the result via a callback.
  * @throws {Error} Throws an error if the network request fails or if the API returns an error.
  */
-function setUserAsParticipant(data, callback) {
+async function setUserAsParticipant(data) {
     console.log('Adding user to room:', data);
-    fetch('/api/add_room_to_user', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(result => {callback(result);})
-    .catch(error => {
+    try {
+        const response = await fetch('/api/add_room_to_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+        return result;
+    } catch (error) {
         console.error('Error adding room to user:', error);
-        callback({ error: 'Failed to add room to user' });
-    });
+        return { success: false, error: 'Failed to add room to user' };
+    }
 }
 
 
@@ -663,9 +665,17 @@ async function createCard(id, text, x, y, rot, colour) {
         user: user,
         room: decodeURIComponent(location.pathname.split('/').filter(Boolean).pop())
     };
-    setUserAsParticipant(obj, (response) => {
-        console.log("setUserAsParticipant response", response);
-    });
+
+    try {
+        const result = setUserAsParticipant(obj);
+        if (result.success) {
+            console.log('User added to room successfully:', result);
+        } else {
+            console.error('Failed to add user to room:', result.error);
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
 }
 
 function randomCardColour() {
@@ -1093,6 +1103,7 @@ $(function() {
 		var font = currentFont;
 		
 		if (font != null) {
+            console.log("font-size: ", font.size);
 			font.size = font.size + 1;
 		
 			if (font.size > 20) {

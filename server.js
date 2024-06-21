@@ -368,14 +368,14 @@ router.get('/api/current_user', (req, res) => {
 });
 
 
-router.post('/api/add_room_to_user', (req, res) => {
-	const { user, room } = req.body;
+// router.post('/api/add_room_to_user', (req, res) => {
+// 	const { user, room } = req.body;
 
-	db.addRoomToUserAsParticipant(user, room, (response) => {
-		console.log(response);
-		return res.status(response.success ? 200 : 400).json(response);
-	});
-});
+// 	db.addRoomToUserAsParticipant(user, room, (response) => {
+// 		console.log(response);
+// 		return res.status(response.success ? 200 : 400).json(response);
+// 	});
+// });
 
 
 router.post('/api/add_room_to_user', async (req, res) => {
@@ -384,7 +384,7 @@ router.post('/api/add_room_to_user', async (req, res) => {
 
     try {
         const response = await db.addRoomToUserAsParticipant(user, room);
-        console.log(response);
+        console.log("*** response ***", response);
         res.status(response.success ? 200 : 400).json(response);
     } catch (error) {
         console.error('Failed to add room to user:', error);
