@@ -31,7 +31,7 @@ socket.on('connect', function() {
     const user = getCookie("username");
 
     const data = {
-        room: parts.pop(),
+        room: decodeURIComponent(parts.pop()),
         user: user
     }
 
@@ -661,7 +661,7 @@ async function createCard(id, text, x, y, rot, colour) {
     // add user as a participant in the room
     const obj = {
         user: user,
-        room: location.pathname.split('/').filter(Boolean).pop()
+        room: decodeURIComponent(location.pathname.split('/').filter(Boolean).pop())
     };
     setUserAsParticipant(obj, (response) => {
         console.log("setUserAsParticipant response", response);
