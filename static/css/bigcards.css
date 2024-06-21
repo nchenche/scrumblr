@@ -1,18 +1,12 @@
 .card {
 	width: 277px;
 	height: 183px;
-	font-size: .9em;
-
-
-
+	/* font-size: .9em; */
 	overflow: hidden;
-
 	position: absolute;
 	z-index: 10;
-
 	top: 460px;
 	left: 0px;
-
 	display: block;
 }
 
@@ -45,7 +39,7 @@
 	height: 122px;
 	margin: 5px 23px 0px 43px;
 	font-family: 'Covered By Your Grace',"Arial Rounded MT Bold", arial, serif;
-	font-size: 19px;
+	/* font-size: 19px; */
 	letter-spacing: 0px;
 	opacity: 1;
 	color: black;

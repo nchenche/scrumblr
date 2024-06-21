@@ -4,7 +4,7 @@ var columns = [];
 var requiredPassword = null;
 var passwordAttempts = 0;
 var currentTheme = "bigcards";
-var currentFont = null;
+var currentFont = {family: 'Covered By Your Grace', size: 16};
 var boardInitialized = false;
 var keyTrap = null;
 
@@ -191,18 +191,6 @@ $(document).bind('keyup', function(event) {
 
 // password functions
 function initPasswordForm(attempt) {
-
-    // blockUI(
-    //     `${attempt === true ? '<h1 class="mb-2">Invalid password</h1>' : '<h1 class="mb-2">Room protected</h1>'}
-    //     <form id="password-form" class="mt-8">
-    //         <input type="password" id="room-password" placeholder="Enter the room password" class="w-3/5 px-4 py-2 rounded shadow focus:outline-none focus:shadow-outline">
-    //         <div class="flex justify-center mt-2 space-x-4">
-    //             <input type="submit" class="text-white font-black bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg px-4 py-2 rounded" value="Submit">
-    //             <button id="exit-form" class="text-red-300 opacity-70 font-bold cursor-pointer hover:opacity-100 hover:shadow-lg px-4 py-2 rounded">Exit</button>
-    //         </div>
-    //     </form>`
-    // );
-
     blockUI(
         `${attempt === true ? '<h1 class="mb-2">Invalid password</h1>' : '<h1 class="mb-2">Room protected</h1>'}
         <form id="password-form" class="mt-8">
@@ -394,7 +382,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
         <img src="/images/icons/token/Xion.png" class="card-icon delete-card-icon z-10" />
         
         <img class="card-image" src="/images/${colour}-card.png" />
-        <div data-user="${user}" id="content:${id}" class="content stickertarget droppable">${text}</div>
+        <div data-user="${user}" id="content:${id}" class="content stickertarget droppable" style="font-size: 16px;">${text}</div>
         <span class="flex space-x-2 filler">
         </span>
 	</div>`;
@@ -512,10 +500,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     card.children('.delete-card-icon').click(
         function() {
             $("#" + id).remove();
-            //notify server of delete
-            sendAction('deleteCard', {
-                'id': id
-            });
+            sendAction('deleteCard', {'id': id}); // notify server of delete
         }
     );
 
@@ -626,7 +611,6 @@ async function setUserAsParticipant(data) {
         });
 
         const result = await response.json();
-        console.log("result", result);
         return result;
     } catch (error) {
         console.error('Error adding room to user:', error);
@@ -1064,38 +1048,32 @@ $(function() {
         return false;
     });
 	
-	// Style changer
+    // Style changer
     $("#fontify").click(function() {
-		
-		var font = currentFont;
-		
-		if (font != null) {
-			if (font.family == "Covered By Your Grace") {
-				font.family = 'Chela One';
-			} else if (font.family == "Chela One") {
-				font.family = 'Gaegu';
-			} else if (font.family == "Gaegu") {
-				font.family = 'Merienda';
-			} else if (font.family == "Merienda") {
-				font.family = 'Oswald';
-			} else if (font.family == "Oswald") {
-				font.family = 'Roboto';
-			} else if (font.family == "Roboto") {
-				font.family = 'Ubuntu';
-			} else {
-				font.family = 'Covered By Your Grace';
-			}
-        } else {
-			font = {
-				family: 'Covered By Your Grace',
-				size: '12'
-			};
-        }
-		
-		changeFontTo(font);
-        sendAction('changeFont', currentFont);
+        // Array of font families to cycle through
+        const fonts = [
+            "Covered By Your Grace", "Chela One", "Gaegu", 
+            "Merienda", "Oswald", "Roboto", "Ubuntu"
+        ];
 
-        return false;
+        var font = currentFont || {
+            family: 'Covered By Your Grace', // Default family if none is set
+            size: 16 // Default size if none is set
+        };
+
+        // Get the current index of the font family
+        let currentIndex = fonts.indexOf(font.family);
+
+        // Determine the next index: if at the end, cycle back to the start
+        let nextIndex = (currentIndex + 1) % fonts.length;
+
+        // Set the new font family
+        font.family = fonts[nextIndex];
+
+        changeFontTo(font);
+        sendAction('changeFont', font); // Ensure the correct font object is sent
+
+        return false; // Prevent default action
     });
 	
     // Increase card font size

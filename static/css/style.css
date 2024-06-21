@@ -6,11 +6,8 @@ body {
 	font-size: 13px;
 	color: #333;
 	background-color: #ddd;
-	xbackground-image: -webkit-gradient(radial, 265 118, 456, 147 0, 29, from(#DDDDDD), to(#f3f3f3));
 
 	padding-left: 10px;
-
-
 
 	user-select: none;
 	-o-user-select:none;
@@ -61,12 +58,6 @@ body {
 	background-image: url('scribbles2.png');
 }
 
-
-
-.hover .content {
-	xborder: solid rgba(92, 157, 181,0.5) 3px;
-}
-
 #password-form input, #lock-form input, #lock-form button, #lock-form span, #exit-form {
 	font-family: roboto;
 	font-size: 16px;
@@ -112,39 +103,31 @@ body {
 	font-size:inherit;
 	font-weight:inherit;
 	background-color:inherit;
-	xvertical-align: inherit;
 	font-family: inherit;
 	text-align: center;
-	xcolor: #444;
 	padding: 0;
 	margin: 0;
 	outline-width:0;
 	overflow: hidden;
 	resize: none;
 	width: 100%;
-	color: #330066;
-	color: #666;
-
+	color: #646464;
 }
 
 
 
 .board-table {
-	xz-index: 1;
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	xborder: solid black 1px;
 	height: 100%;
 	width: 100%;
 }
 
 .board-table .col{
-	xborder-left: dashed #19ba98 5px;
 	text-align: center;
 	vertical-align: top;
 	height: 100%;
-	xopacity: 1;
 	background-image: url('/images/green-board-line.png');
 	background-repeat: repeat-y;
 	background-position: left top;
@@ -165,7 +148,6 @@ h1, h1 a {
 	margin: 0px;
 	margin-left: 1px;
 	font-weight: normal;
-	xtext-shadow: 1px 1px 1px #b6b6b6;
 	font-size: 15px;
 	padding-top: 14px;
 	letter-spacing: +1px;
@@ -288,13 +270,10 @@ h2 {
 }
 
 .names input:hover {
-    xpadding: 2px 2px 2px 2px;
-    xborder: solid 1px #E5E5E5;
     outline: 0;
     width: 100px;
     background: -webkit-gradient(linear, left top, left 25, from(#FFFFFF), color-stop(4%, #EEEEEE), to(#FFFFFF));
     background: -moz-linear-gradient(top, #FFFFFF, #EEEEEE 1px, #FFFFFF 25px);
-xopacity: .5;
 	background: none;
     box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px;
 	border-radius: 10px;
@@ -325,7 +304,6 @@ xopacity: .5;
 .sticker {
 	padding-top:  0px;
 	padding-left: 2px;
-	xz-index:10;
 	display: inline-block;
 	width: 11px;
 	height: 11px;
