@@ -383,7 +383,6 @@ router.post('/api/add_room_to_user', async (req, res) => {
 });
 
 
-
 router.post('/api/delete_room', async (req, res) => {
 	const { room } = req.body;
 	const user = req.user

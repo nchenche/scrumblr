@@ -626,6 +626,7 @@ async function setUserAsParticipant(data) {
         });
 
         const result = await response.json();
+        console.log("result", result);
         return result;
     } catch (error) {
         console.error('Error adding room to user:', error);
@@ -667,7 +668,7 @@ async function createCard(id, text, x, y, rot, colour) {
     };
 
     try {
-        const result = setUserAsParticipant(obj);
+        const result = await setUserAsParticipant(obj);
         if (result.success) {
             console.log('User added to room successfully:', result);
         } else {
@@ -1097,53 +1098,42 @@ $(function() {
         return false;
     });
 	
-	// Increase card font size
+    // Increase card font size
     $('#font-increase').click(function() {
-		
-		var font = currentFont;
-		
-		if (font != null) {
-            console.log("font-size: ", font.size);
-			font.size = font.size + 1;
-		
-			if (font.size > 20) {
-				font.size = 8;
-			}
-		} else {
-			font = {
-				family: 'Covered By Your Grace',
-				size: 12
-			};
-		}
-		
-        changeFontTo(font);
-        sendAction('changeFont', currentFont);
+        var font = currentFont || {
+            family: 'Covered By Your Grace', // Default font family if none is set
+            size: 16 // Start at a default size if none is set
+        };
 
-        return false;
+        font.size += 1; // Increment the font size
+
+        if (font.size > 20) { // Check if the font size goes beyond the maximum
+            font.size = 10; // Reset to the minimum size, creating a cycle
+        }
+
+        changeFontTo(font);
+        sendAction('changeFont', font); // Ensure the correct font object is sent
+
+        return false; // Prevent default action
     });
-	
-	// Decrease card font size
-    $('#font-decrease').click(function() {
-		
-		var font = currentFont;
-		
-		if (font != null) {
-			font.size = font.size - 1;
-		
-			if (font.size < 8) {
-				font.size = 22;
-			}
-		} else {
-			font = {
-				family: 'Covered By Your Grace',
-				size: 12
-			};
-		}
-		
-        changeFontTo(font);
-        sendAction('changeFont', currentFont);
 
-        return false;
+    // Decrease card font size
+    $('#font-decrease').click(function() {
+        var font = currentFont || {
+            family: 'Covered By Your Grace', // Default font family if none is set
+            size: 16 // Start at a default size if none is set
+        };
+
+        font.size -= 1; // Decrement the font size
+
+        if (font.size < 10) { // Check if the font size goes below the minimum
+            font.size = 20; // Reset to the maximum size, creating a cycle
+        }
+
+        changeFontTo(font);
+        sendAction('changeFont', font); // Ensure the correct font object is sent
+
+        return false; // Prevent default action
     });
 	
 	// Setup a password
