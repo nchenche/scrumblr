@@ -17,14 +17,13 @@ console.log('Server configuration:', config.server);
 
 const port = config.server.port;
 const baseUrl = config.server.baseurl;
+const avatar_api = config.dicebear.url;
 
-
+console.log("avatar_api", avatar_api);
 
 /**************
  LOCAL INCLUDES
 **************/
-// var conf = require('./config.js').server;
-
 const setupSocketHandlers = require('./lib/socketHandlers.js');
 const { setCurrentUser, setRouteProtection } = require('./lib/middleware.js');
 const routeProtection = setRouteProtection(redisClient);
@@ -174,6 +173,7 @@ router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
 				body: 'partials/room.ejs',
 				pageTitle: ('Scrumblr - ' + req.params.id),
 				pageScripts: ['/script.js'],
+				variable: {avatar_api: avatar_api},
 				username: req.user,
 				is_owner: response.is_owner,
 				is_room_protected: resExists === 1 ? true : false

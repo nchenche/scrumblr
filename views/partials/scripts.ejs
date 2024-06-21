@@ -3,3 +3,11 @@
         <script type="module" src="<%= script %>"></script>
     <% }); %>
 <% } %>
+
+<!-- Check if the variable object is defined -->
+<% if (typeof variable !== 'undefined') { %>
+    <script>
+        // Define the global variable GLOB_VAR with the value from server-side
+        var GLOB_VAR = <%- JSON.stringify(variable) %>;
+    </script>
+<% } %>
