@@ -2,6 +2,27 @@ import { setUpForm } from "./loginFormHandler.js";
 import { accountManager } from "../../userAccount.js";
 
 
+// function login(username, password) {
+//     const MAX_ATTEMPTS = 3;
+//     let remainingAttempts = MAX_ATTEMPTS - user.attempts;  // user.attempts tracks failed attempts
+
+//     if (authenticate(username, password)) {
+//         resetLoginAttempts(username);
+//         redirectToDashboard();
+//     } else {
+//         incrementLoginAttempts(username);
+//         remainingAttempts--;
+
+//         if (remainingAttempts <= 0) {
+//             lockAccount(username);
+//             return "Your account has been locked due to multiple failed login attempts. Please contact support.";
+//         } else {
+//             return `Incorrect username or password. Please try again. You have ${remainingAttempts} more attempt${remainingAttempts !== 1 ? 's' : ''} before your account is locked.`;
+//         }
+//     }
+// }
+
+
 function submitForm(event) {
     event.preventDefault(); // Prevent form from submitting traditionally
 

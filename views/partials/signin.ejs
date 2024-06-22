@@ -1,7 +1,15 @@
 <div class="board-outline" style="height: fit-content;">
     <div id="board" style="min-height: 50vh;">
 
-        <h1 class="font-customFont text-5xl text-center text-gray-400 mb-24">Sign In to Scrumblr</h1>
+        <div class="text-center mb-24 h-24">
+            <h1 class="font-customFont text-5xl text-gray-400">Sign In to Scrumblr</h1>
+            <div id="attempts-container" class="font-customFont text-lg text-red-500 mt-3">
+                <p id="attempts-count">You have 5 more attempts before your account is temporarily locked.</p>
+                <p id="attempts-locked">Your account has been locked due to multiple failed login attempts. Please contact support.</p>
+            </div>
+        </div>
+
+        <!-- <h1 class="font-customFont text-5xl text-center text-gray-400 mb-24">Sign In to Scrumblr</h1> -->
 
         <div class="flex flex-col items-center font-customFont">
         
