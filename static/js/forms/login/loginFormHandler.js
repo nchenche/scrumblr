@@ -11,7 +11,7 @@ export function setUpForm() {
 
     // Initialize fields on load
     inputs.forEach(input => {
-        input.value = '';
+        // input.value = '';
         input.addEventListener('input', handleFieldInput); // Single event handler for input event
     });
 
@@ -32,8 +32,15 @@ export function setUpForm() {
         submitButton.disabled = !allFieldsValid;
     }
 
+    // focus on empty input
+    if ( !inputs[0].value.trim() ) {
+        inputs[0].focus();
+    } else {
+        inputs[1].focus();
+    }
+
     // Check fields initially in case of autofill
-    inputs.forEach(input => {
-        handleFieldInput({ target: input });
-    });
+    // inputs.forEach(input => {
+    //     handleFieldInput({ target: input });
+    // });
 }

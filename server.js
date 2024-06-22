@@ -81,10 +81,12 @@ router.get('/register', routeProtection.loggedOut, function (req, res) {
 
 
 router.get('/login', routeProtection.loggedOut, function (req, res) {
+	const username = req.query.username;
+
 	res.render('layout', {
 		body: 'partials/signin.ejs',
 		pageScripts: ['/js/forms/login/login.js'],
-		username: null
+		username: username
 	});
 });
 

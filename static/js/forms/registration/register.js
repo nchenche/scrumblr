@@ -59,6 +59,8 @@ function handleSubmit() {
 }
 
 function showSuccessMessage() {
+    const username = document.getElementById("username").value.trim();
+
     const contentDiv = document.getElementById("board-content");
     const statusDiv = document.getElementById("status-message");
     const counter = document.getElementById("counter");
@@ -73,7 +75,7 @@ function showSuccessMessage() {
 
         if (counter.innerHTML == 0) {
             clearInterval(intervalId);  // Stop the countdown
-            window.location.href = "/login";  // Redirect to login page
+            window.location.href = `/login?username=${username}`;  // Redirect to login page
         }
     }, 1000);
 }
