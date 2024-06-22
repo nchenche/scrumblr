@@ -81,12 +81,13 @@ router.get('/register', routeProtection.loggedOut, function (req, res) {
 
 
 router.get('/login', routeProtection.loggedOut, function (req, res) {
-	const username = req.query.username;
+	const user = req.query.username;
 
 	res.render('layout', {
 		body: 'partials/signin.ejs',
 		pageScripts: ['/js/forms/login/login.js'],
-		username: username
+		username: null,  // used as a signal for signed in user 
+		user: user
 	});
 });
 
