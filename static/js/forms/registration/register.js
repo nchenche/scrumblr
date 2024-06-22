@@ -32,21 +32,8 @@ async function submitForm(event) {
             window.location.href = "/register";
             return;
         }
-
-        const responseDiv = document.getElementById("status-message");
-        let countdown = 3; // Set the countdown starting at 3 seconds
-        responseDiv.textContent = `Registration successfull! Redirecting to login page in ${countdown}s...`;
-    
-        // Update the countdown every second
-        const intervalId = setInterval(() => {
-            countdown--;
-            responseDiv.textContent = `Registration successfull, redirecting to login page in ${countdown}s...`;
-    
-            if (countdown === 0) {
-                clearInterval(intervalId);  // Stop the countdown
-                window.location.href = "/login";  // Redirect to login page
-            }
-        }, 1000);
+        
+        showSuccessMessage();
     });
 }
 
@@ -71,25 +58,30 @@ function handleSubmit() {
     });
 }
 
+function showSuccessMessage() {
+    const contentDiv = document.getElementById("board-content");
+    const statusDiv = document.getElementById("status-message");
+    const counter = document.getElementById("counter");
 
+    counter.innerHTML = 3;
+    contentDiv.classList.add("hidden");
+    statusDiv.classList.remove("hidden");
 
+    // Update the counter value every second
+    const intervalId = setInterval(() => {
+        counter.innerHTML--;
 
-
-
-// Updates the UI based on field validity
-function updateUI(opt) {
-    const allFieldsValid = Object.values(fieldValidity).every(Boolean);
-    registerButton.disabled = !allFieldsValid;
-
-    if (opt !== undefined && opt.exists) {
-        const span = document.getElementById(`${opt.target}-error`);
-        span.textContent = `${capitalize(opt.target)} already exists`;
-    }
+        if (counter.innerHTML == 0) {
+            clearInterval(intervalId);  // Stop the countdown
+            window.location.href = "/login";  // Redirect to login page
+        }
+    }, 1000);
 }
 
-function capitalize(word) {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-}
+
+// function capitalize(word) {
+//     return word.charAt(0).toUpperCase() + word.slice(1);
+// }
 
 
 
