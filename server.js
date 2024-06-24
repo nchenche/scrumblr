@@ -61,9 +61,8 @@ router.use(setCurrentUser);
 /**************
  SETUP Socket.IO
 **************/
-const io = socketIo(server, {
-	path: baseUrl == '/' ? '' : baseUrl + "/socket.io"
-});
+const ioOptions = {path: '/socketio'};
+const io = socketIo(server, ioOptions);
 setupSocketHandlers(io, db);
 
 

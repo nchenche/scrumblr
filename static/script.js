@@ -10,8 +10,9 @@ var keyTrap = null;
 
 // const baseurl = location.origin;
 var baseurl = location.pathname.substring(0, location.pathname.lastIndexOf('/'));
-var socket = io.connect({path: "/socket.io"});
+var socket = io.connect({path: "/socketio"});
 // var socket = io.connect({path: baseurl + "/socket.io"});
+console.log(socket)
 
 const AVATAR_API = GLOB_VAR.avatar_api;
 

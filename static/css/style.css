@@ -16,7 +16,6 @@ body {
 	-webkit-user-select: none;
 
 	background-image: url('bg/concrete_wall_2_2.png');
-
 }
 
 #board {
@@ -46,7 +45,7 @@ body {
 
 	box-shadow: 1px 3px 2px #aaa;
 
-	-webkit-transform:rotate(0.3deg); /*"is that a little off-level? i feel like it is off-level"*/
+	transform: rotate(0deg); /*"is that a little off-level? i feel like it is off-level"*/
 }
 
 #board-doodles {
@@ -236,7 +235,8 @@ h2 {
 }
 
 .names p {
-	padding: 0; margin 0;
+	padding: 0; 
+	margin: 0;
 }
 
 .names ul {
@@ -497,7 +497,7 @@ p.small {
 
 input.text {
     width: 230px;
-    background: none;
+    /* background: none; */
     padding: 6px;
     margin-bottom: 10px;
     border: none;
@@ -506,6 +506,7 @@ input.text {
 	color: #5c9db4;
 	text-align: center;
 	border-bottom: dashed 3px #19ba98;
+	caret-color:  auto;
 }
 
 /* input:hover {
