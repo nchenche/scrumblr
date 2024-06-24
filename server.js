@@ -74,7 +74,8 @@ router.get('/register', routeProtection.loggedOut, function (req, res) {
 	res.render('layout', {
 		body: 'partials/register.ejs',
 		pageScripts: ['/js/forms/registration/register.js'],
-		username: null
+		username: null,
+		currentNav: 'register'
 	});
 });
 
@@ -86,7 +87,8 @@ router.get('/login', routeProtection.loggedOut, function (req, res) {
 		body: 'partials/signin.ejs',
 		pageScripts: ['/js/forms/login/login.js'],
 		username: null,  // used as a signal for signed in user 
-		user: user
+		user: user,
+		currentNav: 'login'
 	});
 });
 
@@ -144,6 +146,7 @@ router.get('/', routeProtection.loggedIn, function (req, res) {
 		body: 'partials/home.ejs',
 		username: req.user ? req.user : null,
 		pageScripts: ['/js/utils.js'],
+		currentNav: 'home'
 	});
 });
 
@@ -153,6 +156,7 @@ router.get('/rooms', routeProtection.loggedIn, function (req, res) {
 		body: 'partials/rooms_list.ejs',
 		username: req.user,
 		pageScripts: ['/js/table/grid.js'],
+		currentNav: 'rooms'
 	});
 });
 
@@ -178,7 +182,8 @@ router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
 				variable: {avatar_api: avatar_api},
 				username: req.user,
 				is_owner: response.is_owner,
-				is_room_protected: resExists === 1 ? true : false
+				is_room_protected: resExists === 1 ? true : false,
+				currentNav: null
 			});
 		});
 	});

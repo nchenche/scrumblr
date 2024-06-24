@@ -1,5 +1,6 @@
-<div class="board-outline">
-  <div id="board">
+<div class="board-outline" style="height: fit-content;">
+  <div id="board" style="min-height: 60vh;">
+
     <div id="board-doodles"></div>
     <img id="marker" src="/images/marker.png" />
     <img id="eraser" src="/images/eraser.png" />
@@ -27,16 +28,6 @@
   </div>
 </div>
 
-<!-- <div class="buttons">
-  <i id="create-card" class="fa fa-plus-circle fa-2x bottom-icon"></i><br />
-  <i id="smallify" class="fa fa-expand fa-2x bottom-icon"></i><br />
-  <i id="fontify" class="fa fa-font fa-2x bottom-icon"></i><br />
-  <i id="font-increase" class="fa fa-search-plus fa-2x bottom-icon"></i><br />
-  <i id="font-decrease" class="fa fa-search-minus fa-2x bottom-icon"></i><br />
-  <% if (is_owner) { %>
-  <i id="protect-room" class="fa fa-eye-slash fa-2x bottom-icon"></i>
-  <% } %>
-</div> -->
 
 <div class="fixed top-4 right-4 z-10 p-2.5 bg-white rounded opacity-50 flex flex-col items-center space-y-2">
   <i id="create-card" class="fa fa-plus-circle fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Create card"></i>
@@ -69,9 +60,9 @@
 </div>
 
 <div class="names">
-  <p>connected:</p>
+  <p>Connected users:</p>
   <img id="user-icon" src="/images/icons/cc/black/png/user_icon&16.png" />
-  <input id="yourname-input" disabled />
+  <input id="yourname-input" disabled class="" />
   <span class="you-text">(you)</span>
   <ul id="names-ul"></ul>
 </div>

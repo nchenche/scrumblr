@@ -3,10 +3,10 @@
         <ul class="flex flex-row font-medium mt-0 space-x-12 rtl:space-x-reverse text-xl">
             <% if (username) { %>
                 <li>
-                    <a href="/rooms" class="text-gray-900 dark:text-white hover:underline">Dashboard</a>
+                    <a href="/rooms" class="<%= currentNav === 'rooms' ? 'underline font-semibold' : 'text-gray-900' %> dark:text-white hover:underline">Dashboard</a>
                 </li>                
                 <li>
-                    <a href="/" class="text-gray-900 dark:text-white hover:underline" aria-current="page">Room Access</a>
+                    <a href="/" class="<%= currentNav === 'home' ? 'underline font-semibold' : 'text-gray-900' %> dark:text-white hover:underline">Room Access</a>
                 </li>
             
                 <li>
@@ -15,10 +15,11 @@
 
             <% } else { %>
                 <li>
-                    <a href="/login" class="text-gray-900 dark:text-white hover:underline">Sign In</a>
+                    <a href="/login" class="<%= currentNav === 'login' ? 'underline font-semibold' : 'text-gray-900' %> dark:text-white hover:underline">Sign In</a>
+
                 </li>
                 <li>
-                    <a href="/register" class="text-gray-900 dark:text-white hover:underline">Register</a>
+                    <a href="/register" class="<%= currentNav === 'register' ? 'underline font-semibold' : 'text-gray-900' %> dark:text-white hover:underline">Register</a>
                 </li>
             <% } %>
         </ul>

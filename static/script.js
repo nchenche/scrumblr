@@ -12,7 +12,6 @@ var keyTrap = null;
 var baseurl = location.pathname.substring(0, location.pathname.lastIndexOf('/'));
 var socket = io.connect({path: "/socketio"});
 // var socket = io.connect({path: baseurl + "/socket.io"});
-console.log(socket)
 
 const AVATAR_API = GLOB_VAR.avatar_api;
 
@@ -40,18 +39,33 @@ socket.on('connect', function() {
 
     //imediately join the room which will trigger the initializations
     sendAction('joinRoom', data);
+
 });
 
 socket.on('disconnect', function() {
+    const parts = location.pathname.split('/').filter(Boolean);
+
+    sendAction('leaveRoom', { room: decodeURIComponent(parts.pop()) });
+
     blockUI("Loading...");
     // blockUI("Server disconnected. Refresh page to try and reconnect...");
 
     //$('.blockOverlay').click($.unblockUI);
 });
 
+
 socket.on('message', function(data) {
     getMessage(data);
 });
+
+
+socket.on('updateRoomUsers', (users) => {
+    console.log('Users in room:', users);
+    // Here you would update your client-side UI to display the list of users
+});
+
+
+
 
 function unblockUI() {
     $.unblockUI({fadeOut: 50});
@@ -888,20 +902,14 @@ function setName(name) {
 
 function displayInitialUsers(users) {
     for (var i in users) {
-        //console.log(users);
         displayUserJoined(users[i].sid, users[i].user_name);
     }
 }
 
 function displayUserJoined(sid, user_name) {
-    let name = '';
-    if (user_name)
-        name = user_name;
-    else
-        name = sid.substring(0, 5);
+    let name = user_name ? user_name : sid.substring(0, 5);
 
-
-    $('#names-ul').append('<li id="user-' + sid + '">' + name + '</li>');
+    $('#names-ul').append(`<li id="user-${sid}">${name}</li>`);
 }
 
 function displayUserLeft(sid) {
@@ -913,9 +921,7 @@ function displayUserLeft(sid) {
 
     var id = '#user-' + sid.toString();
 
-    $('#names-ul').children(id).fadeOut(1000, function() {
-        $(this).remove();
-    });
+    $('#names-ul').children(id).remove();
 }
 
 
