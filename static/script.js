@@ -597,7 +597,6 @@ function addSticker(cardId, stickerId) {
         if (stickerContainer.html().indexOf(stickerId) < 0)
             stickerContainer.prepend(`<img src="/images/stickers/${stickerId}.png">`);
     }
-
 }
 
 
@@ -766,7 +765,6 @@ function drawNewColumn(columnName) {
         onblur: 'submit',
         width: '',
         height: '',
-        xindicator: '<img src="/images/ajax-loader.gif">',
         event: 'dblclick', //event: 'mouseover'
         }
     );
@@ -792,7 +790,6 @@ function onColumnChange(id, text) {
         } else {
             names.push($(this).text());
         }
-
     });
 
     updateColumns(names);
@@ -889,21 +886,21 @@ function changeFontTo(font) {
 
 
 
-function setCookie(c_name, value, exdays) {
-    console.log("setting cookie")
-    var exdate = new Date();
-    exdate.setDate(exdate.getDate() + exdays);
-    var c_value = escape(value) + ((exdays === null) ? "" : "; expires=" +
-        exdate.toUTCString());
-    document.cookie = c_name + "=" + c_value;
-}
+// function setCookie(c_name, value, exdays) {
+//     console.log("setting cookie")
+//     var exdate = new Date();
+//     exdate.setDate(exdate.getDate() + exdays);
+//     var c_value = escape(value) + ((exdays === null) ? "" : "; expires=" +
+//         exdate.toUTCString());
+//     document.cookie = c_name + "=" + c_value;
+// }
 
 
-function getCookie(name) {
-    let value = `; ${document.cookie}`;
-    let parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-}
+// function getCookie(name) {
+//     let value = `; ${document.cookie}`;
+//     let parts = value.split(`; ${name}=`);
+//     if (parts.length === 2) return parts.pop().split(";").shift();
+// }
 
 
 // function setCookie(name, value, days, path, secure, sameSite) {
@@ -1002,17 +999,10 @@ function adjustCard(offsets, doSync) {
 //////////////////////////////////////////////////////////
 
 $(function() {
-
-
-	//disable image dragging
-	//window.ondragstart = function() { return false; };
-
-
     if (boardInitialized === false)
         // blockUI('<img src="/images/ajax-loader.gif" width=43 height=11/>');
 
     //setTimeout($.unblockUI, 2000);
-
 
     $("#create-card").click(function() {
             var rotation = Math.random() * 10 - 5; //add a bit of random rotation (+/- 10deg)
@@ -1029,8 +1019,6 @@ $(function() {
                 randomCardColour()
             );
     });
-
-
 
     // Style changer
     $("#smallify").click(function() {
@@ -1171,7 +1159,7 @@ $(function() {
 
     $(".sticker").draggable({
         revert: true,
-        zIndex: 1000
+        zIndex: 10000
     });
 
 
