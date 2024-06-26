@@ -1,64 +1,78 @@
-<div class="board-outline" style="height: fit-content;">
-  <div id="board" style="min-height: 40vh;">
 
-    <div id="board-doodles"></div>
-    <img id="marker" src="/images/marker.png" />
-    <img id="eraser" src="/images/eraser.png" />
 
-    <table id="board-table" class="board-table">
-      <tr>
-        <td id="icon-col" width="1%">
-          <img
-            id="add-col"
-            class="col-icon"
-            width="20"
-            height="20"
-            src="/images/icons/iconic/raster/black/plus_alt_32x32.png"
-          />
-          <img
-            id="delete-col"
-            class="col-icon"
-            width="20"
-            height="20"
-            src="/images/icons/iconic/raster/black/minus_alt_32x32.png"
-          />
-        </td>
-      </tr>
-    </table>
+<div class="main-container flex w-full h-full">
+
+  <div class="ml-6 p-2 clients-container w-1/5 border-4 border-zinc-300 shadow-lg rounded-lg font-customFont">
+    <div class="text-xl text-center">
+      <h2>Connected users</h2>
+
+      <!-- Placeholder for dynamically generated user list -->
+      <div class="mt-5 overflow-y-auto" id="userListContainer"></div>
+    </div>
+
   </div>
+  <div class="w-full">
+    <div class="board-outline" style="height: fit-content;">
+      <div id="board" style="min-height: 40vh;">
+    
+        <div id="board-doodles"></div>
+        <img id="marker" src="/images/marker.png" />
+        <img id="eraser" src="/images/eraser.png" />
+    
+        <table id="board-table" class="board-table">
+          <tr>
+            <td id="icon-col" width="1%">
+              <img
+                id="add-col"
+                class="col-icon"
+                width="20"
+                height="20"
+                src="/images/icons/iconic/raster/black/plus_alt_32x32.png"
+              />
+              <img
+                id="delete-col"
+                class="col-icon"
+                width="20"
+                height="20"
+                src="/images/icons/iconic/raster/black/minus_alt_32x32.png"
+              />
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    
+    <div class="fixed top-4 right-4 z-10 p-2.5 bg-white rounded opacity-50 flex flex-col items-center space-y-2">
+      <i id="create-card" class="fa fa-plus-circle fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Create card"></i>
+      <!-- <i id="smallify" class="fa fa-expand fa-2x bottom-icon cursor-pointer hover:opacity-100"></i> -->
+      <i id="fontify" class="fa fa-font fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Change font family"></i>
+      <i id="font-increase" class="fa fa-search-plus fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Increase font size"></i>
+      <i id="font-decrease" class="fa fa-search-minus fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Decrease font size"></i>
+      <% if (is_owner) { %>
+        <% if (is_room_protected) { %>
+            <i id="protect-room" class="fa fa-unlock fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Unlock room"></i>
+        <% } else { %>
+            <i id="protect-room" class="fa fa-lock fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Lock room"></i>
+        <% } %>
+      <% } %>
+    </div>    
+    
+    <div class="stickers">
+      <div class="sticker" id="sticker-red"></div>
+      <div class="sticker" id="sticker-blue"></div>
+      <div class="sticker" id="sticker-yellow"></div>
+      <div class="sticker" id="sticker-green"></div>
+      <br />
+      <div class="sticker" id="sticker-pink"></div>
+      <div class="sticker" id="sticker-lightblue"></div>
+      <div class="sticker" id="sticker-orange"></div>
+      <div class="sticker" id="sticker-purple"></div>
+      <br />
+      <div class="sticker" id="nosticker"></div>
+    </div>    
+  
+    
+  </div>
+  
+
 </div>
-
-
-<div class="fixed top-4 right-4 z-10 p-2.5 bg-white rounded opacity-50 flex flex-col items-center space-y-2">
-  <i id="create-card" class="fa fa-plus-circle fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Create card"></i>
-  <!-- <i id="smallify" class="fa fa-expand fa-2x bottom-icon cursor-pointer hover:opacity-100"></i> -->
-  <i id="fontify" class="fa fa-font fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Change font family"></i>
-  <i id="font-increase" class="fa fa-search-plus fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Increase font size"></i>
-  <i id="font-decrease" class="fa fa-search-minus fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Decrease font size"></i>
-  <% if (is_owner) { %>
-    <% if (is_room_protected) { %>
-        <i id="protect-room" class="fa fa-unlock fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Unlock room"></i>
-    <% } else { %>
-        <i id="protect-room" class="fa fa-lock fa-2x bottom-icon cursor-pointer hover:opacity-100" title="Lock room"></i>
-    <% } %>
-  <% } %>
-</div>
-
-
-<div class="stickers">
-  <div class="sticker" id="sticker-red"></div>
-  <div class="sticker" id="sticker-blue"></div>
-  <div class="sticker" id="sticker-yellow"></div>
-  <div class="sticker" id="sticker-green"></div>
-  <br />
-  <div class="sticker" id="sticker-pink"></div>
-  <div class="sticker" id="sticker-lightblue"></div>
-  <div class="sticker" id="sticker-orange"></div>
-  <div class="sticker" id="sticker-purple"></div>
-  <br />
-  <div class="sticker" id="nosticker"></div>
-</div>
-
-
-<!-- Placeholder for dynamically generated user list -->
-<div id="userListContainer"></div>

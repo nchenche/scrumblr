@@ -66,16 +66,23 @@ socket.on('updateRoomUsers', (users) => {
     container.innerHTML = '';  // Clear the container
 
     const div = document.createElement('div');
-    div.className = 'flex justify-center mt-4 font-customFont';
+    div.className = 'flex justify-center font-customFont';
 
     const ul = document.createElement('ul');
     ul.className = 'bg-transparent p-4 w-fit max-w-xs text-center';
     ul.id = 'userList';
 
+    users = [
+        "John", "Jane", "Alice", "Bob", "Claire",
+        "David", "Emma", "Frank", "Grace", "Henry",
+        "Isabel", "Jack", "Karen", "Leo", "Mia",
+        "Nick", "Olivia", "Paul", "Quinn", "Rachel"
+    ];
+    
     users.forEach(user => {
         const li = document.createElement('li');
-        li.className = 'flex items-center space-x-3 px-4 hover:text-gray-800 text-gray-500 text-[1.2em]';
-
+        li.className = 'flex items-center my-2 space-x-3 px-4 opacity-80 hover:text-gray-800 hover:opacity-100 text-gray-500 text-[1.2em]';
+        li.title = user;
         // Construct avatar image URL
         const avatarUrl = `${AVATAR_API}?seed=${encodeURIComponent(user)}&${dicebearQuery}`;
         
@@ -83,8 +90,7 @@ socket.on('updateRoomUsers', (users) => {
         const img = document.createElement('img');
         img.src = avatarUrl;
         img.alt = "User Avatar";
-        img.title = user;
-        img.className = 'w-7 h-7 opacity-80 hover:opacity-100';  // Tailwind classes for size and rounding
+        img.className = 'w-7 h-7';  // Tailwind classes for size and rounding
 
         // Create span for username
         const username = document.createElement('span');
