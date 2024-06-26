@@ -13,85 +13,92 @@ var baseurl = location.pathname.substring(0, location.pathname.lastIndexOf('/'))
 var socket = io.connect({path: "/socketio"});
 // var socket = io.connect({path: baseurl + "/socket.io"});
 
+const room_end_url = location.pathname.split('/').filter(Boolean); // retrieve the final part of the path be the room name
+
+const ROOM = decodeURIComponent(room_end_url.pop());
+const USERNAME = GLOB_VAR.user; // getCookie("username"); // await fetchCurrentUser()
 const AVATAR_API = GLOB_VAR.avatar_api;
 
 
-//an action has happened, send it to the
-//server
+
+window.addEventListener('beforeunload', function() {
+    if (socket) {
+        socket.disconnect();
+    }
+});
+
+
+
+// message sending handler
 function sendAction(a, d) {
     var message = {
         action: a,
         data: d
     };
 
+    console.log("sendAction", message);
+
+    // socket.json uses 'message' channel by default
     socket.json.send(message);
 }
 
-socket.on('connect', function() {
-    //let the final part of the path be the room name
-    const parts = location.pathname.split('/').filter(Boolean);
-    const user = getCookie("username");
-
-    const data = {
-        room: decodeURIComponent(parts.pop()),
-        user: user
-    }
-
-    //imediately join the room which will trigger the initializations
-    sendAction('joinRoom', data);
-
-});
-
-socket.on('disconnect', function() {
-    const parts = location.pathname.split('/').filter(Boolean);
-
-    sendAction('leaveRoom', { room: decodeURIComponent(parts.pop()) });
-
-    blockUI("Loading...");
-    // blockUI("Server disconnected. Refresh page to try and reconnect...");
-
-    //$('.blockOverlay').click($.unblockUI);
-});
-
-
+// message receiving handler
 socket.on('message', function(data) {
     getMessage(data);
 });
 
+socket.on('connect', function() {
+    const data = {
+        room: ROOM,
+        user: USERNAME
+    }
 
-socket.on('updateRoomUsers', (users) => {
-    console.log('Users in room:', users);
-    // Here you would update your client-side UI to display the list of users
+    // join the room which will trigger the initializations
+    sendAction('joinRoom', data);
 });
 
+socket.on('updateRoomUsers', (users) => {
+    const dicebearQuery = "scale=50&radius=50&rowColor=00897b,00acc1,039be5,3949ab,43a047,546e7a,5e35b1,6d4c41,757575,7cb342,8e24aa,c0ca33,d81b60,e53935,f4511e,ffb300,1e88e5";
 
+    console.log('Users in room:', users);
 
+    const container = document.getElementById('userListContainer');
+    container.innerHTML = '';  // Clear the container
 
-function unblockUI() {
-    $.unblockUI({fadeOut: 50});
-}
+    const div = document.createElement('div');
+    div.className = 'flex justify-center mt-4 font-customFont';
 
-function blockUI(message) {
-    message = message || 'Waiting...';
+    const ul = document.createElement('ul');
+    ul.className = 'bg-transparent p-4 w-fit max-w-xs text-center';
+    ul.id = 'userList';
 
-    $.blockUI({
-        message: message,
+    users.forEach(user => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center space-x-3 px-4 hover:text-gray-800 text-gray-500 text-[1.2em]';
 
-        css: {
-            border: 'none',
-            padding: '15px',
-            backgroundColor: '#000',
-            '-webkit-border-radius': '10px',
-            '-moz-border-radius': '10px',
-            opacity: 0.68,
-            color: '#fff',
-            fontSize: '20px'
-        },
+        // Construct avatar image URL
+        const avatarUrl = `${AVATAR_API}?seed=${encodeURIComponent(user)}&${dicebearQuery}`;
+        
+        // Create img element for avatar
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = "User Avatar";
+        img.title = user;
+        img.className = 'w-7 h-7 opacity-80 hover:opacity-100';  // Tailwind classes for size and rounding
 
-        fadeOut: 0,
-        fadeIn: 10
+        // Create span for username
+        const username = document.createElement('span');
+        username.textContent = user;
+
+        li.appendChild(img);
+        li.appendChild(username);
+        ul.appendChild(li);
     });
-}
+
+    div.appendChild(ul);
+    container.appendChild(div);
+});
+
 
 //respond to an action event
 function getMessage(m) {
@@ -99,13 +106,11 @@ function getMessage(m) {
     var action = message.action;
     var data = message.data;
 
-    //console.log('<-- ' + action);
-
     switch (action) {
         case 'roomAccept':
             //okay we're accepted, then request initialization
             //(this is a bit of unnessary back and forth but that's okay for now)
-            sendAction('initializeMe');
+            sendAction('initializeMe', {room: ROOM});
             break;
 
         case 'roomDeny':
@@ -118,6 +123,7 @@ function getMessage(m) {
 			break;
 
         case 'moveCard':
+            console.log("moving card:", data.id)
             moveCard($("#" + data.id), data.position);
             break;
 
@@ -133,23 +139,10 @@ function getMessage(m) {
             break;
 
         case 'deleteCard':
-            $("#" + data.id).fadeOut(500,
-                function() {
-                    $(this).remove();
-                }
-            );
+            $("#" + data.id).fadeOut(200, () => { $(this).remove() });
             break;
 
         case 'editCard':
-            // console.log("editing card")
-            // var $container = $("#" + data.id).empty();  // Get the container by ID and empty it
-            // var texts = data.text.split('\n');
-            // $.each(texts, function(index, text) {
-            //     if (text.trim() !== '') {  // Check if the text is not just whitespace
-            //         $('<div></div>').text(text).appendTo($container);  // Create a div, set its text, and append it
-            //     }
-            // });
-
             $("#" + data.id).children('.content:first').text(data.value);
             break;
 
@@ -181,9 +174,9 @@ function getMessage(m) {
             displayInitialUsers(data);
             break;
 
-        case 'nameChangeAnnounce':
-            updateName(message.data.sid, message.data.user_name);
-            break;
+        // case 'nameChangeAnnounce':
+        //     updateName(message.data.sid, message.data.user_name);
+        //     break;
 
         case 'addSticker':
             addSticker(message.data.cardId, message.data.stickerId);
@@ -201,6 +194,35 @@ function getMessage(m) {
 
 
 }
+
+
+function unblockUI() {
+    $.unblockUI({fadeOut: 20});
+}
+
+function blockUI(message) {
+    message = message || 'Waiting...';
+
+    $.blockUI({
+        message: message,
+
+        css: {
+            border: 'none',
+            padding: '15px',
+            backgroundColor: '#000',
+            '-webkit-border-radius': '10px',
+            '-moz-border-radius': '10px',
+            opacity: 0.68,
+            color: '#fff',
+            fontSize: '20px'
+        },
+
+        fadeOut: 0,
+        fadeIn: 10
+    });
+}
+
+
 
 $(document).bind('keyup', function(event) {
     keyTrap = event.which;
@@ -287,7 +309,6 @@ function initLockForm(attempt) {
 		var confirmPasswrd = $('#lock-password-confirm').val().trim();
 
         console.log("submit password triggered");
-
 		
 		if (validateLock(passwrd, confirmPasswrd) === true) {
 			sendAction('setPassword', (passwrd !== null ? window.btoa(passwrd) : null));
@@ -313,7 +334,6 @@ function initLockForm(attempt) {
             }
         }
     });
-
 
     $('#close-form').on('click', function(e) {
         e.preventDefault();  // Prevent default click behavior
@@ -388,7 +408,7 @@ function validatePassword(passwrd) {
 async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed, user) {
     //cards[id] = {id: id, text: text, x: x, y: y, rot: rot, colour: colour};
     // const textDivs = text.split('\n').map(line => `<div>${line.trim()}</div>`).join('');
-    const currentUser = await fetchCurrentUser();
+    const currentUser = USERNAME;
     var cardOwner = user;
 
     const dicebearQuery = "scale=50&radius=50&rowColor=00897b,00acc1,039be5,3949ab,43a047,546e7a,5e35b1,6d4c41,757575,7cb342,8e24aa,c0ca33,d81b60,e53935,f4511e,ffb300,1e88e5";
@@ -450,6 +470,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
             id: this.id,
             position: ui.position,
             oldposition: ui.originalPosition,
+            room: ROOM
         };
 
         sendAction('moveCard', data);
@@ -465,7 +486,8 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 
             var data = {
                 cardId: cardId,
-                stickerId: stickerId
+                stickerId: stickerId,
+                room: ROOM
             };
             sendAction('addSticker', data);
 
@@ -517,7 +539,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     card.children('.delete-card-icon').click(
         function() {
             $("#" + id).remove();
-            sendAction('deleteCard', {'id': id}); // notify server of delete
+            sendAction('deleteCard', {'id': id, room: ROOM}); // notify server of delete
         }
     );
 
@@ -545,7 +567,8 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 function onCardChange(id, text) {
     sendAction('editCard', {
         id: id,
-        value: text
+        value: text,
+        room: ROOM
     });
 }
 
@@ -639,8 +662,10 @@ async function setUserAsParticipant(data) {
 // cards
 //----------------------------------
 async function createCard(id, text, x, y, rot, colour) {
-    const user = await fetchCurrentUser();
-    console.log("User creating card:", user);
+    // const user = await fetchCurrentUser();
+    const user = USERNAME;
+
+    console.log("User creating card:", user, ROOM);
 
     const sticker = null;
     const animationspeed = 250;
@@ -656,15 +681,16 @@ async function createCard(id, text, x, y, rot, colour) {
         y: y,
         rot: rot,
         colour: colour,
-        user: user
+        user: user,
+        room: ROOM
     };
 
     sendAction(action, data);
 
     // add user as a participant in the room
     const obj = {
-        user: user,
-        room: decodeURIComponent(location.pathname.split('/').filter(Boolean).pop())
+        user: USERNAME,
+        room: ROOM
     };
 
     try {
@@ -726,7 +752,7 @@ function drawNewColumn(columnName) {
     }
 
     $('#icon-col').before('<td class="' + cls +
-        '" width="10%" style="display:none"><h2 id="col-' + (totalcolumns + 1) +
+        '" width="10%" style="display:none; font-size: 1.75em;"><h2 id="col-' + (totalcolumns + 1) +
         '" class="editable">' + columnName + '</h2></td>');
 
     $('.editable').editable(function(value, settings) {
@@ -790,11 +816,12 @@ function createColumn(name) {
     drawNewColumn(name);
     columns.push(name);
 
-    var action = "updateColumns";
+    var data = {
+        columns: columns,
+        room: ROOM
+    };
 
-    var data = columns;
-
-    sendAction(action, data);
+    sendAction("updateColumns", data);
 }
 
 function deleteColumn() {
@@ -803,21 +830,23 @@ function deleteColumn() {
     displayRemoveColumn();
     columns.pop();
 
-    var action = "updateColumns";
+    var data = {
+        columns: columns,
+        room: ROOM
+    };
 
-    var data = columns;
-
-    sendAction(action, data);
+    sendAction("updateColumns", data);
 }
 
 function updateColumns(c) {
     columns = c;
 
-    var action = "updateColumns";
+    var data = {
+        columns: columns,
+        room: ROOM
+    };
 
-    var data = columns;
-
-    sendAction(action, data);
+    sendAction("updateColumns", data);
 }
 
 function deleteColumns(next) {
@@ -842,6 +871,7 @@ function initColumns(columnArray) {
 
 
 function changeThemeTo(theme) {
+
     currentTheme = theme;
     $("link[title=cardsize]").attr("href", "/css/" + theme + ".css");
 }
@@ -892,44 +922,6 @@ function getCookie(name) {
 // }
 
 
-function setName(name) {
-    let username = getCookie("username");
-    // sendAction('setUserName', name);
-    sendAction('setUserName', username);
-
-    // setCookie('username', name, 365);
-}
-
-function displayInitialUsers(users) {
-    for (var i in users) {
-        displayUserJoined(users[i].sid, users[i].user_name);
-    }
-}
-
-function displayUserJoined(sid, user_name) {
-    let name = user_name ? user_name : sid.substring(0, 5);
-
-    $('#names-ul').append(`<li id="user-${sid}">${name}</li>`);
-}
-
-function displayUserLeft(sid) {
-    let name = '';
-    if (name)
-        name = user_name;
-    else
-        name = sid;
-
-    var id = '#user-' + sid.toString();
-
-    $('#names-ul').children(id).remove();
-}
-
-
-function updateName(sid, name) {
-    var id = '#user-' + sid.toString();
-
-    $('#names-ul').children(id).text(name);
-}
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -987,7 +979,8 @@ function adjustCard(offsets, doSync) {
                 oldposition: {
                     left: parseInt(card.css('left').slice(0, -2)),
                     top: parseInt(card.css('top').slice(0, -2))
-                }
+                },
+                room: ROOM
             }; //use .css() instead of .position() because css' rotate
             //console.log(data);
             if (!doSync) {
@@ -1016,7 +1009,7 @@ $(function() {
 
 
     if (boardInitialized === false)
-        blockUI('<img src="/images/ajax-loader.gif" width=43 height=11/>');
+        // blockUI('<img src="/images/ajax-loader.gif" width=43 height=11/>');
 
     //setTimeout($.unblockUI, 2000);
 
@@ -1050,11 +1043,15 @@ $(function() {
 			changeThemeTo('smallcards');
 		}
 
-        sendAction('changeTheme', currentTheme);
+        let data = {
+            theme: currentTheme,
+            room: ROOM
+        }
 
-
+        sendAction('changeTheme', data);
         return false;
     });
+
 	
     // Style changer
     $("#fontify").click(function() {
@@ -1079,7 +1076,13 @@ $(function() {
         font.family = fonts[nextIndex];
 
         changeFontTo(font);
-        sendAction('changeFont', font); // Ensure the correct font object is sent
+
+        let data = {
+            font: font,
+            room: ROOM
+        };
+
+        sendAction('changeFont', data);
 
         return false; // Prevent default action
     });
@@ -1098,7 +1101,13 @@ $(function() {
         }
 
         changeFontTo(font);
-        sendAction('changeFont', font); // Ensure the correct font object is sent
+
+        let data = {
+            font: font,
+            room: ROOM
+        }
+
+        sendAction('changeFont', data);
 
         return false; // Prevent default action
     });
@@ -1110,6 +1119,8 @@ $(function() {
             size: 16 // Start at a default size if none is set
         };
 
+        console.log(font);
+
         font.size -= 1; // Decrement the font size
 
         if (font.size < 10) { // Check if the font size goes below the minimum
@@ -1117,11 +1128,18 @@ $(function() {
         }
 
         changeFontTo(font);
-        sendAction('changeFont', font); // Ensure the correct font object is sent
+
+        let data = {
+            font: font,
+            room: ROOM
+        }
+
+        sendAction('changeFont', data);
 
         return false; // Prevent default action
-    });
+    });   
 	
+
 	// Setup a password
 	$('#protect-room').click(function() {
 		initLockForm(false);
@@ -1151,52 +1169,6 @@ $(function() {
         }
     );
 
-
-    // $('#cog-button').click( function(){
-    // 	$('#config-dropdown').fadeToggle();
-    // } );
-
-    // $('#config-dropdown').hover(
-    // 	function(){ /*$('#config-dropdown').fadeIn()*/ },
-    // 	function(){ $('#config-dropdown').fadeOut() }
-    // );
-    //
-
-    var user_name = getCookie('username');
-
-
-    // $("#yourname-input").focus(function() {
-    //     if ($(this).val() == 'unknown') {
-    //         $(this).val("");
-    //     }
-
-    //     $(this).addClass('focused');
-
-    // });
-
-    $("#yourname-input").blur(function() {
-        if ($(this).val() === "") {
-            $(this).val('unknown');
-        }
-        // $(this).removeClass('focused');
-
-        setName($(this).val());
-    });
-
-    $("#yourname-input").val(user_name);
-    $("#yourname-input").blur();
-
-    $("#yourname-li").hide();
-
-    // $("#yourname-input").keypress(function(e) {
-    //     code = (e.keyCode ? e.keyCode : e.which);
-    //     if (code == 10 || code == 13) {
-    //         $(this).blur();
-    //     }
-    // });
-
-
-
     $(".sticker").draggable({
         revert: true,
         zIndex: 1000
@@ -1219,11 +1191,13 @@ $(function() {
             offsets = calcCardOffset();
         });
         $(".board-outline").bind("resize", function(event, ui) {
-            adjustCard(offsets, false);
+
+            // adjustCard(offsets, false);
         });
         $(".board-outline").bind("resizestop", function(event, ui) {
+
             boardResizeHappened(event, ui);
-            adjustCard(offsets, true);
+            // adjustCard(offsets, true);
         });
     })();
 

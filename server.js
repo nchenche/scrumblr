@@ -179,7 +179,7 @@ router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
 				body: 'partials/room.ejs',
 				pageTitle: ('Scrumblr - ' + req.params.id),
 				pageScripts: ['/script.js'],
-				variable: {avatar_api: avatar_api},
+				variable: {avatar_api: avatar_api, user: req.user},
 				username: req.user,
 				is_owner: response.is_owner,
 				is_room_protected: resExists === 1 ? true : false,

@@ -250,7 +250,7 @@ h2 {
 }
 
 .names input {
-   padding: 0; //2px 8px 2px 2px;
+   padding: 0; /*2px 8px 2px 2px;*/
     border: none;
     outline: 0;
     width: 100px;
@@ -464,7 +464,6 @@ h1.home {
 	padding: 0;
 	margin: 0;
 	text-align: center;
-	xline-height: .9em;
 }
 
 .home {
@@ -476,7 +475,6 @@ h1.home {
 	padding: 0;
 	margin: 0;
 	text-align: center;
-	xline-height: .9em;
 }
 
 p.home a {
@@ -525,7 +523,6 @@ input.text {
 }
 
 .notice-bar {
-	xbackground-color: #ccc;
 	opacity: .2;
 	padding: 0;
 	margin: 0;
@@ -549,7 +546,6 @@ input.text {
 
 
 .card-hover-draggable {
-	xborder: 1px dashed blue;
 	box-shadow:inset 0 0 40px rgba(128, 128, 256,0.2);
 	background-color: rgba(128, 128, 256,0.1)
 }
