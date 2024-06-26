@@ -36,6 +36,7 @@ export function setUpForm() {
     if ( !inputs[0].value.trim() ) {
         inputs[0].focus();
     } else {
+        fieldValidity.username = true;
         inputs[1].focus();
     }
 

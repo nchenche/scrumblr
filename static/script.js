@@ -174,14 +174,14 @@ function getMessage(m) {
             displayInitialUsers(data);
             break;
 
-        // case 'nameChangeAnnounce':
-        //     updateName(message.data.sid, message.data.user_name);
-        //     break;
-
         case 'addSticker':
             addSticker(message.data.cardId, message.data.stickerId);
             break;
 
+        case 'removeSticker':
+            removeSticker(message.data.stickerId);
+            break;
+    
         case 'setBoardSize':
             resizeBoard(message.data);
             break;
@@ -580,23 +580,47 @@ function moveCard(card, position) {
 }
 
 function addSticker(cardId, stickerId) {
-
     const stickerContainer = $('#' + cardId + ' .filler');
-    console.log(stickerContainer);
 
     if (stickerId === "nosticker") {
         stickerContainer.html("");
         return;
     }
 
+    const appendSticker = (id) => {
+        if (stickerContainer.html().indexOf(id) < 0) {
+            const stickerImg = $(`<img id=${id} src="/images/stickers/${id}.png" class="sticker hover:cursor-pointer" title="double-click to remove"> `);
+            stickerContainer.prepend(stickerImg);
+            attachRemoveStickerEvent(stickerImg, cardId, stickerId);
+        }
+    };
+
     if (Array.isArray(stickerId)) {
         for (var i in stickerId) {
-            stickerContainer.prepend(`<img src="/images/stickers/${stickerId[i]}.png">`);
+            appendSticker(stickerId[i]);
         }
     } else {
-        if (stickerContainer.html().indexOf(stickerId) < 0)
-            stickerContainer.prepend(`<img src="/images/stickers/${stickerId}.png">`);
+        appendSticker(stickerId);
     }
+}
+
+function attachRemoveStickerEvent(stickerElement, cardId, stickerId) {
+    var data = {
+        cardId: cardId,
+        room: ROOM,
+        stickerElement: stickerElement
+    };
+
+
+    stickerElement.on('dblclick', function() {
+        data = {...data, stickerId: this.id};
+        $(this).remove(); // Remove the sticker image from the DOM
+        sendAction("removeSticker", data);
+    });
+}
+
+function removeSticker(stickerId) {
+    $(`#${stickerId}`).remove();
 }
 
 

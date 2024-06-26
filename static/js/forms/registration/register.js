@@ -73,7 +73,7 @@ function showSuccessMessage() {
     const intervalId = setInterval(() => {
         counter.innerHTML--;
 
-        if (counter.innerHTML == 0) {
+        if (counter.innerHTML == 1) {
             clearInterval(intervalId);  // Stop the countdown
             window.location.href = `/login?username=${username}`;  // Redirect to login page
         }
