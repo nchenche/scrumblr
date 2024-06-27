@@ -97,8 +97,13 @@ body {
 	opacity: .95 !important;
 }
 
+.icon-card-hover {
+	cursor: pointer;
+	opacity: .95 !important;
+}
+
 .card-edit-form, .card-edit-form input, .card-edit-form textarea {
-	border: none;
+	border: solid 1px darkblue;
 	font-size:inherit;
 	font-weight:inherit;
 	background-color:inherit;
@@ -526,7 +531,6 @@ input.text {
 	opacity: .2;
 	padding: 0;
 	margin: 0;
-	xtext-align: center;
 	margin-left: 300px;
 }
 
@@ -576,9 +580,6 @@ img {
 
 
 .filler {
-	xwidth: 100%;
-	xbackground-color: rgba(255,0,0,0.1);
-	xheight: 100%;
 	right: 0;
 	bottom: 0;
 	position: absolute;
@@ -624,17 +625,4 @@ img {
 
 .invalid i {
 	visibility: hidden;
-}
-
-
-.editable {
-    width: 300px;       /* Fixed width */
-    height: 200px;      /* Fixed height */
-    background-size: cover; /* Ensure the background image covers the entire element */
-    background-position: center; /* Center the background image */
-    padding: 10px;      /* Padding for text inside */
-    outline: none;      /* Remove outline to look better */
-    border: 1px solid #ccc; /* A subtle border */
-    overflow-y: auto;   /* Allow vertical scrolling */
-    resize: none;       /* Prevent resizing */
 }

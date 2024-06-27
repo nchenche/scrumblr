@@ -35,7 +35,7 @@ function sendAction(a, d) {
         data: d
     };
 
-    console.log("sendAction", message);
+    // console.log("sendAction", message);
 
     // socket.json uses 'message' channel by default
     socket.json.send(message);
@@ -59,7 +59,7 @@ socket.on('connect', function() {
 socket.on('updateRoomUsers', (users) => {
     const dicebearQuery = "scale=50&radius=50&rowColor=00897b,00acc1,039be5,3949ab,43a047,546e7a,5e35b1,6d4c41,757575,7cb342,8e24aa,c0ca33,d81b60,e53935,f4511e,ffb300,1e88e5";
 
-    console.log('Users in room:', users);
+    // console.log('Users in room:', users);
 
     const container = document.getElementById('userListContainer');
     container.innerHTML = '';  // Clear the container
@@ -418,16 +418,46 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 
     const dicebearQuery = "scale=50&radius=50&rowColor=00897b,00acc1,039be5,3949ab,43a047,546e7a,5e35b1,6d4c41,757575,7cb342,8e24aa,c0ca33,d81b60,e53935,f4511e,ffb300,1e88e5";
 
+
+    // var h = `
+    // <div id="${id}" class="card ${colour} draggable" style="transform:rotate(${rot}deg);">
+    //     <img src="${AVATAR_API}?seed=${user}&${dicebearQuery}" class="card-avatar card-icon w-6 h-6 rounded-full z-10" alt="User Avatar" title="${user}" />
+    //     <img src="/images/icons/token/Xion.png" class="card-icon delete-card-icon z-10" />        
+    //     <img class="card-image" src="/images/${colour}-card.png" />        
+    //     <div data-user="${user}" id="content:${id}" class="content stickertarget droppable">${text}</div>
+    //     <span class="flex space-x-2 filler">
+    //     </span>
+	// </div>`;
+
+
     var h = `
-    <div id="${id}" class="card ${colour} draggable" style="transform:rotate(${rot}deg);">
-        <img src="${AVATAR_API}?seed=${user}&${dicebearQuery}" class="card-avatar card-icon w-6 h-6 rounded-full z-10" alt="User Avatar" title="${user}" />
-        <img src="/images/icons/token/Xion.png" class="card-icon delete-card-icon z-10" />
-        
-        <img class="card-image" src="/images/${colour}-card.png" />
-        <div data-user="${user}" id="content:${id}" class="content stickertarget droppable">${text}</div>
-        <span class="flex space-x-2 filler">
-        </span>
+    <div id="${id}" class="relative border-2 border-blue-400 card ${colour} draggable" style="transform:rotate(${rot}deg);">
+
+        <div class="relative top-4 flex h-6 mx-auto justify-between border-2 border-gray-400 w-3/4">
+
+            <div class="ml-1 flex items-center space-x-2 z-10">
+                <svg fill="#000000" aria-labelledby="Change color" title="Change color" class="icon-card hidden w-4 h-4 opacity-50 hover:cursor-pointer hover:opacity-90" viewBox="0 0 256.00 256.00" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00256"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M230.627,25.37207a32.03909,32.03909,0,0,0-45.2539,0c-.10254.10156-.20117.207-.29785.31348L130.17383,86.85938l-9.20313-9.20313a24.00066,24.00066,0,0,0-33.9414,0L10.34277,154.34277a8.00122,8.00122,0,0,0,0,11.31446l80,80a8.00181,8.00181,0,0,0,11.31446,0l76.68652-76.68653a24.00066,24.00066,0,0,0,0-33.9414l-9.20313-9.20215L230.31445,70.9248c.10645-.09668.21192-.19531.31348-.29785A32.03761,32.03761,0,0,0,230.627,25.37207ZM96,228.68652,81.87842,214.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,96.09863,177.7168L70.564,203.25049,53.87842,186.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,68.09863,149.7168L42.564,175.25049,27.31348,160,72,115.31445,140.68555,184Z"></path> </g></svg>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <img src="${AVATAR_API}?seed=${user}&${dicebearQuery}" class="icon-card avatar-card hidden w-6 h-6 rounded-full z-10 opacity-50 hover:cursor-pointer hover:opacity-90" alt="User Avatar" title="${user}" />
+                <img src="/images/icons/token/Xion.png" class="icon-card delete-card-icon hidden w-3 h-3 z-10 opacity-50 hover:cursor-pointer hover:opacity-90" title="Delete card"/>
+            </div>
+
+        </div>
+
+        <div class="relative border-2 border-yellow-400 bg-cover bg-center h-3/4 text-center" style="background-image: url('/images/${colour}-card.png');">
+            <div data-user="${user}" id="content:${id}" class="mx-auto content stickertarget droppable">${text}</div>
+        </div>
+
+        <div id="sticker-container" class="pr-1 relative top-[120px] flex items-center justify-end space-x-2 mx-auto w-3/4 h-6 border-2 border-orange-400">v</div>
+
 	</div>`;
+
+//     <div class="border-2 border-yellow-400">
+//     <img class="card-image" src="/images/${colour}-card.png" />
+//     <div data-user="${user}" id="content:${id}" class="content stickertarget droppable">${text}</div>
+// </div>
 
     var card = $(h);
     card.appendTo('#board');
@@ -481,11 +511,11 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
         sendAction('moveCard', data);
     });
 
-    card.children(".droppable").droppable({
+    card.find(".droppable").droppable({
         accept: '.sticker',
         drop: function(event, ui) {
             var stickerId = ui.draggable.attr("id");
-            var cardId = $(this).parent().attr('id');
+            var cardId = card.attr("id") // $(this).parent().attr('id');
 
             addSticker(cardId, stickerId);
 
@@ -518,38 +548,69 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 
     card.hover(
         function() {
-            // var cardOwner = $(this).find('.content').data('user');
             if (cardOwner === currentUser) {
-                $(this).addClass('hover');
-                $(this).children('.card-icon').fadeIn(0);
+                // $(this).addClass('hover');
+                $(this).find('.icon-card').fadeIn(0);
             }
-            $(this).children('.card-avatar').fadeIn(0);
+            $(this).find('.avatar-card').fadeIn(0);
 
         },
         function() {
-            $(this).removeClass('hover');
-            $(this).children('.card-icon').fadeOut(0);
+            // $(this).removeClass('hover');
+            $(this).find('.icon-card').fadeOut(0);
         }
     );
 
-    card.children('.card-icon').hover(
-        function() {
-            $(this).addClass('card-icon-hover');
-        },
-        function() {
-            $(this).removeClass('card-icon-hover');
-        }
-    );
+    // card.find('.icon-card').hover(
+    //     function() {
+    //         $(this).addClass('icon-card-hover');
+    //     },
+    //     function() {
+    //         $(this).removeClass('icon-card-hover');
+    //     }
+    // );
 
-    card.children('.delete-card-icon').click(
+    card.find('.delete-card-icon').click(
         function() {
             $("#" + id).remove();
             sendAction('deleteCard', {'id': id, room: ROOM}); // notify server of delete
         }
     );
 
+    // card.hover(
+    //     function() {
+    //         // var cardOwner = $(this).find('.content').data('user');
+    //         if (cardOwner === currentUser) {
+    //             $(this).addClass('hover');
+    //             $(this).find('.card-icon').fadeIn(0);
+    //         }
+    //         $(this).find('.card-avatar').fadeIn(0);
+
+    //     },
+    //     function() {
+    //         $(this).removeClass('hover');
+    //         $(this).find('.card-icon').fadeOut(0);
+    //     }
+    // );
+
+    // card.find('.card-icon').hover(
+    //     function() {
+    //         $(this).addClass('card-icon-hover');
+    //     },
+    //     function() {
+    //         $(this).removeClass('card-icon-hover');
+    //     }
+    // );
+
+    // card.find('.delete-card-icon').click(
+    //     function() {
+    //         $("#" + id).remove();
+    //         sendAction('deleteCard', {'id': id, room: ROOM}); // notify server of delete
+    //     }
+    // );
+
     if (cardOwner === currentUser) {
-        card.children('.content').editable(function(value, settings) {
+        card.find('.content').editable(function(value, settings) {
             onCardChange(id, value);
             return (value);
         }, {
@@ -562,7 +623,6 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
             event: 'dblclick', //event: 'mouseover'
         });
     }
-
     //add applicable sticker
     if (sticker) addSticker(id, sticker);
 
@@ -581,11 +641,14 @@ function moveCard(card, position) {
     card.animate({
         left: position.left + "px",
         top: position.top + "px"
-    }, 500);
+    }, 200);
 }
 
 function addSticker(cardId, stickerId) {
-    const stickerContainer = $('#' + cardId + ' .filler');
+    // const stickerContainer = $('#' + cardId + ' .filler');
+
+    const stickerContainer = $(`#${cardId} #sticker-container`);
+
 
     if (stickerId === "nosticker") {
         stickerContainer.html("");
