@@ -72,12 +72,12 @@ socket.on('updateRoomUsers', (users) => {
     ul.className = 'bg-transparent p-4 w-fit max-w-xs text-center';
     ul.id = 'userList';
 
-    users = [
-        "John", "Jane", "Alice", "Bob", "Claire",
-        "David", "Emma", "Frank", "Grace", "Henry",
-        "Isabel", "Jack", "Karen", "Leo", "Mia",
-        "Nick", "Olivia", "Paul", "Quinn", "Rachel"
-    ];
+    // users = [
+    //     "John", "Jane", "Alice", "Bob", "Claire",
+    //     "David", "Emma", "Frank", "Grace", "Henry",
+    //     "Isabel", "Jack", "Karen", "Leo", "Mia",
+    //     "Nick", "Olivia", "Paul", "Quinn", "Rachel"
+    // ];
     
     users.forEach(user => {
         const li = document.createElement('li');

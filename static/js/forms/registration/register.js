@@ -11,6 +11,7 @@ async function submitForm(event) {
 
     // Check username/email fields validity
     const areFieldsValid = await checkFields(username, email);
+
     if ( !areFieldsValid ) return
 
     // Data payload to register

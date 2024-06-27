@@ -105,8 +105,8 @@ export async function checkFields(username, email) {
                }
            }
        });
-
-       return true;
+       
+       return allAvailable;
    } catch (error) {
        console.error("Error checking username/email availability:", error);
        return false;
