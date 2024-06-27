@@ -433,7 +433,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     var h = `
     <div id="${id}" class="relative border-2 border-blue-400 card ${colour} draggable" style="transform:rotate(${rot}deg);">
 
-        <div class="relative top-4 flex h-6 mx-auto justify-between border-2 border-gray-400 w-3/4">
+        <div class="relative top-1 flex h-6 mx-auto justify-between  border-2 border-gray-400 w-8/12">
 
             <div class="ml-1 flex items-center space-x-2 z-10">
                 <svg fill="#000000" aria-labelledby="Change color" title="Change color" class="icon-card hidden w-4 h-4 opacity-50 hover:cursor-pointer hover:opacity-90" viewBox="0 0 256.00 256.00" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00256"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M230.627,25.37207a32.03909,32.03909,0,0,0-45.2539,0c-.10254.10156-.20117.207-.29785.31348L130.17383,86.85938l-9.20313-9.20313a24.00066,24.00066,0,0,0-33.9414,0L10.34277,154.34277a8.00122,8.00122,0,0,0,0,11.31446l80,80a8.00181,8.00181,0,0,0,11.31446,0l76.68652-76.68653a24.00066,24.00066,0,0,0,0-33.9414l-9.20313-9.20215L230.31445,70.9248c.10645-.09668.21192-.19531.31348-.29785A32.03761,32.03761,0,0,0,230.627,25.37207ZM96,228.68652,81.87842,214.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,96.09863,177.7168L70.564,203.25049,53.87842,186.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,68.09863,149.7168L42.564,175.25049,27.31348,160,72,115.31445,140.68555,184Z"></path> </g></svg>
@@ -446,11 +446,11 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 
         </div>
 
-        <div class="relative border-2 border-yellow-400 bg-cover bg-center h-3/4 text-center" style="background-image: url('/images/${colour}-card.png');">
-            <div data-user="${user}" id="content:${id}" class="mx-auto content stickertarget droppable">${text}</div>
+        <div class="relative border-2 border-yellow-400 h-3/4 w-11/12 text-center mx-auto">
+            <div data-user="${user}" id="content:${id}" class="content h-full w-full border-2 border-red-500 bg-cover bg-center stickertarget droppable" style="background-image: url('/images/${colour}-card.png')">${text}</div>
         </div>
 
-        <div id="sticker-container" class="pr-1 relative top-[120px] flex items-center justify-end space-x-2 mx-auto w-3/4 h-6 border-2 border-orange-400">v</div>
+        <div id="sticker-container" class="pr-2 relative bottom-11 flex items-center justify-end space-x-2 mx-auto w-9/12 h-6 border-2 border-orange-400"></div>
 
 	</div>`;
 
@@ -616,7 +616,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
         }, {
             type: 'textarea',
             multiline: true,
-            style: 'inherit',
+            // style: 'inherit',
             cssclass: 'card-edit-form',
             placeholder: `Double Click to Edit`,
             onblur: 'submit',

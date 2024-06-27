@@ -114,7 +114,7 @@ body {
 	outline-width:0;
 	overflow: hidden;
 	resize: none;
-	width: 100%;
+	/* width: 100%; */
 	color: #646464;
 }
 
