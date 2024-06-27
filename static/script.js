@@ -20,7 +20,6 @@ const USERNAME = GLOB_VAR.user; // getCookie("username"); // await fetchCurrentU
 const AVATAR_API = GLOB_VAR.avatar_api;
 
 
-
 window.addEventListener('beforeunload', function() {
     if (socket) {
         socket.disconnect();
@@ -81,7 +80,7 @@ socket.on('updateRoomUsers', (users) => {
     
     users.forEach(user => {
         const li = document.createElement('li');
-        li.className = 'flex items-center my-2 space-x-3 px-4 opacity-80 hover:text-gray-800 hover:opacity-100 text-gray-500 text-[1.2em]';
+        li.className = 'user border-2 border-dark-500 flex items-center my-2 space-x-3 px-4 opacity-80 hover:text-gray-800 hover:opacity-100 text-gray-500 text-[1.2em]';
         li.title = user;
         // Construct avatar image URL
         const avatarUrl = `${AVATAR_API}?seed=${encodeURIComponent(user)}&${dicebearQuery}`;
@@ -1230,6 +1229,43 @@ $(function() {
         axis: 'x',
         containment: 'parent'
     });
-
-
 });
+
+const container = document.getElementById('userListContainer');
+
+// Event delegation from the container to the list items
+container.addEventListener('mouseenter', function(event) {
+    let targetElement = event.target.closest('li'); // Ensures the event is from an <li> element
+    if (targetElement) {
+        const username = targetElement.title; // Retrieve the title of the hovered <li>
+
+        // Additional actions can be triggered here
+        highlightCards(username, true);
+    }
+}, true); // True for capturing phase
+
+// Event delegation from the container to the list items
+container.addEventListener('mouseleave', function(event) {
+    let targetElement = event.target.closest('li'); // Ensures the event is from an <li> element
+    if (targetElement) {
+        const username = targetElement.title; // Retrieve the title of the hovered <li>
+
+        // Additional actions can be triggered here
+        highlightCards(username, false);
+    }
+}, true); // True for capturing phase
+
+
+function highlightCards(username, bool) {
+    // Find all cards and loop through to match the username in the title of the avatar image
+    const event = bool ? 'mouseenter' : 'mouseleave';
+
+    document.querySelectorAll('.card').forEach(card => {
+        const avatar = card.querySelector('.card-avatar');
+        if (avatar && avatar.title === username) {
+
+            // Apply hover effect
+            $(card).trigger(event);
+        }
+    });
+}
