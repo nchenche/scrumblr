@@ -1249,13 +1249,35 @@ $(function() {
     });
 
 
+    // $(".board-outline").resizable({
+    //     ghost: false,
+    //     minWidth: 700,
+    //     minHeight: 500,
+    //     maxWidth: 1750,
+    //     maxHeight: 1800,
+    // });
+
+    // Calculate dimensions based on window size
+    const maxWidth = $(window).width() * 0.78;
+    const maxHeight = $(window).height() * 0.85;
+
     $(".board-outline").resizable({
         ghost: false,
-        minWidth: 700,
-        minHeight: 500,
-        maxWidth: 3200,
-        maxHeight: 1800,
+        minWidth: 700, // Minimum width
+        minHeight: 500, // Minimum height
+        maxWidth: maxWidth, // 75% of the window width
+        maxHeight: maxHeight, // 75% of the window height
     });
+
+    // Optionally handle window resize to update constraints dynamically
+    $(window).resize(function() {
+        const updatedMaxWidth = $(window).width() * 0.78;
+        const updatedMaxHeight = $(window).height() * 0.85;
+
+        $(".board-outline").resizable("option", "maxWidth", updatedMaxWidth);
+        $(".board-outline").resizable("option", "maxHeight", updatedMaxHeight);
+    });
+
 
     //A new scope for precalculating
     (function() {
@@ -1265,13 +1287,11 @@ $(function() {
             offsets = calcCardOffset();
         });
         $(".board-outline").bind("resize", function(event, ui) {
-
-            // adjustCard(offsets, false);
+            adjustCard(offsets, false);
         });
         $(".board-outline").bind("resizestop", function(event, ui) {
-
             boardResizeHappened(event, ui);
-            // adjustCard(offsets, true);
+            adjustCard(offsets, true);
         });
     })();
 
