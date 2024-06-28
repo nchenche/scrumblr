@@ -26,8 +26,6 @@ window.addEventListener('beforeunload', function() {
     }
 });
 
-
-
 // message sending handler
 function sendAction(a, d) {
     var message = {
@@ -419,26 +417,26 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     const dicebearQuery = "scale=50&radius=50&rowColor=00897b,00acc1,039be5,3949ab,43a047,546e7a,5e35b1,6d4c41,757575,7cb342,8e24aa,c0ca33,d81b60,e53935,f4511e,ffb300,1e88e5";
 
     var h = `
-    <div id="${id}" class="relative border-2 border-blue-400 card ${colour} draggable w-fit h-40" style="transform:rotate(${rot}deg);">
+    <div id="${id}" class="absolute card ${colour} draggable w-fit h-40" style="transform:rotate(${rot}deg);">
 
-        <div class="relative top-1 px-1 flex h-6 mx-auto justify-between border-2 border-gray-400 w-44">
+        <div class="relative top-[0.4rem] px-1 flex h-6 mx-auto justify-between w-44">
 
-            <div class="ml-2 flex items-center space-x-2 z-10">
-                <svg fill="#000000" aria-labelledby="Change color" title="Change color" class="icon-card hidden w-4 h-4 opacity-50 hover:cursor-pointer hover:opacity-90" viewBox="0 0 256.00 256.00" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00256"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M230.627,25.37207a32.03909,32.03909,0,0,0-45.2539,0c-.10254.10156-.20117.207-.29785.31348L130.17383,86.85938l-9.20313-9.20313a24.00066,24.00066,0,0,0-33.9414,0L10.34277,154.34277a8.00122,8.00122,0,0,0,0,11.31446l80,80a8.00181,8.00181,0,0,0,11.31446,0l76.68652-76.68653a24.00066,24.00066,0,0,0,0-33.9414l-9.20313-9.20215L230.31445,70.9248c.10645-.09668.21192-.19531.31348-.29785A32.03761,32.03761,0,0,0,230.627,25.37207ZM96,228.68652,81.87842,214.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,96.09863,177.7168L70.564,203.25049,53.87842,186.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,68.09863,149.7168L42.564,175.25049,27.31348,160,72,115.31445,140.68555,184Z"></path> </g></svg>
+            <div class="flex items-center space-x-2 z-10">
+                <img src="${AVATAR_API}?seed=${user}&${dicebearQuery}" class="icon-card avatar-card hidden w-6 h-6 rounded-full z-10 opacity-50 hover:cursor-pointer hover:opacity-90" alt="User Avatar" title="${user}" />
             </div>
 
             <div class="flex items-center space-x-2">
-                <img src="${AVATAR_API}?seed=${user}&${dicebearQuery}" class="icon-card avatar-card hidden w-6 h-6 rounded-full z-10 opacity-50 hover:cursor-pointer hover:opacity-90" alt="User Avatar" title="${user}" />
+                <svg fill="#000000" aria-labelledby="Change color" title="Change color" class="icon-card hidden w-4 h-4 opacity-50 hover:cursor-pointer hover:opacity-90" viewBox="0 0 256.00 256.00" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00256"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M230.627,25.37207a32.03909,32.03909,0,0,0-45.2539,0c-.10254.10156-.20117.207-.29785.31348L130.17383,86.85938l-9.20313-9.20313a24.00066,24.00066,0,0,0-33.9414,0L10.34277,154.34277a8.00122,8.00122,0,0,0,0,11.31446l80,80a8.00181,8.00181,0,0,0,11.31446,0l76.68652-76.68653a24.00066,24.00066,0,0,0,0-33.9414l-9.20313-9.20215L230.31445,70.9248c.10645-.09668.21192-.19531.31348-.29785A32.03761,32.03761,0,0,0,230.627,25.37207ZM96,228.68652,81.87842,214.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,96.09863,177.7168L70.564,203.25049,53.87842,186.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,68.09863,149.7168L42.564,175.25049,27.31348,160,72,115.31445,140.68555,184Z"></path> </g></svg>
                 <img src="/images/icons/token/Xion.png" class="icon-card delete-card-icon hidden w-3 h-3 z-10 opacity-50 hover:cursor-pointer hover:opacity-90" title="Delete card"/>
             </div>
 
         </div>
 
-        <div class="relative border-2 border-yellow-400 w-44 text-center mx-auto">
-            <div data-user="${user}" id="content:${id}" class="relative overflow-clip content p-[0.6rem] mx-auto h-[8rem] w-44 border-2 border-red-500 stickertarget droppable" style="background-image: url('/images/${colour}-card.png'); background-position: 55% 28%">${text}</div>
+        <div class="relative w-44 text-center mx-auto">
+            <div data-user="${user}" id="content:${id}" class="relative overflow-clip content p-[0.6rem] mx-auto h-[8rem] w-44 stickertarget droppable" style="background-image: url('/images/${colour}-card.png'); background-position: 55% 28%">${text}</div>
         </div>
 
-        <div id="sticker-container" class="pr-2 relative bottom-8 flex items-center justify-end space-x-2 mx-auto w-44 h-4 border-2 border-orange-400"></div>
+        <div id="sticker-container" class="pr-2 relative bottom-8 flex items-center justify-end space-x-2 mx-auto w-44 h-4"></div>
 
 	</div>`;
 
@@ -521,8 +519,8 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 
     var startPosition = $("#create-card").position();
 
-    card.css('top', startPosition.top - card.height() * 0.5);
-    card.css('left', startPosition.left - card.width() * 0.5);
+    // card.css('top', startPosition.top - card.height() * 0.5);
+    // card.css('left', startPosition.left - card.width() * 0.5);
 
     card.animate({
         left: `${x}px`,
@@ -700,7 +698,6 @@ async function fetchCurrentUser() {
  * @throws {Error} Throws an error if the network request fails or if the API returns an error.
  */
 async function setUserAsParticipant(data) {
-    console.log('Adding user to room:', data);
     try {
         const response = await fetch('/api/add_room_to_user', {
             method: 'POST',
@@ -725,8 +722,6 @@ async function setUserAsParticipant(data) {
 async function createCard(id, text, x, y, rot, colour) {
     // const user = await fetchCurrentUser();
     const user = USERNAME;
-
-    console.log("User creating card:", user, ROOM);
 
     const sticker = null;
     const animationspeed = 250;
@@ -756,9 +751,7 @@ async function createCard(id, text, x, y, rot, colour) {
 
     try {
         const result = await setUserAsParticipant(obj);
-        if (result.success) {
-            console.log('User added to room successfully:', result);
-        } else {
+        if (!result.success) {
             console.error('Failed to add user to room:', result.error);
         }
     } catch (error) {
@@ -1067,13 +1060,15 @@ $(function() {
     //setTimeout($.unblockUI, 2000);
 
     $("#create-card").click(function() {
-            var rotation = Math.random() * 10 - 5; //add a bit of random rotation (+/- 10deg)
-            let uniqueID = Math.round(Math.random() * 99999999); //is this big enough to assure uniqueness?
-			var x = (window.innerWidth / 2) + $(window).scrollLeft();
-			var y = (window.innerHeight / 2) + $(window).scrollTop();
+            var rotation = Math.random() * 12 - 3; // add a bit of random rotation (+/- 10deg)
+            let uniqueID = Math.round(Math.random() * 99999999); // is this big enough to assure uniqueness?
+
+            let boardPosition = $(".board-outline").position();        
+			var y = boardPosition.top  + $(".board-outline").height() ; 
+			var x = boardPosition.left + $(".board-outline").outerWidth();
 			
             createCard(
-                'card' + uniqueID,
+                `card${uniqueID}`,
                 '',
                 x, 
 				y,

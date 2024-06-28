@@ -95,7 +95,7 @@ body {
 
 
 .card-edit-form, .card-edit-form input, .card-edit-form textarea {
-	border: solid 1px darkblue;
+	_border: solid 1px darkblue;
 	font-size:inherit;
 	font-weight:inherit;
 	background-color:inherit;
