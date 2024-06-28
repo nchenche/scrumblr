@@ -1294,7 +1294,7 @@ function highlightCards(username, bool) {
     const event = bool ? 'mouseenter' : 'mouseleave';
 
     document.querySelectorAll('.card').forEach(card => {
-        const avatar = card.querySelector('.card-avatar');
+        const avatar = card.querySelector('.avatar-card');
         if (avatar && avatar.title === username) {
 
             // Apply hover effect
