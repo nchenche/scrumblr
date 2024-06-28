@@ -127,8 +127,7 @@ function getMessage(m) {
 			break;
 
         case 'moveCard':
-            console.log("moving card:", data.id)
-            moveCard($("#" + data.id), data.position);
+            moveCard($(`#${data.id}`), data.position);
             break;
 
         case 'initCards':
