@@ -92,15 +92,7 @@ body {
 	height: 12px;
 }
 
-.card-icon-hover {
-	cursor: pointer;
-	opacity: .95 !important;
-}
 
-.icon-card-hover {
-	cursor: pointer;
-	opacity: .95 !important;
-}
 
 .card-edit-form, .card-edit-form input, .card-edit-form textarea {
 	border: solid 1px darkblue;
@@ -109,7 +101,7 @@ body {
 	background-color:inherit;
 	font-family: inherit;
 	text-align: center;
-	padding: 0;
+	/* padding-bottom: 2rem; */
 	margin: 0;
 	outline-width:0;
 	overflow: hidden;
@@ -579,12 +571,6 @@ img {
 
 
 
-.filler {
-	right: 0;
-	bottom: 0;
-	position: absolute;
-	text-align: right;
-}
 
 .active-connections {
 	color: #999

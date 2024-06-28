@@ -418,24 +418,12 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 
     const dicebearQuery = "scale=50&radius=50&rowColor=00897b,00acc1,039be5,3949ab,43a047,546e7a,5e35b1,6d4c41,757575,7cb342,8e24aa,c0ca33,d81b60,e53935,f4511e,ffb300,1e88e5";
 
-
-    // var h = `
-    // <div id="${id}" class="card ${colour} draggable" style="transform:rotate(${rot}deg);">
-    //     <img src="${AVATAR_API}?seed=${user}&${dicebearQuery}" class="card-avatar card-icon w-6 h-6 rounded-full z-10" alt="User Avatar" title="${user}" />
-    //     <img src="/images/icons/token/Xion.png" class="card-icon delete-card-icon z-10" />        
-    //     <img class="card-image" src="/images/${colour}-card.png" />        
-    //     <div data-user="${user}" id="content:${id}" class="content stickertarget droppable">${text}</div>
-    //     <span class="flex space-x-2 filler">
-    //     </span>
-	// </div>`;
-
-
     var h = `
-    <div id="${id}" class="relative border-2 border-blue-400 card ${colour} draggable" style="transform:rotate(${rot}deg);">
+    <div id="${id}" class="relative border-2 border-blue-400 card ${colour} draggable w-fit h-40" style="transform:rotate(${rot}deg);">
 
-        <div class="relative top-1 flex h-6 mx-auto justify-between  border-2 border-gray-400 w-8/12">
+        <div class="relative top-1 px-1 flex h-6 mx-auto justify-between border-2 border-gray-400 w-44">
 
-            <div class="ml-1 flex items-center space-x-2 z-10">
+            <div class="ml-2 flex items-center space-x-2 z-10">
                 <svg fill="#000000" aria-labelledby="Change color" title="Change color" class="icon-card hidden w-4 h-4 opacity-50 hover:cursor-pointer hover:opacity-90" viewBox="0 0 256.00 256.00" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00256"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M230.627,25.37207a32.03909,32.03909,0,0,0-45.2539,0c-.10254.10156-.20117.207-.29785.31348L130.17383,86.85938l-9.20313-9.20313a24.00066,24.00066,0,0,0-33.9414,0L10.34277,154.34277a8.00122,8.00122,0,0,0,0,11.31446l80,80a8.00181,8.00181,0,0,0,11.31446,0l76.68652-76.68653a24.00066,24.00066,0,0,0,0-33.9414l-9.20313-9.20215L230.31445,70.9248c.10645-.09668.21192-.19531.31348-.29785A32.03761,32.03761,0,0,0,230.627,25.37207ZM96,228.68652,81.87842,214.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,96.09863,177.7168L70.564,203.25049,53.87842,186.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,68.09863,149.7168L42.564,175.25049,27.31348,160,72,115.31445,140.68555,184Z"></path> </g></svg>
             </div>
 
@@ -446,18 +434,13 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 
         </div>
 
-        <div class="relative border-2 border-yellow-400 h-3/4 w-11/12 text-center mx-auto">
-            <div data-user="${user}" id="content:${id}" class="content h-full w-full border-2 border-red-500 bg-cover bg-center stickertarget droppable" style="background-image: url('/images/${colour}-card.png')">${text}</div>
+        <div class="relative border-2 border-yellow-400 w-44 text-center mx-auto">
+            <div data-user="${user}" id="content:${id}" class="relative overflow-clip content p-[0.6rem] mx-auto h-[8rem] w-44 border-2 border-red-500 stickertarget droppable" style="background-image: url('/images/${colour}-card.png'); background-position: 55% 28%">${text}</div>
         </div>
 
-        <div id="sticker-container" class="pr-2 relative bottom-11 flex items-center justify-end space-x-2 mx-auto w-9/12 h-6 border-2 border-orange-400"></div>
+        <div id="sticker-container" class="pr-2 relative bottom-8 flex items-center justify-end space-x-2 mx-auto w-44 h-4 border-2 border-orange-400"></div>
 
 	</div>`;
-
-//     <div class="border-2 border-yellow-400">
-//     <img class="card-image" src="/images/${colour}-card.png" />
-//     <div data-user="${user}" id="content:${id}" class="content stickertarget droppable">${text}</div>
-// </div>
 
     var card = $(h);
     card.appendTo('#board');
@@ -542,72 +525,29 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     card.css('left', startPosition.left - card.width() * 0.5);
 
     card.animate({
-        left: x + "px",
-        top: y + "px"
+        left: `${x}px`,
+        top: `${y}px`
     }, speed);
 
     card.hover(
         function() {
             if (cardOwner === currentUser) {
-                // $(this).addClass('hover');
                 $(this).find('.icon-card').fadeIn(0);
             }
             $(this).find('.avatar-card').fadeIn(0);
 
         },
         function() {
-            // $(this).removeClass('hover');
             $(this).find('.icon-card').fadeOut(0);
         }
     );
 
-    // card.find('.icon-card').hover(
-    //     function() {
-    //         $(this).addClass('icon-card-hover');
-    //     },
-    //     function() {
-    //         $(this).removeClass('icon-card-hover');
-    //     }
-    // );
-
     card.find('.delete-card-icon').click(
         function() {
-            $("#" + id).remove();
+            $(`#${id}`).remove();
             sendAction('deleteCard', {'id': id, room: ROOM}); // notify server of delete
         }
     );
-
-    // card.hover(
-    //     function() {
-    //         // var cardOwner = $(this).find('.content').data('user');
-    //         if (cardOwner === currentUser) {
-    //             $(this).addClass('hover');
-    //             $(this).find('.card-icon').fadeIn(0);
-    //         }
-    //         $(this).find('.card-avatar').fadeIn(0);
-
-    //     },
-    //     function() {
-    //         $(this).removeClass('hover');
-    //         $(this).find('.card-icon').fadeOut(0);
-    //     }
-    // );
-
-    // card.find('.card-icon').hover(
-    //     function() {
-    //         $(this).addClass('card-icon-hover');
-    //     },
-    //     function() {
-    //         $(this).removeClass('card-icon-hover');
-    //     }
-    // );
-
-    // card.find('.delete-card-icon').click(
-    //     function() {
-    //         $("#" + id).remove();
-    //         sendAction('deleteCard', {'id': id, room: ROOM}); // notify server of delete
-    //     }
-    // );
 
     if (cardOwner === currentUser) {
         card.find('.content').editable(function(value, settings) {
@@ -619,14 +559,45 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
             // style: 'inherit',
             cssclass: 'card-edit-form',
             placeholder: `Double Click to Edit`,
-            onblur: 'submit',
+            onblur: 'submit', // (value) => {customSubmitFunction(value)},// 
             event: 'dblclick', //event: 'mouseover'
+            // data: (value) => {return value.replaceAll("<br>", "/n")}
         });
     }
+
+    // if (cardOwner === currentUser) {
+    //     card.find('.content').editable(function(value, settings) {
+    //     }, {
+    //         type: 'textarea',
+    //         multiline: true,
+    //         // style: 'inherit',
+    //         cssclass: 'card-edit-form',
+    //         placeholder: `Double Click to Edit`,
+    //         onblur: (value) => {customSubmitFunction(value)},// 'submit',
+    //         event: 'dblclick', //event: 'mouseover'
+    //         loaddata: (data) => {console.log(data)}
+    //     });
+    // }
+
     //add applicable sticker
     if (sticker) addSticker(id, sticker);
 
+    function customSubmitFunction(value) {
+        // Process the value if needed
+        console.log("Custom submit with value:", value);
+    
+        let processedContent = value.replaceAll('\n', '<br>');
+    
+        // Update the DOM or handle the visual feedback
+        document.getElementById(`content:${id}`).innerHTML = processedContent;
+
+        onCardChange(id, value);
+        return (value);
+    }
+    
 }
+
+
 
 
 function onCardChange(id, text) {
@@ -645,7 +616,6 @@ function moveCard(card, position) {
 }
 
 function addSticker(cardId, stickerId) {
-    // const stickerContainer = $('#' + cardId + ' .filler');
 
     const stickerContainer = $(`#${cardId} #sticker-container`);
 

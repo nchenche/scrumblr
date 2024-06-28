@@ -1,11 +1,11 @@
 .card {
-	width: 277px;
-	height: 183px;
+	/* width: 277px;
+	height: 183px; */
 	/* font-size: .9em; */
 	overflow: hidden;
 	position: absolute;
 	z-index: 10;
-	top: 460px;
+	/* top: 460px; */
 	left: 0px;
 	display: block;
 }
@@ -35,6 +35,8 @@
 	text-align: center;
 	padding-top: 18px;
 } */
+
+
 
 .filler {
 	margin-right: 34px;
