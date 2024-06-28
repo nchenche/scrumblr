@@ -7,6 +7,7 @@ var currentTheme = "bigcards";
 var currentFont = {family: 'Covered By Your Grace', size: 16};
 var boardInitialized = false;
 var keyTrap = null;
+const CARD_COLORS = ["green", "yellow", "blue", "white"];
 
 // const baseurl = location.origin;
 var baseurl = location.pathname.substring(0, location.pathname.lastIndexOf('/'));
@@ -142,11 +143,11 @@ function getMessage(m) {
             break;
 
         case 'deleteCard':
-            $("#" + data.id).fadeOut(200, () => { $(this).remove() });
+            $(`#${data.id}`).fadeOut(50, () => { $(this).remove() });
             break;
 
         case 'editCard':
-            $("#" + data.id).children('.content:first').text(data.value);
+            $(`#${data.id}`).find('.content').text(data.value);
             break;
 
         case 'initColumns':
@@ -188,6 +189,10 @@ function getMessage(m) {
         case 'setBoardSize':
             resizeBoard(message.data);
             break;
+
+        case 'changeCardColor':
+            onCardChangeColor(data.id, data.color);
+            break
 
         default:
             //unknown message
@@ -426,14 +431,14 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
             </div>
 
             <div class="flex items-center space-x-2">
-                <svg fill="#000000" aria-labelledby="Change color" title="Change color" class="icon-card hidden w-4 h-4 opacity-50 hover:cursor-pointer hover:opacity-90" viewBox="0 0 256.00 256.00" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00256"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M230.627,25.37207a32.03909,32.03909,0,0,0-45.2539,0c-.10254.10156-.20117.207-.29785.31348L130.17383,86.85938l-9.20313-9.20313a24.00066,24.00066,0,0,0-33.9414,0L10.34277,154.34277a8.00122,8.00122,0,0,0,0,11.31446l80,80a8.00181,8.00181,0,0,0,11.31446,0l76.68652-76.68653a24.00066,24.00066,0,0,0,0-33.9414l-9.20313-9.20215L230.31445,70.9248c.10645-.09668.21192-.19531.31348-.29785A32.03761,32.03761,0,0,0,230.627,25.37207ZM96,228.68652,81.87842,214.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,96.09863,177.7168L70.564,203.25049,53.87842,186.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,68.09863,149.7168L42.564,175.25049,27.31348,160,72,115.31445,140.68555,184Z"></path> </g></svg>
+                <svg fill="#000000" aria-labelledby="Change color" title="Change color" class="icon-card icon-color-change hidden w-4 h-4 opacity-50 hover:cursor-pointer hover:opacity-90" viewBox="0 0 256.00 256.00" id="Flat" xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00256"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M230.627,25.37207a32.03909,32.03909,0,0,0-45.2539,0c-.10254.10156-.20117.207-.29785.31348L130.17383,86.85938l-9.20313-9.20313a24.00066,24.00066,0,0,0-33.9414,0L10.34277,154.34277a8.00122,8.00122,0,0,0,0,11.31446l80,80a8.00181,8.00181,0,0,0,11.31446,0l76.68652-76.68653a24.00066,24.00066,0,0,0,0-33.9414l-9.20313-9.20215L230.31445,70.9248c.10645-.09668.21192-.19531.31348-.29785A32.03761,32.03761,0,0,0,230.627,25.37207ZM96,228.68652,81.87842,214.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,96.09863,177.7168L70.564,203.25049,53.87842,186.56494l25.53467-25.53369A8.00053,8.00053,0,0,0,68.09863,149.7168L42.564,175.25049,27.31348,160,72,115.31445,140.68555,184Z"></path> </g></svg>
                 <img src="/images/icons/token/Xion.png" class="icon-card delete-card-icon hidden w-3 h-3 z-10 opacity-50 hover:cursor-pointer hover:opacity-90" title="Delete card"/>
             </div>
 
         </div>
 
         <div class="relative w-44 text-center mx-auto">
-            <div data-user="${user}" id="content:${id}" class="relative overflow-clip content p-[0.6rem] mx-auto h-[8rem] w-44 stickertarget droppable" style="background-image: url('/images/${colour}-card.png'); background-position: 55% 28%">${text}</div>
+            <div data-user="${user}" data-color="${colour}" id="content:${id}" class="relative overflow-clip content p-[0.6rem] mx-auto h-[8rem] w-44 stickertarget droppable" style="background-image: url('/images/${colour}-card.png'); background-position: 55% 28%">${text}</div>
         </div>
 
         <div id="sticker-container" class="pr-2 relative bottom-8 flex items-center justify-end space-x-2 mx-auto w-44 h-4"></div>
@@ -517,8 +522,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     var speed = Math.floor(Math.random() * 800) + 200;
     if (typeof(animationspeed) != 'undefined') speed = animationspeed;
 
-    var startPosition = $("#create-card").position();
-
+    // var startPosition = $("#create-card").position();
     // card.css('top', startPosition.top - card.height() * 0.5);
     // card.css('left', startPosition.left - card.width() * 0.5);
 
@@ -544,6 +548,28 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
         function() {
             $(`#${id}`).remove();
             sendAction('deleteCard', {'id': id, room: ROOM}); // notify server of delete
+        }
+    );
+
+    card.find('.icon-color-change').click(
+        function() {
+            let content = card.find(".content");
+
+            let currentColor = content.data('color');  // Assume we store the current color in a data attribute
+
+            // Get the current index of the font family
+            let currentIndex = CARD_COLORS.indexOf(currentColor);
+
+            // Determine the next index: if at the end, cycle back to the start
+            let nextIndex = (currentIndex + 1) % CARD_COLORS.length;
+
+            // Set the new font family
+            let nextColor = CARD_COLORS[nextIndex];
+
+            content.css('background-image', `url("/images/${nextColor}-card.png"`);
+            content.data('color', nextColor);
+
+            sendAction("changeCardColor", {id: id, color: nextColor});
         }
     );
 
@@ -596,6 +622,12 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 }
 
 
+function onCardChangeColor(id, color) {
+    let content = $(`#${id}`).find(".content");
+
+    content.css('background-image', `url("/images/${color}-card.png"`);
+    content.data('color', color);
+}
 
 
 function onCardChange(id, text) {
@@ -760,11 +792,9 @@ async function createCard(id, text, x, y, rot, colour) {
 }
 
 function randomCardColour() {
-    var colours = ['yellow', 'green', 'blue', 'white'];
+    var i = Math.floor(Math.random() * CARD_COLORS.length);
 
-    var i = Math.floor(Math.random() * colours.length);
-
-    return colours[i];
+    return CARD_COLORS[i];
 }
 
 
@@ -853,7 +883,7 @@ function onColumnChange(id, text) {
 function displayRemoveColumn() {
     if (totalcolumns <= 0) return false;
 
-    $('.col:last').fadeOut(150,
+    $('.col:last').fadeOut(50,
         function() {
             $(this).remove();
         }
@@ -903,7 +933,7 @@ function updateColumns(c) {
 
 function deleteColumns(next) {
     //delete all existing columns:
-    $('.col').fadeOut('slow', next());
+    $('.col').fadeOut(50, next());
 }
 
 function initColumns(columnArray) {
