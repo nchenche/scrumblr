@@ -419,6 +419,8 @@ router.get('/api/rooms', async (req, res) => {
 });
 
 
+
+
 // Catch-all route that redirects to the home page if no other route matches | MUST BE AFTER ALL DEFINED ROUTES
 router.use((req, res) => {
     res.redirect('/');

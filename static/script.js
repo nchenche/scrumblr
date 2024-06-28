@@ -1249,14 +1249,6 @@ $(function() {
     });
 
 
-    // $(".board-outline").resizable({
-    //     ghost: false,
-    //     minWidth: 700,
-    //     minHeight: 500,
-    //     maxWidth: 1750,
-    //     maxHeight: 1800,
-    // });
-
     // Calculate dimensions based on window size
     const maxWidth = $(window).width() * 0.78;
     const maxHeight = $(window).height() * 0.85;
