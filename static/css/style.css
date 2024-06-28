@@ -103,7 +103,8 @@ body {
 	text-align: center;
 	/* padding-bottom: 2rem; */
 	margin: 0;
-	outline-width:0;
+	outline: none;
+	/* outline-width:0; */
 	overflow: hidden;
 	resize: none;
 	/* width: 100%; */
