@@ -854,7 +854,7 @@ function drawNewColumn(columnName) {
         }
     );
 
-    $('.col:last').fadeIn(100);
+    $('.col:last').fadeIn(10);
 
     totalcolumns++;
 }
