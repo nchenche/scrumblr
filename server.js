@@ -123,13 +123,13 @@ router.get('/reset-password', routeProtection.loggedOut, function (req, res) {
 	const { user, token } = req.query;
 
 	db.checkToken(user, token, (response) => {
-		if (!response.success) {
-			return res.render('layout', {
-				body: 'partials/reset_unauthorized.ejs',
-				username: null,
-				currentNav: null
-			});
-		}
+		// if (!response.success) {
+		// 	return res.render('layout', {
+		// 		body: 'partials/reset_unauthorized.ejs',
+		// 		username: null,
+		// 		currentNav: null
+		// 	});
+		// }
 
 		res.render('layout', {
 			body: 'partials/resetpass.ejs',

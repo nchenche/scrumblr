@@ -1,8 +1,7 @@
-import {accountManager} from "../../userAccount.js"
+import { accountManager } from "../../userAccount.js"
+import { validatePasswordRequirements } from '../registration/registerFormHandler.js'
 
-const input = document.getElementById('password');
-const submitButton = document.getElementById('btn-submit');
-
+var isFieldValid = false;
 
 function setUpForm() {
     const input = document.getElementById('password');
@@ -14,7 +13,9 @@ function setUpForm() {
 
     function handleFieldInput(event) {
         event.target.nextElementSibling.textContent = ''; // Clear any previous error messages
-        const isFieldValid = event.target.value.trim() !== '';
+        isFieldValid = event.target.value.trim() !== '';
+
+        isFieldValid = isFieldValid && validatePasswordRequirements(input.value);
 
         submitButton.disabled = !isFieldValid;
     }
@@ -35,7 +36,9 @@ async function submitForm(event) {
         password: document.getElementById("password").value.trim()
     }
 
-    if (!data.password) return;
+    if (!isFieldValid) return;
+
+    showSuccessMessage();
 
     accountManager.resetPassword(data, (response) => {
         if (!response.success) {
@@ -69,6 +72,28 @@ async function submitForm(event) {
     });
 }
 
+
+function showSuccessMessage() {
+    const username = document.getElementById("user").value.trim();
+
+    const contentDiv = document.getElementById("board-content");
+    const statusDiv = document.getElementById("status-message");
+    const counter = document.getElementById("counter");
+
+    counter.innerHTML = 3;
+    contentDiv.classList.add("hidden");
+    statusDiv.classList.remove("hidden");
+
+    // Update the counter value every second
+    const intervalId = setInterval(() => {
+        counter.innerHTML--;
+
+        if (counter.innerHTML == 1) {
+            clearInterval(intervalId);  // Stop the countdown
+            window.location.href = `/login?username=${username}`;  // Redirect to the login page
+        }
+    }, 1000);
+}
 
 function handleSubmit() {
     const submitButton = document.getElementById("btn-submit");

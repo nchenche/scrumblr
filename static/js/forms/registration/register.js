@@ -16,9 +16,9 @@ async function submitForm(event) {
 
     // Data payload to register
     var userData = {
-        username: document.getElementById("username").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        password: document.getElementById("password").value.trim(),
+        username: username.value.trim(),
+        email: email.value.trim(),
+        password: password.value.trim(),
     };
 
     // If validation passes, proceed to register

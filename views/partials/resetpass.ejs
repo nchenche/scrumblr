@@ -1,14 +1,21 @@
 <div class="board-outline" style="height: fit-content;">
     <div id="board" style="min-height: 50vh;">
 
-        <div class="text-center mb-24 h-24">
-            <h1 class="font-customFont text-5xl text-gray-400">Reset your password?</h1>
-        </div>
+        <h1 class="font-customFont text-5xl text-center text-gray-400 mb-24">Reset your password?</h1>
 
-        <div class="flex flex-col items-center font-customFont h-full">        
-            <div class="w-full max-w-md text-2xl h-full">         
+        <div id="board-container" class="flex flex-col items-center font-customFont h-full">
 
-                <div class="flex items-center mb-10">
+            <div id="status-message" class="w-full max-w-md hidden">
+                <div class="text-center">
+                    <p class="text-4xl text-green-800 mb-4">Successful password update!</p>
+                    <p class="text-2xl text-gray-600 mb-2s">You will be redireced to the login page in</p>
+                    <p class="text-3xl text-gray-600"><span id="counter">3</span>s</p>                    
+                </div>
+            </div>
+
+            <div id="board-content" class="w-full max-w-md text-2xl h-full">         
+
+                <!-- <div class="flex items-center mb-10">
                     <label for="password" class="text-gray-800 w-1/3">New password</label>
                     <div class="flex-1 flex flex-col">
                         <input id="token" type="hidden" name="token" value="<%= token %>">
@@ -17,7 +24,32 @@
                         <input id="password" type="password" name="password" value='' autofocus autocomplete="off" class="p-0 focus:outline-none text-gray-600 border-b-2 border-dashed border-gray-500 bg-inherit">
                         <span id="reset-error" class="h-2 error-message text-sm text-red-700 mt-1 opacity-90"></span>
                     </div>
-                </div>                          
+                </div> -->
+
+                <div class="flex flex-col mb-10">  <!-- This container is for vertical stacking -->
+                    <div class="flex items-center">  <!-- This container is for horizontal alignment of label and input -->
+
+                        <!-- hidden data -->
+                        <input id="token" type="hidden" name="token" value="<%= token %>">
+                        <input id="user" type="hidden" name="user" value="<%= user %>">
+
+                        <label for="password" class="text-gray-800 w-1/3">New Password</label>
+                        <div class="flex-1 flex flex-col">
+                            <input id="password" type="password" name="username" autocomplete="off" class="p-0 focus:outline-none text-gray-600 border-b-2 border-dashed border-gray-500 bg-inherit">
+                            <span id="reset-error" class="h-2 error-message text-sm text-red-700 mt-1 opacity-90"></span>
+                        </div>
+                    </div>
+                
+                    <div id="password-requirements" class="flex flex-col items-center text-sm ml-2 mt-1">
+                        <div>
+                            <div id="lowercase" class="password-requirement invalid"><i class="fa fa-check text-green-500"></i> - 1 lowercase letter</div>
+                            <div id="uppercase" class="password-requirement invalid"><i class="fa fa-check text-green-500"></i> - 1 uppercase letter</div>
+                            <div id="number" class="password-requirement invalid"><i class="fa fa-check text-green-500"></i> - 1 number</div>
+                            <div id="length" class="password-requirement invalid"><i class="fa fa-check text-green-500"></i> - 8 characters long</div>
+                        </div>
+                    </div>
+
+                </div>
                 
                 <div class="flex justify-end">
                     <button disabled id="btn-submit" class="text-white text-2xl bg-blue-500 hover:bg-blue-700 opacity-90 font-bold py-2 px-4 rounded-xl focus:outline-none focus:shadow-outline disabled:opacity-50 disabled:cursor-not-allowed">
@@ -25,8 +57,8 @@
                     </button>
                 </div>
 
-                <div id="reset-success" class="flex flex-col my-auto justify-center text-center justify-end text-green-600 mt-6">
-                </div>
+                <!-- <div id="reset-success" class="flex flex-col my-auto justify-center text-center justify-end text-green-600 mt-6">
+                </div> -->
 
             </div>
             

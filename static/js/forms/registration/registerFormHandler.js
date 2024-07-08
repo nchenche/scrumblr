@@ -38,29 +38,33 @@ export function setUpForm() {
         registerButton.disabled = !areFieldsFilled;
     }
 
-
-    function validatePasswordRequirements(password) {
-        const validationResults = [
-            updateRequirement('lowercase', /[a-z]/.test(password)),
-            updateRequirement('uppercase', /[A-Z]/.test(password)),
-            updateRequirement('number', /[0-9]/.test(password)),
-            updateRequirement('length', password.length >= 8)
-        ];
-
-        // Return true if all requirements are met
-        return validationResults.every(Boolean);
-    }
-
-    function updateRequirement(id, isValid) {
-        const element = document.getElementById(id);
-        element.classList.toggle('invalid', !isValid);
-
-        return isValid;
-    }
-
     // Check fields initially in case of autofill
     inputs.forEach(input => handleFieldInput( { target: input } ));
 }
+
+
+export function validatePasswordRequirements(password) {
+    function updateRequirement(id, isValid) {
+        const element = document.getElementById(id);
+        element.classList.toggle('invalid', !isValid);
+    
+        return isValid;
+    }
+    
+    const validationResults = [
+        updateRequirement('lowercase', /[a-z]/.test(password)),
+        updateRequirement('uppercase', /[A-Z]/.test(password)),
+        updateRequirement('number', /[0-9]/.test(password)),
+        updateRequirement('length', password.length >= 8)
+    ];
+
+    // Return true if all requirements are met
+    return validationResults.every(Boolean);
+}
+
+
+
+
 
 
 /**
