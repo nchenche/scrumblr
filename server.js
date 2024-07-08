@@ -8,8 +8,6 @@ const socketIo = require('socket.io');
 const { db, redisClient } = require('./lib/redis');
 const { sendEmail } = require("./lib/mailer.js");
 
-
-sendEmail("nicolas.chevrollier@laposte.net", "nche", "tokenResponse.token");
 /**************
  GET CONFIG VARS
 **************/
