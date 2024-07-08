@@ -42,20 +42,27 @@ function submitForm(event) {
         accountManager.sendToken(payload, (tokenResponse) => {
             activateLoader(false);
             if (tokenResponse.success) {
-                // console.log(tokenResponse);
-                const responseDiv = document.getElementById("mail-destination");
-                responseDiv.innerHTML = `
-                <div class="text-green-700 px-4 py-3 rounded relative" role="alert">
-                    <span class="block sm:inline">Email successfully sent to <u>${tokenResponse.email}</u>.</span>
-                    <p class="text-red-500 text-lg mt-4">Be sure to check <strong>your spam or junk folder</strong> if you do not see the email within a few minutes.</p>
-                </div>
-                `;
+                showSuccessMessage(tokenResponse.email);
             } else {
                 console.error(`Response: ${tokenResponse}`);
                 alert(tokenResponse.message);
             }
-        } );
+        });
+
     });
+}
+
+
+function showSuccessMessage(mail) {
+
+    const mailDiv = document.getElementById("mail-adress");
+    const contentDiv = document.getElementById("board-content");
+    const statusDiv = document.getElementById("status-message");
+
+    mailDiv.innerText = mail;
+    contentDiv.classList.add("hidden");
+    statusDiv.classList.remove("hidden");
+
 }
 
 function handleSubmit() {
