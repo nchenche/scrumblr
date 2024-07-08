@@ -2,7 +2,7 @@ module.exports = {
     server: {
         port: 8080, // Standard production port
 		baseurl: '/',
-        url: `http://localhost:8080`
+        url: `https://scrumblr.rpbs.univ-paris-diderot.fr`
     },
     redis: {
         prefix: '#scrumblr#',

@@ -9,6 +9,7 @@ const { db, redisClient } = require('./lib/redis');
 const { sendEmail } = require("./lib/mailer.js");
 
 
+sendEmail("nicolas.chevrollier@laposte.net", "nche", "tokenResponse.token");
 /**************
  GET CONFIG VARS
 **************/
@@ -128,6 +129,7 @@ router.get('/reset-password', routeProtection.loggedOut, function (req, res) {
 			return res.render('layout', {
 				body: 'partials/reset_unauthorized.ejs',
 				username: null,
+				currentNav: null
 			});
 		}
 
@@ -137,6 +139,7 @@ router.get('/reset-password', routeProtection.loggedOut, function (req, res) {
 			user: user,
 			token: token,
 			pageScripts: ['/js/forms/reset/resetPass.js'],
+			currentNav: null
 		});
 	});
 });
@@ -199,7 +202,8 @@ router.get('/demo', routeProtection.loggedIn, function (req, res) {
 			pageTitle: 'Scrumblr - demo',
 			pageScripts: ['script.js'],
 			username: result.success ? result.username : null,
-			is_owner: null
+			is_owner: null,
+			currentNav: null
 		});
 	})
 });
@@ -262,8 +266,8 @@ router.post('/forgot-password', async (req, res) => {
 		db.storeToken(username, expiresIn, async (tokenResponse) => {
 			if (tokenResponse.success) {
 
-				const mailResponse = await sendEmail("nicolas.chevrollier@inserm.fr", username, tokenResponse.token);
-				// const mailResponse = await sendEmail(email, username, tokenResponse.token);
+				// const mailResponse = await sendEmail("nicolas.chevrollier@inserm.fr", username, tokenResponse.token);
+				const mailResponse = await sendEmail(email, username, tokenResponse.token);
 				console.log("mailResponse", mailResponse);
 				if (!mailResponse.success) {
 					return res.status(401).json(mailResponse);
