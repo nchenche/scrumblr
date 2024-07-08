@@ -115,6 +115,7 @@ router.get('/forgot-password', routeProtection.loggedOut, function (req, res) {
 		body: 'partials/forgotpass.ejs',
 		username: null,
 		pageScripts: ['/js/forms/reset/forgotPass.js'],
+		currentNav: ''
 	});
 });
 
