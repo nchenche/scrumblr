@@ -30,7 +30,7 @@ function submitForm(event) {
     const payload = { username: username };
 
     checkUsername(payload.username, (response) => {
-        if (! response.exists) {
+        if (! response.result ) {
             const span = document.getElementById(`username-error`);
             span.textContent = "User does not exist";
             return
