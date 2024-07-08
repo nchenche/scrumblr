@@ -243,7 +243,7 @@ function initPasswordForm(attempt) {
             <input type="password" id="room-password" placeholder="Enter the room password" class="w-3/5 px-4 py-2 rounded shadow focus:outline-none focus:shadow-outline">
             <div class="flex flex-col items-center mt-2 space-y-2">
                 <input type="submit" class="text-white font-black bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg px-4 py-2 rounded" value="Submit">
-                <button id="exit-form" class="text-red-400 opacity-70 font-black cursor-pointer hover:opacity-100 hover:shadow-lg px-4 py-2 rounded">Go back home</button>
+                <button id="exit-form" class="text-red-400 opacity-70 font-black cursor-pointer hover:opacity-100 hover:shadow-lg px-4 py-2 rounded">Go back</button>
             </div>
         </form>`
     );
@@ -320,7 +320,7 @@ function initLockForm(attempt) {
 		if (validateLock(passwrd, confirmPasswrd) === true) {
 			sendAction('setPassword', (passwrd !== null ? window.btoa(passwrd) : null));
 			unblockUI();
-            location.reload(); 
+            // location.reload();
 		}
 	});
 
