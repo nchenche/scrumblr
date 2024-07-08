@@ -859,8 +859,6 @@ function drawNewColumn(columnName) {
 function onColumnChange(id, text) {
     var names = Array();
 
-    //console.log(id + " " + text );
-
     //Get the names of all the columns right from the DOM
     $('.col').each(function() {
 
