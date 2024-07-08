@@ -834,9 +834,7 @@ function drawNewColumn(columnName) {
         cls = "col first";
     }
 
-    $('#icon-col').before('<td class="' + cls +
-        '" width="10%" style="display:none; font-size: 1.75em;"><h2 id="col-' + (totalcolumns + 1) +
-        '" class="editable">' + columnName + '</h2></td>');
+    $('#icon-col').before(`<td class="${cls}" width="10%" style="display:none; font-size: 1.75em;"><h2 id="col-${totalcolumns + 1}" class="editable">${columnName}</h2></td>`);
 
     $('.editable').editable(function(value, settings) {
         onColumnChange(this.id, value);
@@ -847,7 +845,7 @@ function drawNewColumn(columnName) {
         type: 'textarea',
         placeholder: 'New',
         onblur: 'submit',
-        width: '',
+        width: '95%',
         height: '',
         event: 'dblclick', //event: 'mouseover'
         }
