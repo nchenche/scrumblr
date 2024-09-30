@@ -9,10 +9,10 @@ const socketIo = require('socket.io');
 const { db, redisClient } = require('./lib/redis');
 const { sendEmail } = require("./lib/mailer.js");
 
-const axios = require('axios'); // Install via 'npm install axios'
+// const axios = require('axios'); // Install via 'npm install axios'
 
-const dns = require('node:dns');
-dns.setDefaultResultOrder('ipv4first');
+// const dns = require('node:dns');
+// dns.setDefaultResultOrder('ipv4first');
 
 
 /**************
