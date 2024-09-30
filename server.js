@@ -440,13 +440,13 @@ router.get('/api/get_avatar/:username', async (req, res) => {
     ...dicebearQuery,
   });
 
-  const avatarUrl = `${AVATAR_API}/?${queryParams.toString()}`;
+  const avatarUrl = `${AVATAR_API}?${queryParams.toString()}`;
   console.log("fetching avatar at: ", avatarUrl);
 
 
   try {
     // Fetch the avatar from DiceBear API
-    const response = await axios.get(avatarUrl, { responseType: 'stream' });
+    const response = await fetch(avatarUrl);
 
     if (!response.ok) {
       res.status(response.status).send('Error fetching avatar');
@@ -459,7 +459,7 @@ router.get('/api/get_avatar/:username', async (req, res) => {
     // Pipe the response body directly to the client
     response.body.pipe(res);
   } catch (error) {
-    console.error('Error fetching avatar:', error);
+    console.error('** Error fetching avatar:', error);
     res.status(500).send('Internal Server Error');
   }
 });

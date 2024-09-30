@@ -15,7 +15,9 @@ const DEFAULT_CONFIG = {
         url: 'redis://127.0.0.1:6379', // Default Redis URL
     },
     dicebear: {
-        url: 'http://127.0.0.1:3000/8.x/identicon/svg'
+        // url: 'http://127.0.0.1:3000/8.x/identicon/svg',
+        url: 'https://api.dicebear.com/9.x/identicon/svg'
+
     }
 
     // googleAnalytics: {
