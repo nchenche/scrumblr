@@ -426,7 +426,13 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
         <div class="relative top-[0.4rem] px-1 flex h-6 mx-auto justify-between w-44">
 
             <div class="flex items-center space-x-2 z-10">
-                <img src="${AVATAR_API}?seed=${user}&${dicebearQuery}" class="icon-card avatar-card hidden w-6 h-6 rounded-full z-10 opacity-50 hover:cursor-pointer hover:opacity-90" alt="User Avatar" title="${user}" />
+                <img
+                    // src="/api/get_avatar/${user}?${dicebearQuery}"
+                    src="${AVATAR_API}?seed=${user}&${dicebearQuery}"
+                    class="icon-card avatar-card hidden w-6 h-6 rounded-full z-10 opacity-50 hover:cursor-pointer hover:opacity-90"
+                    alt="User Avatar"
+                    title="${user}" 
+                />
             </div>
 
             <div class="flex items-center space-x-2">

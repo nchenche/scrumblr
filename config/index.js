@@ -8,14 +8,14 @@ const DEFAULT_CONFIG = {
     server: {
         port: argv.port || 8080,
         baseurl: argv.baseurl || '/',
-        url: `http://localhost:${argv.port || 8080}`
+        url: `http://127.0.0.1:${argv.port || 8080}`
     },
     redis: {
         prefix: '#scrumblr#',
         url: 'redis://127.0.0.1:6379', // Default Redis URL
     },
     dicebear: {
-        url: 'http://0.0.0.0:3000/8.x/identicon/svg'
+        url: 'http://127.0.0.1:3000/8.x/identicon/svg'
     }
 
     // googleAnalytics: {

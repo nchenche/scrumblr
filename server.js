@@ -3,10 +3,17 @@
 **************/
 const compression = require('compression');
 const express = require('express');
-var cookieParser = require('cookie-parser')
+var cookieParser = require('cookie-parser');
+const fetch = require('node-fetch'); // If using Node.js version < 18
 const socketIo = require('socket.io');
 const { db, redisClient } = require('./lib/redis');
 const { sendEmail } = require("./lib/mailer.js");
+
+const axios = require('axios'); // Install via 'npm install axios'
+
+const dns = require('node:dns');
+dns.setDefaultResultOrder('ipv4first');
+
 
 /**************
  GET CONFIG VARS
@@ -18,7 +25,6 @@ const port = config.server.port;
 const baseUrl = config.server.baseurl;
 const avatar_api = config.dicebear.url;
 
-console.log("avatar_api", avatar_api);
 
 /**************
  LOCAL INCLUDES
@@ -419,6 +425,43 @@ router.get('/api/rooms', async (req, res) => {
         console.error("Error handling /api/rooms:", error);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
+});
+
+
+router.get('/api/get_avatar/:username', async (req, res) => {
+  const username = req.params.username;
+  const dicebearQuery = req.query; // Pass through any query parameters
+
+  const AVATAR_API = avatar_api;
+
+  // Build the URL with query parameters
+  const queryParams = new URLSearchParams({
+    seed: username,
+    ...dicebearQuery,
+  });
+
+  const avatarUrl = `${AVATAR_API}/?${queryParams.toString()}`;
+  console.log("fetching avatar at: ", avatarUrl);
+
+
+  try {
+    // Fetch the avatar from DiceBear API
+    const response = await axios.get(avatarUrl, { responseType: 'stream' });
+
+    if (!response.ok) {
+      res.status(response.status).send('Error fetching avatar');
+      return;
+    }
+
+    // Set the content type from the API response
+    res.set('Content-Type', response.headers.get('Content-Type'));
+
+    // Pipe the response body directly to the client
+    response.body.pipe(res);
+  } catch (error) {
+    console.error('Error fetching avatar:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 
