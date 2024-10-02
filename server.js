@@ -414,6 +414,38 @@ router.post('/api/delete_room', async (req, res) => {
 });
 
 
+router.post('/api/allow_user_access', async (req, res) => {
+	const { room, user } = req.body;
+
+	try {
+		const response = await db.setAllowedUsers(room, user);
+		console.log('RESPONSE to POST /api/allow_user_access: ', response);
+
+		// Add user as allowed member to the room
+		// const allowUserResponse = await db.setAllowedUsers(room, user);
+		return res.status(200).json(response);
+
+	} catch (error) {
+		console.error(`Error in /api/allow_user_access request: ${error}`)
+		return res.status(400).json({success: false, message: error});
+	}
+});
+
+
+router.post('/api/check_user_access', async (req, res) => {
+	const { room, user } = req.body;
+
+	try {
+		const response = await db.isUserAllowed(room, user);
+		console.log('RESPONSE to POST /api/check_user_access: ', response);
+		return res.status(200).json(response);
+	} catch (error) {
+		console.error(`Error in /api/check_user_access request: ${error}`)
+		return res.status(400).json({success: false, message: error});
+	}
+});
+
+
 router.get('/api/rooms', async (req, res) => {
     const user = req.user;
 
@@ -464,6 +496,24 @@ router.get('/api/get_avatar/:username', async (req, res) => {
   }
 });
 
+
+router.get('/api/get_pwd/:room', async (req, res) => {
+    const room = req.params.room;
+
+    try {
+        const response = await db._getPasswordAsync(room);
+        console.log("Response from GET request to /api/get_pwd/:room", response);
+
+		if (!response) {
+			res.status(500).send('Error fetching room password...');
+			return;
+		  }
+        res.status(200).json({ success: true, data: response, message: "Successfully fetched room password!" });
+    } catch (error) {
+        console.error("Error handling /api/rooms:", error);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
+});
 
 
 

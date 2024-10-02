@@ -3,6 +3,7 @@ var totalcolumns = 0;
 var columns = [];
 var requiredPassword = null;
 var passwordAttempts = 0;
+var MaxPasswordAttempts = 5;
 var currentTheme = "bigcards";
 var currentFont = {family: 'Covered By Your Grace', size: 16};
 var boardInitialized = false;
@@ -105,7 +106,7 @@ socket.on('updateRoomUsers', (users) => {
 
 
 //respond to an action event
-function getMessage(m) {
+async function getMessage(m) {
     var message = m; //JSON.parse(m);
     var action = message.action;
     var data = message.data;
@@ -122,10 +123,25 @@ function getMessage(m) {
             break;
 			
 		case 'requirePassword':
-			initPasswordForm(false);
-			requiredPassword = data;
-			break;
+            requiredPassword = data;
 
+            // Check if user has right to access room (i.e. he already entered the password)
+            const isUserAllowed = await checkUserRightAccess(ROOM, USERNAME);
+            if (isUserAllowed) {
+                sendAction('passwordValidated', null);
+            } else {
+                // Show the password form
+                initPasswordForm(false);
+            }
+
+            // if (localStorage.getItem(`room-${ROOM}-passwordValidated`) === 'true') {
+            //     pwd_room = await fetchRoomPwd(ROOM);
+            // }
+
+            // if (pwd_room && validatePassword(window.atob(pwd_room.data))) {
+            //     sendAction('passwordValidated', null);
+
+            break;
         case 'moveCard':
             moveCard($(`#${data.id}`), data.position);
             break;
@@ -230,17 +246,21 @@ function blockUI(message) {
 }
 
 
-
 $(document).bind('keyup', function(event) {
     keyTrap = event.which;
 });
 
+
 // password functions
 function initPasswordForm(attempt) {
+    //             <div class="w-3/5 text-red-600 text-left text-sm mx-auto">Remaining attempts: ${MaxPasswordAttempts - passwordAttempts}</div>
+
     blockUI(
-        `${attempt === true ? '<h1 class="mb-2">Invalid password</h1>' : '<h1 class="mb-2">Room protected</h1>'}
+        `<h1 class="mb-2">Room protected</h1>
         <form id="password-form" class="mt-8">
             <input type="password" id="room-password" placeholder="Enter the room password" class="w-3/5 px-4 py-2 rounded shadow focus:outline-none focus:shadow-outline">
+            <div id="pwd-message" class="w-3/5 text-red-600 text-left text-xs mx-auto opacity-0">Invalid password</div>
+
             <div class="flex flex-col items-center mt-2 space-y-2">
                 <input type="submit" class="text-white font-black bg-transparent cursor-pointer opacity-70 hover:opacity-100 hover:shadow-lg px-4 py-2 rounded" value="Submit">
                 <button id="exit-form" class="text-red-400 opacity-70 font-black cursor-pointer hover:opacity-100 hover:shadow-lg px-4 py-2 rounded">Go back</button>
@@ -248,12 +268,23 @@ function initPasswordForm(attempt) {
         </form>`
     );
 
-	$('#password-form').submit(function(event) {
+    if (attempt === true) {
+        $('#pwd-message').removeClass("opacity-0");
+        $('#pwd-message').addClass("opacity-90");
+    }
+
+	$('#password-form').submit(async function(event) {
 		event.preventDefault();
 
-        if (! $('#room-password').val() ) return;
+        const pwd = $('#room-password').val().trim();
+        if (!pwd) return;
 		
-		if (validatePassword($('#room-password').val()) === true) {
+		if (validatePassword(pwd)) {
+            // Store that the password has been validated
+            // localStorage.setItem(`room-${ROOM}-passwordValidated`, 'true');
+
+            // Add user as allowed members in the room - Remember user has already entered the password
+            await allowUserAccess(ROOM, USERNAME);
 			sendAction('passwordValidated', null);
 		}
 	});
@@ -310,48 +341,35 @@ function initLockForm(attempt) {
     blockUI(formContent);
 
 	$('#lock-submit').on('click', function(e) {
-        e.preventDefault();  // Prevent default click behavior
+        e.preventDefault();
 
 		var passwrd = $('#lock-password').val().trim();
 		var confirmPasswrd = $('#lock-password-confirm').val().trim();
 
-        console.log("submit password triggered");
+        if (!passwrd || !confirmPasswrd) return;
 		
-		if (validateLock(passwrd, confirmPasswrd) === true) {
-			sendAction('setPassword', (passwrd !== null ? window.btoa(passwrd) : null));
+		if (validateLock(passwrd, confirmPasswrd)) {
+            const bPassword = (passwrd !== null ? window.btoa(passwrd) : null);
+			sendAction('setPassword', bPassword);
 			unblockUI();
-            // location.reload();
+            location.reload();
 		}
 	});
 
     $('#lock-password, #lock-password-confirm').on('keypress', function(e) {
         if (e.which == 13) {  // 13 is the keycode for 'Enter'
-            e.preventDefault();  // Prevent the default form submission behavior
-            
-            var passwrd = $('#lock-password').val().trim();  // Get and trim the password
-            if (passwrd !== "") {  // Check if the password input is not empty
-                var confirmPasswrd = $('#lock-password-confirm').val().trim();  // Get and trim the confirm password
-                if (validateLock(passwrd, confirmPasswrd) === true) {  // Validate the passwords if necessary
-                    $('#lock-submit').click();  // Trigger the form submission
-                } else {
-                    // Optionally handle validation failure (e.g., show a message)
-                }
-            } else {
-                // Optionally handle the case where the password is empty (e.g., show a message)
-            }
+            e.preventDefault();
+            $('#lock-submit').click();
         }
     });
 
     $('#close-form').on('click', function(e) {
-        e.preventDefault();  // Prevent default click behavior
-
+        e.preventDefault();
         unblockUI();
+        location.reload();
     });
 
 	$('#lock-remove').on('click', function(e) {
-        e.preventDefault();  // Prevent default click behavior
-        console.log("remove password triggered");
-
 		sendAction('clearPassword', null);
         unblockUI();
         location.reload();
@@ -359,8 +377,7 @@ function initLockForm(attempt) {
 }
 
 
-function validateLock(passwrd, confirmPasswrd) {
-	
+function validateLock(passwrd, confirmPasswrd) {	
 	if ( !passwrd ) {
 		return false;
 	}
@@ -374,14 +391,15 @@ function validateLock(passwrd, confirmPasswrd) {
 	return true;
 }
 
-function validatePassword(passwrd) {
-	
+
+function validatePassword(passwrd) {	
 	passwordAttempts++;
 	
+    // Invalid password, too many attemps - redirect to home page
 	if (passwordAttempts > 5) {
 		// blockUI('<h1>You have attempted to login too many times. Please return to the homepage</h1><br>');
         const message = 'You have attempted to login too many times.';
-        let countdown = 5;
+        let countdown = 3;
         
         // Initial display with full message
         blockUI(`${message} You will be redirected to the home page in <span id="countdown">${countdown}</span> seconds.`);
@@ -400,13 +418,14 @@ function validatePassword(passwrd) {
 		return false;
 	}
 	
-	var modified = window.btoa(passwrd);
-	
-	if (requiredPassword == modified) {
+    // Valid password
+	if (requiredPassword == window.btoa(passwrd)) {
 		return true;
 	}
 	
-	initPasswordForm(true);
+    // Invalid password - send back the form
+    initPasswordForm(true);
+
 	return false;
 }
 
@@ -697,6 +716,59 @@ function removeSticker(stickerId) {
 }
 
 
+async function fetchRoomPwd(room) {
+    try {
+        const response = await fetch(`/api/get_pwd/${room}`);
+        const data = await response.json();
+        if (data.success) {
+            return data
+        } else {
+            console.log(data.message);
+            return
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+    }
+}
+
+
+async function checkUserRightAccess(room, username) {
+    try {
+        const data = {room: room, user: username};
+        const response = await fetch('/api/check_user_access', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error when checking user access! status: ${response.status}`);
+        }
+        return response.json();
+
+    } catch (error) {
+        console.error(`Error checking user ${username} to access room ${room}: ${error}`);
+    }
+}
+
+
+async function allowUserAccess(room, username) {
+    try {
+        const data = {room: room, user: username};
+        const response = await fetch('/api/allow_user_access', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+        console.log("response from fetching allowUserAccess: ", response);
+    } catch (error) {
+        console.error(`Error allowing user ${username} to access room ${room}: ${error}`);
+    }
+}
+
 /**
  * Fetches the current user's information from the server. It returns the username
  * if the user is logged in. If not, it logs that the user is not logged in but does not return anything.
@@ -787,7 +859,7 @@ async function createCard(id, text, x, y, rot, colour) {
     };
 
     try {
-        const result = await setUserAsParticipant(obj);
+        const result = setUserAsParticipant(obj);
         if (!result.success) {
             console.error('Failed to add user to room:', result.error);
         }
