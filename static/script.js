@@ -57,30 +57,28 @@ socket.on('connect', function() {
 });
 
 socket.on('updateRoomUsers', (users) => {
-    const dicebearQuery = "scale=50&radius=50&rowColor=00897b,00acc1,039be5,3949ab,43a047,546e7a,5e35b1,6d4c41,757575,7cb342,8e24aa,c0ca33,d81b60,e53935,f4511e,ffb300,1e88e5";
-
-    // console.log('Users in room:', users);
+    const dicebearQuery = "scale=40&radius=40&rowColor=00897b,00acc1,039be5,3949ab,43a047,546e7a,5e35b1,6d4c41,757575,7cb342,8e24aa,c0ca33,d81b60,e53935,f4511e,ffb300,1e88e5";
 
     const container = document.getElementById('userListContainer');
     container.innerHTML = '';  // Clear the container
 
     const div = document.createElement('div');
-    div.className = 'flex justify-center font-customFont';
+    div.className = 'flex font-customFont';
 
     const ul = document.createElement('ul');
-    ul.className = 'bg-transparent p-4 w-fit max-w-xs text-center';
+    ul.className = 'min-w-[10rem]';
     ul.id = 'userList';
 
-    // users = [
-    //     "John", "Jane", "Alice", "Bob", "Claire",
-    //     "David", "Emma", "Frank", "Grace", "Henry",
-    //     "Isabel", "Jack", "Karen", "Leo", "Mia",
-    //     "Nick", "Olivia", "Paul", "Quinn", "Rachel"
-    // ];
+    users = [
+        "John", "Jane", "Alice", "Bob", "Claire",
+        "David", "Emma", "Frank", "Grace", "Henrysssssssssssssssssssssssssss",
+        "Isabel", "Jack", "Karen", "Leo", "Mia",
+        "Nick", "Olivia", "Paul", "Quinn", "Rachel"
+    ];
     
     users.forEach(user => {
         const li = document.createElement('li');
-        li.className = 'user border-2 border-dark-500 flex items-center my-2 space-x-3 px-4 opacity-80 hover:text-gray-800 hover:opacity-100 text-gray-500 text-[1.2em]';
+        li.className = 'user rder-2 rder-gray-400 px-2 space-x-2 flex my-1 items-center opacity-80 hover:text-gray-800 hover:opacity-100 text-gray-500 text-[1.3em]';
         li.title = user;
         // Construct avatar image URL
         const avatarUrl = `${AVATAR_API}?seed=${encodeURIComponent(user)}&${dicebearQuery}`;
@@ -93,6 +91,8 @@ socket.on('updateRoomUsers', (users) => {
 
         // Create span for username
         const username = document.createElement('span');
+        username.className = 'truncate';
+
         username.textContent = user;
 
         li.appendChild(img);
