@@ -46,8 +46,6 @@ function sendAction(a, d) {
         data: d
     };
 
-    // console.log("sendAction", message);
-
     // socket.json uses 'message' channel by default
     socket.json.send(message);
 }
@@ -605,10 +603,6 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     var speed = Math.floor(Math.random() * 800) + 200;
     if (typeof (animationspeed) != 'undefined') speed = animationspeed;
 
-    // var startPosition = $("#create-card").position();
-    // card.css('top', startPosition.top - card.height() * 0.5);
-    // card.css('left', startPosition.left - card.width() * 0.5);
-
     card.animate({
         left: `${x}px`,
         top: `${y}px`
@@ -786,8 +780,6 @@ async function createCard(id, text, x, y, rot, colour) {
 
     drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed, user);
 
-    var action = "createCard";
-
     var data = {
         id: id,
         text: text,
@@ -798,8 +790,6 @@ async function createCard(id, text, x, y, rot, colour) {
         user: user,
         room: ROOM
     };
-
-    sendAction(action, data);
 
     // add user as a participant in the room
     const obj = {
@@ -815,6 +805,9 @@ async function createCard(id, text, x, y, rot, colour) {
     } catch (error) {
         console.error('An error occurred:', error);
     }
+
+    sendAction("createCard", data);
+
 }
 
 function randomCardColour() {
@@ -1107,9 +1100,6 @@ function adjustCard(offsets, doSync) {
 
 $(function () {
     if (boardInitialized === false)
-        // blockUI('<img src="/images/ajax-loader.gif" width=43 height=11/>');
-
-        //setTimeout($.unblockUI, 2000);
 
         $("#create-card").click(function () {
             var rotation = Math.random() * 12 - 3; // add a bit of random rotation (+/- 10deg)

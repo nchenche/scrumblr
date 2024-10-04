@@ -33,7 +33,7 @@ async function fetchCurrentUser() {
  * @param {Function} callback A callback function that processes the result of the request. It takes one argument:
  *                            the result from the server.
  * 
- * @returns {void} This function does not return a value; it handles the result via a callback.
+ * @returns {Promise} This function does not return a value; it handles the result via a callback.
  * @throws {Error} Throws an error if the network request fails or if the API returns an error.
  */
 async function setUserAsParticipant(data) {

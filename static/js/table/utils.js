@@ -10,7 +10,6 @@ and custom css to override default gridsj one.
 
 import { setupGridConfig } from './config.js'
 
-
 // This function fetches data required to initialize the grid.
 async function fetchData() {
     const loader = document.getElementById("loader");

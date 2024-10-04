@@ -453,7 +453,7 @@ router.get('/api/user/rooms', async (req, res) => {
         console.log("Response from GET request to /api/rooms", response);
         res.status(response.success ? 200 : 400).json(response);
     } catch (error) {
-        console.error("Error handling /api/rooms:", error);
+        console.error("Error handling /api/user/rooms:", error);
         res.status(500).json({ success: false, message: "Internal server error" });
     }
 });
