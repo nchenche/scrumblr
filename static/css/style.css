@@ -7,7 +7,7 @@ body {
 	color: #333;
 	background-color: #ddd;
 
-	padding-left: 10px;
+	/* padding-left: 10px; */
 
 	user-select: none;
 	-o-user-select:none;

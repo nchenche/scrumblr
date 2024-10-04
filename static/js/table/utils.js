@@ -17,7 +17,7 @@ async function fetchData() {
     try {
         loader.classList.toggle("hidden");
 
-        const response = await fetch('/api/rooms');
+        const response = await fetch('/api/user/rooms');
         if (!response.ok) {
             loader.classList.add("hidden");
             throw new Error('Failed to fetch rooms');

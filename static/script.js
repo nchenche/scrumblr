@@ -1,3 +1,15 @@
+import {
+    fetchCurrentUser,
+    setUserAsParticipant,
+    checkUserRightAccess,
+    allowUserAccess,
+    getRoomMembers
+} from './client/services.js';
+
+
+import { aggregateUsers } from './client/utils.js';
+
+
 var cards = {};
 var totalcolumns = 0;
 var columns = [];
@@ -5,24 +17,23 @@ var requiredPassword = null;
 var passwordAttempts = 0;
 var MaxPasswordAttempts = 5;
 var currentTheme = "bigcards";
-var currentFont = {family: 'Covered By Your Grace', size: 16};
+var currentFont = { family: 'Covered By Your Grace', size: 16 };
 var boardInitialized = false;
 var keyTrap = null;
 const CARD_COLORS = ["green", "yellow", "blue", "white"];
 
 // const baseurl = location.origin;
 var baseurl = location.pathname.substring(0, location.pathname.lastIndexOf('/'));
-var socket = io.connect({path: "/socketio"});
-// var socket = io.connect({path: baseurl + "/socket.io"});
+var socket = io.connect({ path: "/socketio" });
 
 const room_end_url = location.pathname.split('/').filter(Boolean); // retrieve the final part of the path be the room name
 
 const ROOM = decodeURIComponent(room_end_url.pop());
-const USERNAME = GLOB_VAR.user; // getCookie("username"); // await fetchCurrentUser()
+const USERNAME = GLOB_VAR.user;
 const AVATAR_API = GLOB_VAR.avatar_api;
 
 
-window.addEventListener('beforeunload', function() {
+window.addEventListener('beforeunload', function () {
     if (socket) {
         socket.disconnect();
     }
@@ -42,11 +53,11 @@ function sendAction(a, d) {
 }
 
 // message receiving handler
-socket.on('message', function(data) {
+socket.on('message', function (data) {
     getMessage(data);
 });
 
-socket.on('connect', function() {
+socket.on('connect', function () {
     const data = {
         room: ROOM,
         user: USERNAME
@@ -56,52 +67,108 @@ socket.on('connect', function() {
     sendAction('joinRoom', data);
 });
 
-socket.on('updateRoomUsers', (users) => {
+
+// Define a Map to keep track of user list items
+const userListItems = new Map();
+
+socket.on('updateRoomUsers', async (connectedUsers) => {
     const dicebearQuery = "scale=40&radius=40&rowColor=00897b,00acc1,039be5,3949ab,43a047,546e7a,5e35b1,6d4c41,757575,7cb342,8e24aa,c0ca33,d81b60,e53935,f4511e,ffb300,1e88e5";
 
     const container = document.getElementById('userListContainer');
-    container.innerHTML = '';  // Clear the container
+    let ul = document.getElementById('userList');
 
-    const div = document.createElement('div');
-    div.className = 'flex font-customFont';
+    // If the list doesn't exist yet, create it
+    if (!ul) {
+        ul = document.createElement('ul');
+        ul.className = 'min-w-[10rem]';
+        ul.id = 'userList';
+        container.appendChild(ul);
+    }
 
-    const ul = document.createElement('ul');
-    ul.className = 'min-w-[10rem]';
-    ul.id = 'userList';
+    const members = await getRoomMembers(ROOM);
+    const aggregatedUsers = aggregateUsers(members, connectedUsers);
 
-    users = [
-        "John", "Jane", "Alice", "Bob", "Claire",
-        "David", "Emma", "Frank", "Grace", "Henrysssssssssssssssssssssssssss",
-        "Isabel", "Jack", "Karen", "Leo", "Mia",
-        "Nick", "Olivia", "Paul", "Quinn", "Rachel"
-    ];
-    
-    users.forEach(user => {
-        const li = document.createElement('li');
-        li.className = 'user rder-2 rder-gray-400 px-2 space-x-2 flex my-1 items-center opacity-80 hover:text-gray-800 hover:opacity-100 text-gray-500 text-[1.3em]';
-        li.title = user;
-        // Construct avatar image URL
-        const avatarUrl = `${AVATAR_API}?seed=${encodeURIComponent(user)}&${dicebearQuery}`;
-        
-        // Create img element for avatar
-        const img = document.createElement('img');
-        img.src = avatarUrl;
-        img.alt = "User Avatar";
-        img.className = 'w-7 h-7';  // Tailwind classes for size and rounding
+    // Create a Set of current usernames for quick lookup
+    const newUsernamesSet = new Set(aggregatedUsers.map(user => user.username));
 
-        // Create span for username
-        const username = document.createElement('span');
-        username.className = 'truncate';
+    // Remove users that are no longer in the list (i.e. disconnected visitors)
+    for (const [username, li] of userListItems) {
+        if (!newUsernamesSet.has(username)) {
+            ul.removeChild(li);
+            userListItems.delete(username);
+        }
+    }
 
-        username.textContent = user;
+    // Update existing users and add new ones
+    aggregatedUsers.forEach(user => {
+        let li = userListItems.get(user.username);
 
-        li.appendChild(img);
-        li.appendChild(username);
-        ul.appendChild(li);
+        const isConnectedClass = user.isConnected ? 'opacity-80 hover:opacity-100' : 'opacity-30 hover:opacity-50';
+
+        if (li) {
+            // Update existing user
+            li.className = `user rder-2 rder-gray-400 px-2 space-x-2 flex my-1 items-center hover:text-gray-800 text-gray-500 text-[1.3em] ${isConnectedClass}`;
+            li.title = user.username;
+
+            const spanUsername = li.querySelector('span');
+            spanUsername.textContent = `${user.username} (${user.status})`;
+        } else {
+            // Create new user list item
+            li = document.createElement('li');
+            li.className = `user rder-2 rder-gray-400 px-2 space-x-2 flex my-1 items-center hover:text-gray-800 text-gray-500 text-[1.3em] ${isConnectedClass}`;
+            li.title = user.username;
+
+            // Construct avatar image URL
+            const avatarUrl = `${AVATAR_API}?seed=${encodeURIComponent(user.username)}&${dicebearQuery}`;
+
+            // Create img element for avatar
+            const img = document.createElement('img');
+            img.src = avatarUrl;
+            img.alt = "User Avatar";
+            img.className = 'w-7 h-7';
+
+            // Create span for username
+            const spanUsername = document.createElement('span');
+            spanUsername.className = 'truncate';
+            spanUsername.textContent = `${user.username} (${user.status})`;
+
+            li.appendChild(img);
+            li.appendChild(spanUsername);
+            ul.appendChild(li);
+
+            // Add to Map
+            userListItems.set(user.username, li);
+        }
     });
 
-    div.appendChild(ul);
-    container.appendChild(div);
+
+    // aggregatedUsers.forEach(user => {
+    //     const li = document.createElement('li');
+    //     li.className = 'user rder-2 rder-gray-400 px-2 space-x-2 flex my-1 items-center hover:text-gray-800 text-gray-500 text-[1.3em]';
+    //     li.className +=  user.isConnected ? ' opacity-80 hover:opacity-100' : ' opacity-30  hover:opacity-50'
+
+    //     li.title = user.username;
+    //     // Construct avatar image URL
+    //     const avatarUrl = `${AVATAR_API}?seed=${encodeURIComponent(user.username)}&${dicebearQuery}`;
+
+    //     // Create img element for avatar
+    //     const img = document.createElement('img');
+    //     img.src = avatarUrl;
+    //     img.alt = "User Avatar";
+    //     img.className = 'w-7 h-7';  // Tailwind classes for size and rounding
+
+    //     // Create span for username
+    //     const spanUsername = document.createElement('span');
+    //     spanUsername.className = 'truncate';
+    //     spanUsername.textContent = `${user.username} (${user.status})`;
+
+    //     li.appendChild(img);
+    //     li.appendChild(spanUsername);
+    //     ul.appendChild(li);
+    // });
+
+    // div.appendChild(ul);
+    // container.appendChild(div);
 });
 
 
@@ -115,14 +182,14 @@ async function getMessage(m) {
         case 'roomAccept':
             //okay we're accepted, then request initialization
             //(this is a bit of unnessary back and forth but that's okay for now)
-            sendAction('initializeMe', {room: ROOM});
+            sendAction('initializeMe', { room: ROOM });
             break;
 
         case 'roomDeny':
             //this doesn't happen yet
             break;
-			
-		case 'requirePassword':
+
+        case 'requirePassword':
             requiredPassword = data;
 
             // Check if user has right to access room (i.e. he already entered the password)
@@ -133,14 +200,6 @@ async function getMessage(m) {
                 // Show the password form
                 initPasswordForm(false);
             }
-
-            // if (localStorage.getItem(`room-${ROOM}-passwordValidated`) === 'true') {
-            //     pwd_room = await fetchRoomPwd(ROOM);
-            // }
-
-            // if (pwd_room && validatePassword(window.atob(pwd_room.data))) {
-            //     sendAction('passwordValidated', null);
-
             break;
         case 'moveCard':
             moveCard($(`#${data.id}`), data.position);
@@ -176,8 +235,8 @@ async function getMessage(m) {
         case 'changeTheme':
             changeThemeTo(data);
             break;
-			
-		case 'changeFont':
+
+        case 'changeFont':
             changeFontTo(data);
             break;
 
@@ -200,7 +259,7 @@ async function getMessage(m) {
         case 'removeSticker':
             removeSticker(message.data.stickerId);
             break;
-    
+
         case 'setBoardSize':
             resizeBoard(message.data);
             break;
@@ -220,7 +279,7 @@ async function getMessage(m) {
 
 
 function unblockUI() {
-    $.unblockUI({fadeOut: 20});
+    $.unblockUI({ fadeOut: 20 });
 }
 
 function blockUI(message) {
@@ -246,7 +305,7 @@ function blockUI(message) {
 }
 
 
-$(document).bind('keyup', function(event) {
+$(document).bind('keyup', function (event) {
     keyTrap = event.which;
 });
 
@@ -273,29 +332,29 @@ function initPasswordForm(attempt) {
         $('#pwd-message').addClass("opacity-90");
     }
 
-	$('#password-form').submit(async function(event) {
-		event.preventDefault();
+    $('#password-form').submit(async function (event) {
+        event.preventDefault();
 
         const pwd = $('#room-password').val().trim();
         if (!pwd) return;
-		
-		if (validatePassword(pwd)) {
+
+        if (validatePassword(pwd)) {
             // Store that the password has been validated
             // localStorage.setItem(`room-${ROOM}-passwordValidated`, 'true');
 
             // Add user as allowed members in the room - Remember user has already entered the password
             await allowUserAccess(ROOM, USERNAME);
-			sendAction('passwordValidated', null);
-		}
-	});
+            sendAction('passwordValidated', null);
+        }
+    });
 
 
-    $('#exit-form').on('click', function(e) {
+    $('#exit-form').on('click', function (e) {
         e.preventDefault();  // Prevent default click behavior
 
         window.location.href = "/rooms"
     });
-	
+
 }
 
 function initLockForm(attempt) {
@@ -340,70 +399,70 @@ function initLockForm(attempt) {
     // Use the determined form content in the blockUI function
     blockUI(formContent);
 
-	$('#lock-submit').on('click', function(e) {
+    $('#lock-submit').on('click', function (e) {
         e.preventDefault();
 
-		var passwrd = $('#lock-password').val().trim();
-		var confirmPasswrd = $('#lock-password-confirm').val().trim();
+        var passwrd = $('#lock-password').val().trim();
+        var confirmPasswrd = $('#lock-password-confirm').val().trim();
 
         if (!passwrd || !confirmPasswrd) return;
-		
-		if (validateLock(passwrd, confirmPasswrd)) {
-            const bPassword = (passwrd !== null ? window.btoa(passwrd) : null);
-			sendAction('setPassword', bPassword);
-			unblockUI();
-            location.reload();
-		}
-	});
 
-    $('#lock-password, #lock-password-confirm').on('keypress', function(e) {
+        if (validateLock(passwrd, confirmPasswrd)) {
+            const bPassword = (passwrd !== null ? window.btoa(passwrd) : null);
+            sendAction('setPassword', bPassword);
+            unblockUI();
+            location.reload();
+        }
+    });
+
+    $('#lock-password, #lock-password-confirm').on('keypress', function (e) {
         if (e.which == 13) {  // 13 is the keycode for 'Enter'
             e.preventDefault();
             $('#lock-submit').click();
         }
     });
 
-    $('#close-form').on('click', function(e) {
+    $('#close-form').on('click', function (e) {
         e.preventDefault();
         unblockUI();
         location.reload();
     });
 
-	$('#lock-remove').on('click', function(e) {
-		sendAction('clearPassword', null);
+    $('#lock-remove').on('click', function (e) {
+        sendAction('clearPassword', null);
         unblockUI();
         location.reload();
-	});
+    });
 }
 
 
-function validateLock(passwrd, confirmPasswrd) {	
-	if ( !passwrd ) {
-		return false;
-	}
-	
-	if (passwrd != confirmPasswrd) {
-		initLockForm(true);
-		return false;
-	}
-	
-	requiredPassword = passwrd;
-	return true;
+function validateLock(passwrd, confirmPasswrd) {
+    if (!passwrd) {
+        return false;
+    }
+
+    if (passwrd != confirmPasswrd) {
+        initLockForm(true);
+        return false;
+    }
+
+    requiredPassword = passwrd;
+    return true;
 }
 
 
-function validatePassword(passwrd) {	
-	passwordAttempts++;
-	
+function validatePassword(passwrd) {
+    passwordAttempts++;
+
     // Invalid password, too many attemps - redirect to home page
-	if (passwordAttempts > 5) {
-		// blockUI('<h1>You have attempted to login too many times. Please return to the homepage</h1><br>');
+    if (passwordAttempts > 5) {
+        // blockUI('<h1>You have attempted to login too many times. Please return to the homepage</h1><br>');
         const message = 'You have attempted to login too many times.';
         let countdown = 3;
-        
+
         // Initial display with full message
         blockUI(`${message} You will be redirected to the home page in <span id="countdown">${countdown}</span> seconds.`);
-        
+
         const intervalId = setInterval(() => {
             countdown -= 1;
             if (countdown < 0) {
@@ -415,18 +474,18 @@ function validatePassword(passwrd) {
             }
         }, 1000);
 
-		return false;
-	}
-	
+        return false;
+    }
+
     // Valid password
-	if (requiredPassword == window.btoa(passwrd)) {
-		return true;
-	}
-	
+    if (requiredPassword == window.btoa(passwrd)) {
+        return true;
+    }
+
     // Invalid password - send back the form
     initPasswordForm(true);
 
-	return false;
+    return false;
 }
 
 
@@ -472,9 +531,9 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     var card = $(h);
     card.appendTo('#board');
 
-	
-	// Initialize any custom room font onto the card
-	changeFontTo(currentFont);
+
+    // Initialize any custom room font onto the card
+    changeFontTo(currentFont);
 
     //@TODO
     //Draggable has a bug which prevents blur event
@@ -492,20 +551,20 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
         snapTolerance: 5,
         containment: [0, 0, 2000, 2000],
         stack: ".card",
-        start: function(event, ui) {
+        start: function (event, ui) {
             keyTrap = null;
         },
-        drag: function(event, ui) {
+        drag: function (event, ui) {
             if (keyTrap == 27) {
                 ui.helper.css(ui.originalPosition);
                 return false;
             }
         },
-		handle: "div.content"
+        handle: "div.content"
     });
 
     //After a drag:
-    card.bind("dragstop", function(event, ui) {
+    card.bind("dragstop", function (event, ui) {
         if (keyTrap == 27) {
             keyTrap = null;
             return;
@@ -523,7 +582,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 
     card.find(".droppable").droppable({
         accept: '.sticker',
-        drop: function(event, ui) {
+        drop: function (event, ui) {
             var stickerId = ui.draggable.attr("id");
             var cardId = card.attr("id") // $(this).parent().attr('id');
 
@@ -544,7 +603,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     });
 
     var speed = Math.floor(Math.random() * 800) + 200;
-    if (typeof(animationspeed) != 'undefined') speed = animationspeed;
+    if (typeof (animationspeed) != 'undefined') speed = animationspeed;
 
     // var startPosition = $("#create-card").position();
     // card.css('top', startPosition.top - card.height() * 0.5);
@@ -556,27 +615,27 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     }, speed);
 
     card.hover(
-        function() {
+        function () {
             if (cardOwner === currentUser) {
                 $(this).find('.icon-card').fadeIn(0);
             }
             $(this).find('.avatar-card').fadeIn(0);
 
         },
-        function() {
+        function () {
             $(this).find('.icon-card').fadeOut(0);
         }
     );
 
     card.find('.delete-card-icon').click(
-        function() {
+        function () {
             $(`#${id}`).remove();
-            sendAction('deleteCard', {'id': id, room: ROOM}); // notify server of delete
+            sendAction('deleteCard', { 'id': id, room: ROOM }); // notify server of delete
         }
     );
 
     card.find('.icon-color-change').click(
-        function() {
+        function () {
             let content = card.find(".content");
 
             let currentColor = content.data('color');  // Assume we store the current color in a data attribute
@@ -593,12 +652,12 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
             content.css('background-image', `url("/images/${nextColor}-card.png"`);
             content.data('color', nextColor);
 
-            sendAction("changeCardColor", {id: id, color: nextColor});
+            sendAction("changeCardColor", { id: id, color: nextColor });
         }
     );
 
     if (cardOwner === currentUser) {
-        card.find('.content').editable(function(value, settings) {
+        card.find('.content').editable(function (value, settings) {
             onCardChange(id, value);
             return (value);
         }, {
@@ -633,16 +692,16 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
     function customSubmitFunction(value) {
         // Process the value if needed
         console.log("Custom submit with value:", value);
-    
+
         let processedContent = value.replaceAll('\n', '<br>');
-    
+
         // Update the DOM or handle the visual feedback
         document.getElementById(`content:${id}`).innerHTML = processedContent;
 
         onCardChange(id, value);
         return (value);
     }
-    
+
 }
 
 
@@ -704,8 +763,8 @@ function attachRemoveStickerEvent(stickerElement, cardId, stickerId) {
     };
 
 
-    stickerElement.on('dblclick', function() {
-        data = {...data, stickerId: this.id};
+    stickerElement.on('dblclick', function () {
+        data = { ...data, stickerId: this.id };
         $(this).remove(); // Remove the sticker image from the DOM
         sendAction("removeSticker", data);
     });
@@ -716,120 +775,10 @@ function removeSticker(stickerId) {
 }
 
 
-async function fetchRoomPwd(room) {
-    try {
-        const response = await fetch(`/api/get_pwd/${room}`);
-        const data = await response.json();
-        if (data.success) {
-            return data
-        } else {
-            console.log(data.message);
-            return
-        }
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-    }
-}
-
-
-async function checkUserRightAccess(room, username) {
-    try {
-        const data = {room: room, user: username};
-        const response = await fetch('/api/check_user_access', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error when checking user access! status: ${response.status}`);
-        }
-        return response.json();
-
-    } catch (error) {
-        console.error(`Error checking user ${username} to access room ${room}: ${error}`);
-    }
-}
-
-
-async function allowUserAccess(room, username) {
-    try {
-        const data = {room: room, user: username};
-        const response = await fetch('/api/allow_user_access', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
-        console.log("response from fetching allowUserAccess: ", response);
-    } catch (error) {
-        console.error(`Error allowing user ${username} to access room ${room}: ${error}`);
-    }
-}
-
-/**
- * Fetches the current user's information from the server. It returns the username
- * if the user is logged in. If not, it logs that the user is not logged in but does not return anything.
- *
- * @async
- * @returns {Promise<string|undefined>} A promise that resolves with the username of the currently logged-in user
- * if they are logged in, or undefined if not logged in.
- * @throws {Error} Throws an error if there is a problem fetching the user data.
- */
-async function fetchCurrentUser() {
-    try {
-        const response = await fetch('/api/current_user');
-        const data = await response.json();
-        if (data.success) {
-            return data.username
-        } else {
-            console.log('Not logged in');
-            return
-        }
-    } catch (error) {
-        console.error('Error fetching user data:', error);
-    }
-}
-
-/**
- * Adds a user as a participant to a room by sending user and room information to the server.
- * This function asynchronously posts data to the server and handles the response through a callback.
- * 
- * @param {Object} data An object containing the user and room details.
- * @param {string} data.user The username of the user to add as a participant.
- * @param {string} data.room The room identifier to which the user is being added.
- * @param {Function} callback A callback function that processes the result of the request. It takes one argument:
- *                            the result from the server.
- * 
- * @returns {void} This function does not return a value; it handles the result via a callback.
- * @throws {Error} Throws an error if the network request fails or if the API returns an error.
- */
-async function setUserAsParticipant(data) {
-    try {
-        const response = await fetch('/api/add_room_to_user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
-
-        const result = await response.json();
-        return result;
-    } catch (error) {
-        console.error('Error adding room to user:', error);
-        return { success: false, error: 'Failed to add room to user' };
-    }
-}
-
-
 //----------------------------------
 // cards
 //----------------------------------
 async function createCard(id, text, x, y, rot, colour) {
-    // const user = await fetchCurrentUser();
     const user = USERNAME;
 
     const sticker = null;
@@ -859,7 +808,7 @@ async function createCard(id, text, x, y, rot, colour) {
     };
 
     try {
-        const result = setUserAsParticipant(obj);
+        const result = await setUserAsParticipant(obj);
         if (!result.success) {
             console.error('Failed to add user to room:', result.error);
         }
@@ -914,7 +863,7 @@ function drawNewColumn(columnName) {
 
     $('#icon-col').before(`<td class="${cls}" width="10%" style="display:none; font-size: 1.75em;"><h2 id="col-${totalcolumns + 1}" class="editable">${columnName}</h2></td>`);
 
-    $('.editable').editable(function(value, settings) {
+    $('.editable').editable(function (value, settings) {
         onColumnChange(this.id, value);
         return (value);
     }, {
@@ -926,7 +875,7 @@ function drawNewColumn(columnName) {
         width: '95%',
         height: '',
         event: 'dblclick', //event: 'mouseover'
-        }
+    }
     );
 
     $('.col:last').fadeIn(10);
@@ -938,7 +887,7 @@ function onColumnChange(id, text) {
     var names = Array();
 
     //Get the names of all the columns right from the DOM
-    $('.col').each(function() {
+    $('.col').each(function () {
 
         //get ID of current column we are traversing over
         var thisID = $(this).children("h2").attr('id');
@@ -957,7 +906,7 @@ function displayRemoveColumn() {
     if (totalcolumns <= 0) return false;
 
     $('.col:last').fadeOut(50,
-        function() {
+        function () {
             $(this).remove();
         }
     );
@@ -1034,7 +983,7 @@ function changeThemeTo(theme) {
 function changeFontTo(font) {
     currentFont = font;
     $(".card .content").css("font-family", font.family);
-	$(".card .content").css("font-size", font.size);
+    $(".card .content").css("font-size", font.size);
 }
 
 
@@ -1098,9 +1047,9 @@ function resizeBoard(size) {
 
 function calcCardOffset() {
     var offsets = {};
-    $(".card").each(function() {
+    $(".card").each(function () {
         var card = $(this);
-        $(".col").each(function(i) {
+        $(".col").each(function (i) {
             var col = $(this);
             if (col.offset().left + col.outerWidth() > card.offset().left +
                 card.outerWidth() || i === $(".col").size() - 1) {
@@ -1120,7 +1069,7 @@ function calcCardOffset() {
 //doSync is false if you don't want to synchronize
 //with all the other users who are in this room
 function adjustCard(offsets, doSync) {
-    $(".card").each(function() {
+    $(".card").each(function () {
         var card = $(this);
         var offset = offsets[this.id];
         if (offset) {
@@ -1156,40 +1105,40 @@ function adjustCard(offsets, doSync) {
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
-$(function() {
+$(function () {
     if (boardInitialized === false)
         // blockUI('<img src="/images/ajax-loader.gif" width=43 height=11/>');
 
-    //setTimeout($.unblockUI, 2000);
+        //setTimeout($.unblockUI, 2000);
 
-    $("#create-card").click(function() {
+        $("#create-card").click(function () {
             var rotation = Math.random() * 12 - 3; // add a bit of random rotation (+/- 10deg)
             let uniqueID = Math.round(Math.random() * 99999999); // is this big enough to assure uniqueness?
 
-            let boardPosition = $(".board-outline").position();        
-			var y = boardPosition.top  + $(".board-outline").height() ; 
-			var x = boardPosition.left + $(".board-outline").outerWidth();
-			
+            let boardPosition = $(".board-outline").position();
+            var y = boardPosition.top + $(".board-outline").height();
+            var x = boardPosition.left + $(".board-outline").outerWidth();
+
             createCard(
                 `card${uniqueID}`,
                 '',
-                x, 
-				y,
+                x,
+                y,
                 rotation,
                 randomCardColour()
             );
-    });
+        });
 
     // Style changer
-    $("#smallify").click(function() {
-		
+    $("#smallify").click(function () {
+
         if (currentTheme == "smallcards") {
             changeThemeTo('mediumcards');
         } else if (currentTheme == "mediumcards") {
             changeThemeTo('bigcards');
         } else {
-			changeThemeTo('smallcards');
-		}
+            changeThemeTo('smallcards');
+        }
 
         let data = {
             theme: currentTheme,
@@ -1200,12 +1149,12 @@ $(function() {
         return false;
     });
 
-	
+
     // Style changer
-    $("#fontify").click(function() {
+    $("#fontify").click(function () {
         // Array of font families to cycle through
         const fonts = [
-            "Covered By Your Grace", "Chela One", "Gaegu", 
+            "Covered By Your Grace", "Chela One", "Gaegu",
             "Merienda", "Oswald", "Roboto", "Ubuntu"
         ];
 
@@ -1234,9 +1183,9 @@ $(function() {
 
         return false; // Prevent default action
     });
-	
+
     // Increase card font size
-    $('#font-increase').click(function() {
+    $('#font-increase').click(function () {
         var font = currentFont || {
             family: 'Covered By Your Grace', // Default font family if none is set
             size: 16 // Start at a default size if none is set
@@ -1261,7 +1210,7 @@ $(function() {
     });
 
     // Decrease card font size
-    $('#font-decrease').click(function() {
+    $('#font-decrease').click(function () {
         var font = currentFont || {
             family: 'Covered By Your Grace', // Default font family if none is set
             size: 16 // Start at a default size if none is set
@@ -1285,33 +1234,33 @@ $(function() {
         sendAction('changeFont', data);
 
         return false; // Prevent default action
-    });   
-	
+    });
 
-	// Setup a password
-	$('#protect-room').click(function() {
-		initLockForm(false);
-		return false;
-	});
+
+    // Setup a password
+    $('#protect-room').click(function () {
+        initLockForm(false);
+        return false;
+    });
 
     $('#icon-col').hover(
-        function() {
+        function () {
             $('.col-icon').fadeIn(10);
         },
-        function() {
+        function () {
             $('.col-icon').fadeOut(150);
         }
     );
 
     $('#add-col').click(
-        function() {
+        function () {
             createColumn('New');
             return false;
         }
     );
 
     $('#delete-col').click(
-        function() {
+        function () {
             deleteColumn();
             return false;
         }
@@ -1336,7 +1285,7 @@ $(function() {
     });
 
     // Optionally handle window resize to update constraints dynamically
-    $(window).resize(function() {
+    $(window).resize(function () {
         const updatedMaxWidth = $(window).width() * 0.78;
         const updatedMaxHeight = $(window).height() * 0.85;
 
@@ -1346,16 +1295,16 @@ $(function() {
 
 
     //A new scope for precalculating
-    (function() {
+    (function () {
         var offsets;
 
-        $(".board-outline").bind("resizestart", function() {
+        $(".board-outline").bind("resizestart", function () {
             offsets = calcCardOffset();
         });
-        $(".board-outline").bind("resize", function(event, ui) {
+        $(".board-outline").bind("resize", function (event, ui) {
             adjustCard(offsets, false);
         });
-        $(".board-outline").bind("resizestop", function(event, ui) {
+        $(".board-outline").bind("resizestop", function (event, ui) {
             boardResizeHappened(event, ui);
             adjustCard(offsets, true);
         });
@@ -1377,7 +1326,7 @@ $(function() {
 const container = document.getElementById('userListContainer');
 
 // Event delegation from the container to the list items
-container.addEventListener('mouseenter', function(event) {
+container.addEventListener('mouseenter', function (event) {
     let targetElement = event.target.closest('li'); // Ensures the event is from an <li> element
     if (targetElement) {
         const username = targetElement.title; // Retrieve the title of the hovered <li>
@@ -1388,7 +1337,7 @@ container.addEventListener('mouseenter', function(event) {
 }, true); // True for capturing phase
 
 // Event delegation from the container to the list items
-container.addEventListener('mouseleave', function(event) {
+container.addEventListener('mouseleave', function (event) {
     let targetElement = event.target.closest('li'); // Ensures the event is from an <li> element
     if (targetElement) {
         const username = targetElement.title; // Retrieve the title of the hovered <li>

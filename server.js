@@ -170,7 +170,6 @@ router.get('/rooms', routeProtection.loggedIn, function (req, res) {
 
 
 router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
-	// db.setRoomUserRelationship(req.params.id, req.user, (response) => {
 
 	db.storeRoomDetails(req.params.id, req.user, (response) => {
 		if (!response.success) {
@@ -446,7 +445,7 @@ router.post('/api/check_user_access', async (req, res) => {
 });
 
 
-router.get('/api/rooms', async (req, res) => {
+router.get('/api/user/rooms', async (req, res) => {
     const user = req.user;
 
     try {
@@ -497,21 +496,50 @@ router.get('/api/get_avatar/:username', async (req, res) => {
 });
 
 
-router.get('/api/get_pwd/:room', async (req, res) => {
+router.get('/api/rooms/:room/owner', async (req, res) => {
     const room = req.params.room;
 
     try {
-        const response = await db._getPasswordAsync(room);
-        console.log("Response from GET request to /api/get_pwd/:room", response);
-
+        const response = await db._getRoomData(room);
 		if (!response) {
-			res.status(500).send('Error fetching room password...');
-			return;
-		  }
-        res.status(200).json({ success: true, data: response, message: "Successfully fetched room password!" });
+			return res.status(404).json({ error: 'Room not found' });		
+		}
+		return res.status(200).json(response.owner);
     } catch (error) {
-        console.error("Error handling /api/rooms:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+		console.error("Error handling GET /api/rooms/:room/owner", error);
+		res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+router.get('/api/rooms/:room/members', async (req, res) => {
+    const room = req.params.room;
+
+    try {
+        const response = await db._getRoomData(room);
+		if (!response) {
+			return res.status(404).json({ error: 'Room not found' });		
+		}
+		return res.status(200).json(response.participants);
+    } catch (error) {
+		console.error("Error handling GET /api/rooms/:room/members", error);
+		res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+router.get('/api/rooms/:room', async (req, res) => {
+    const room = req.params.room;
+
+    try {
+        const response = await db._getRoomData(room);
+		if (!response) {
+			return res.status(404).json({ error: 'Room not found' });		
+		}	
+		return res.status(200).json(response);
+    } catch (error) {
+		console.error("Error handling GET /api/rooms/:room", error);
+		res.status(500).json({ error: 'Internal server error' });
     }
 });
 
