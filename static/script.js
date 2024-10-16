@@ -1267,7 +1267,10 @@ $(function () {
     const maxHeight = $(window).height() * 0.85;
 
     $(".board-outline").resizable({
-        ghost: false,
+        ghost: true,
+        animate: false,
+        aspectRatio: false,
+        handles: "e, s, se",
         minWidth: 700, // Minimum width
         minHeight: 500, // Minimum height
         maxWidth: maxWidth, // 75% of the window width
