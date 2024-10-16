@@ -31,6 +31,9 @@ const room_end_url = location.pathname.split('/').filter(Boolean); // retrieve t
 const ROOM = decodeURIComponent(room_end_url.pop());
 const USERNAME = GLOB_VAR.user;
 const AVATAR_API = GLOB_VAR.avatar_api;
+const IS_USER_OWNER = GLOB_VAR.is_owner;
+
+console.log("is user owner?: ", IS_USER_OWNER);
 
 
 window.addEventListener('beforeunload', function () {
@@ -610,7 +613,7 @@ async function drawNewCard(id, text, x, y, rot, colour, sticker, animationspeed,
 
     card.hover(
         function () {
-            if (cardOwner === currentUser) {
+            if (cardOwner === currentUser || IS_USER_OWNER) {
                 $(this).find('.icon-card').fadeIn(0);
             }
             $(this).find('.avatar-card').fadeIn(0);
