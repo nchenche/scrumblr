@@ -71,3 +71,50 @@ author
 ------
 
 ali asaria
+
+
+Specific Rooms
+---
+
+ 
+# Utilisation de la room BFA_monthly Scrumblr
+
+
+La room BFA_monthly est un espace collaboratif créé sur Scrumblr. Elle permet de recueillir les idées, remarques et questions de l’ensemble du personnel de recherche de l’unité. Chaque mois, les responsables de l’unité se réunissent pour examiner les notes collectées, apporter des réponses ou prendre des décisions, et mettre à jour la room pour préparer le cycle suivant.
+
+### Où trouver la room ?
+
+La room BFA_monthly est accessible via [Scrumblr](https://rpbs.docs.rpbs.univ-paris-diderot.fr/documentation/scrumblr). [Scrumblr](https://rpbs.docs.rpbs.univ-paris-diderot.fr/documentation/scrumblr) est une plateforme de tableau collaboratif en ligne. Si vous ne connaissez pas encore Scrumblr, consultez la [documentation détaillée](https://rpbs.docs.rpbs.univ-paris-diderot.fr/documentation/scrumblr) pour vous familiariser avec ses fonctionnalités.
+
+### Comment accéder à la room ?
+
+1. Enregistrez-vous dans Scrumblr en utilisant votre adresse mail institutionnelle
+2. Connectez-vous à Scrumblr avec vos identifiants
+3. Depuis la page 'Join a room' saisissez le nom de la room : BFA_monthly. 
+
+Si vous n’êtes pas déjà participant, vous rejoindrez la room en tant que visiteur. Aucun mot de passe n’est requis pour accéder à cette room.
+
+### Contribution à la room
+
+Pour ajouter une note :
+
+- Cliquez sur l'icône Create card (+), en haut à droite dans la room, pour créer un post-it.
+- Rédigez votre idée, remarque ou question.
+- Déplacez votre post-it dans une colonne si une structure spécifique a été définie.
+    
+Vous ne pourrez modifier ou supprimer que vos propres notes. Si un ajustement est nécessaire, contactez un responsable.
+
+### Cycle mensuel
+
+À la fin de chaque mois, les responsables de l’unité :
+
+- Révisent les notes pour identifier les actions à entreprendre.
+- Suppriment ou archivent les notes traitées.
+- Préparent la room pour le cycle du mois suivant.
+
+### Conseils d’utilisation
+
+- Soyez clair et concis dans vos contributions.
+- Respectez la structure (s’il y a des colonnes) pour une meilleure organisation.
+- Si vous avez une question urgente, utilisez également les canaux de communication habituels pour la remonter directement.
+

@@ -33,8 +33,6 @@ const USERNAME = GLOB_VAR.user;
 const AVATAR_API = GLOB_VAR.avatar_api;
 const IS_USER_OWNER = GLOB_VAR.is_owner;
 
-console.log("is user owner?: ", IS_USER_OWNER);
-
 
 window.addEventListener('beforeunload', function () {
     if (socket) {

@@ -385,7 +385,6 @@ router.get('/api/current_user', (req, res) => {
 
 router.post('/api/add_room_to_user', async (req, res) => {
     const { user, room } = req.body;
-	console.log("room passed:", room);
 
     try {
         const response = await db.addRoomToUserAsParticipant(user, room);
