@@ -66,7 +66,7 @@ router.use(setCurrentUser);
 /**************
  SETUP Socket.IO
 **************/
-const ioOptions = {path: '/socketio'};
+const ioOptions = { path: '/socketio' };
 const io = socketIo(server, ioOptions);
 setupSocketHandlers(io, db);
 
@@ -169,31 +169,37 @@ router.get('/rooms', routeProtection.loggedIn, function (req, res) {
 });
 
 
-router.get('/room/:id', routeProtection.loggedIn, function (req, res) {
+router.get('/room/:id', routeProtection.loggedIn, async function (req, res) {
+	try {
+		// Fetch room details
+		const response = await db.storeRoomDetails(req.params.id, req.user);
 
-	db.storeRoomDetails(req.params.id, req.user, (response) => {
 		if (!response.success) {
 			console.error(response.message);
 		}
 
+		// Check if the room is protected (exists in Redis)
 		const key = `#scrumblr#-room:${req.params.id}-password`;
-		redisClient.exists(key, (err, resExists) => {
-			if (err) {
-				console.log(`Error checking room protection existence: ${err}`);
-			}
+		const isRedisKey = await db._isRedisKey(key);
 
-			res.render('layout', {
-				body: 'partials/room.ejs',
-				pageTitle: ('Scrumblr - ' + req.params.id),
-				pageScripts: ['/script.js'],
-				variable: {avatar_api: avatar_api, user: req.user, is_owner: response.is_owner},
-				username: req.user,
-				is_owner: response.is_owner,
-				is_room_protected: resExists === 1 ? true : false,
-				currentNav: null
-			});
+		// Render the room view
+		res.render('layout', {
+			body: 'partials/room.ejs',
+			pageTitle: `Scrumblr - ${req.params.id}`,
+			pageScripts: ['/script.js'],
+			variable: { avatar_api: avatar_api, user: req.user, is_owner: response.is_owner },
+			username: req.user,
+			is_owner: response.is_owner,
+			is_room_protected: isRedisKey === 1, // True if exists
+			currentNav: null,
 		});
-	});
+	} catch (err) {
+		console.error(`Error handling GET /room/${req.params.id}:`, err);
+
+		res.status(500).render('error', {
+			message: 'Internal server error. Unable to fetch room details.',
+		});
+	}
 });
 
 
@@ -218,11 +224,26 @@ router.get('/demo', routeProtection.loggedIn, function (req, res) {
 /**************
  SETUP USEFUL APIS
 **************/
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
 	const { username, email, password } = req.body;
-	db.createUser(username, email, password, (result) => {
-		res.status(result.success ? 200 : 400).json(result);
-	});
+
+	try {
+		const result = await db.createUser(username, email, password);
+
+		if (result.success) {
+			return res.status(200).json(result); // Return success response
+		} else {
+			return res.status(400).json(result); // Return error response for invalid input or storage issues
+		}
+	} catch (error) {
+		console.error("Error handling POST /register:", error);
+
+		return res.status(500).json({
+			success: false,
+			message: "Internal server error",
+			error: error.message || error,
+		});
+	}
 });
 
 
@@ -240,8 +261,8 @@ router.post('/login', async (req, res) => {
 		}
 
 		// store cookie session
-		res.cookie('session_id', result.session, { httpOnly: false, secure: false, maxAge: 1000*60*60*6 });
-		res.cookie('username', result.user, { httpOnly: false, secure: false, maxAge: 1000*60*60*6 });
+		res.cookie('session_id', result.session, { httpOnly: false, secure: false, maxAge: 1000 * 60 * 60 * 6 });
+		res.cookie('username', result.user, { httpOnly: false, secure: false, maxAge: 1000 * 60 * 60 * 6 });
 		console.log("result login:", result);
 
 		res.json({
@@ -257,41 +278,35 @@ router.post('/login', async (req, res) => {
 
 router.post('/forgot-password', async (req, res) => {
 	const { username } = req.body;
-	const expiresIn = 60*5; // in seconds
+	const expiresIn = 60 * 5; // in seconds
 
-	db.getEmailFromUser(username, (response) => {
-		if (!response.success) {
-			return res.json(response);
+	try {
+		const responseEmail = await db.getEmailByUser(username);
+		const email = responseEmail.data;
+
+		const responseToken = await db.storeToken(username, expiresIn);
+
+		// const mailResponse = await sendEmail("nicolas.chevrollier@inserm.fr", username, tokenResponse.token);
+		const mailResponse = await sendEmail(email, username, responseToken.token);
+		if (!mailResponse.success) {
+			return res.status(401).json(mailResponse);
 		}
-		const email = response.email;
-		console.log("Email successfully retrieved:", email)
 
-		db.storeToken(username, expiresIn, async (tokenResponse) => {
-			if (tokenResponse.success) {
 
-				// const mailResponse = await sendEmail("nicolas.chevrollier@inserm.fr", username, tokenResponse.token);
-				const mailResponse = await sendEmail(email, username, tokenResponse.token);
-				console.log("mailResponse", mailResponse);
-				if (!mailResponse.success) {
-					return res.status(401).json(mailResponse);
-				}
-
-				return res.status(200).json(
-					{
-						message: "A reset email has been sent.",
-						success: mailResponse.success,
-						redirectTo: '/',
-						user: username,
-						token: tokenResponse.token,
-						email: email
-					}
-				)
-			} else {
-				console.error(tokenResponse.message);
-				return res.status(401).json(tokenResponse);
+		return res.status(200).json(
+			{
+				message: "A reset email has been sent.",
+				success: true,
+				redirectTo: '/',
+				user: username,
+				token: responseToken.token,
+				email: email
 			}
-		});
-	});
+		)
+	} catch (err) {
+		console.error(err);
+		res.status(500).json(err)
+	}
 });
 
 
@@ -308,7 +323,7 @@ router.post('/reset-password', (req, res) => {
 			if (!response.success) {
 				console.error("Error resetting password:", response);
 				return res.status(401).json(response);
-			}			
+			}
 			return res.status(200).json(response);
 		});
 	});
@@ -384,16 +399,16 @@ router.get('/api/current_user', (req, res) => {
 
 
 router.post('/api/add_room_to_user', async (req, res) => {
-    const { user, room } = req.body;
+	const { user, room } = req.body;
 
-    try {
-        const response = await db.addRoomToUserAsParticipant(user, room);
-        console.log("*** response ***", response);
-        res.status(response.success ? 200 : 400).json(response);
-    } catch (error) {
-        console.error('Failed to add room to user:', error);
-        res.status(500).json({ success: false, message: 'Server error', error: error });
-    }
+	try {
+		const response = await db.addRoomToUserAsParticipant(user, room);
+		console.log("*** response ***", response);
+		res.status(response.success ? 200 : 400).json(response);
+	} catch (error) {
+		console.error('Failed to add room to user:', error);
+		res.status(500).json({ success: false, message: 'Server error', error: error });
+	}
 });
 
 
@@ -407,7 +422,7 @@ router.post('/api/delete_room', async (req, res) => {
 
 	} catch (error) {
 		console.error(`Error in /api/delete_room request: ${error}`)
-		return res.status(400).json({success: false, message: error});
+		return res.status(400).json({ success: false, message: error });
 	}
 });
 
@@ -425,7 +440,7 @@ router.post('/api/allow_user_access', async (req, res) => {
 
 	} catch (error) {
 		console.error(`Error in /api/allow_user_access request: ${error}`)
-		return res.status(400).json({success: false, message: error});
+		return res.status(400).json({ success: false, message: error });
 	}
 });
 
@@ -439,112 +454,194 @@ router.post('/api/check_user_access', async (req, res) => {
 		return res.status(200).json(response);
 	} catch (error) {
 		console.error(`Error in /api/check_user_access request: ${error}`)
-		return res.status(400).json({success: false, message: error});
+		return res.status(400).json({ success: false, message: error });
 	}
 });
 
 
 router.get('/api/user/rooms', async (req, res) => {
-    const user = req.user;
+	const user = req.user;
 
-    try {
-        const response = await db.getUserRooms(user);
-        console.log("Response from GET request to /api/rooms", response);
-        res.status(response.success ? 200 : 400).json(response);
-    } catch (error) {
-        console.error("Error handling /api/user/rooms:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
-    }
+	try {
+		const response = await db.getUserRooms(user);
+		console.log("Response from GET request to /api/rooms", response);
+		res.status(response.success ? 200 : 400).json(response);
+	} catch (error) {
+		console.error("Error handling /api/user/rooms:", error);
+		res.status(500).json({ success: false, message: "Internal server error" });
+	}
 });
 
 
 router.get('/api/get_avatar/:username', async (req, res) => {
-  const username = req.params.username;
-  const dicebearQuery = req.query; // Pass through any query parameters
+	const username = req.params.username;
+	const dicebearQuery = req.query; // Pass through any query parameters
 
-  const AVATAR_API = avatar_api;
+	const AVATAR_API = avatar_api;
 
-  // Build the URL with query parameters
-  const queryParams = new URLSearchParams({
-    seed: username,
-    ...dicebearQuery,
-  });
+	// Build the URL with query parameters
+	const queryParams = new URLSearchParams({
+		seed: username,
+		...dicebearQuery,
+	});
 
-  const avatarUrl = `${AVATAR_API}?${queryParams.toString()}`;
-  console.log("fetching avatar at: ", avatarUrl);
+	const avatarUrl = `${AVATAR_API}?${queryParams.toString()}`;
+	console.log("fetching avatar at: ", avatarUrl);
 
 
-  try {
-    // Fetch the avatar from DiceBear API
-    const response = await fetch(avatarUrl);
+	try {
+		// Fetch the avatar from DiceBear API
+		const response = await fetch(avatarUrl);
 
-    if (!response.ok) {
-      res.status(response.status).send('Error fetching avatar');
-      return;
-    }
+		if (!response.ok) {
+			res.status(response.status).send('Error fetching avatar');
+			return;
+		}
 
-    // Set the content type from the API response
-    res.set('Content-Type', response.headers.get('Content-Type'));
+		// Set the content type from the API response
+		res.set('Content-Type', response.headers.get('Content-Type'));
 
-    // Pipe the response body directly to the client
-    response.body.pipe(res);
-  } catch (error) {
-    console.error('** Error fetching avatar:', error);
-    res.status(500).send('Internal Server Error');
-  }
+		// Pipe the response body directly to the client
+		response.body.pipe(res);
+	} catch (error) {
+		console.error('** Error fetching avatar:', error);
+		res.status(500).send('Internal Server Error');
+	}
 });
 
 
 router.get('/api/rooms/:room/owner', async (req, res) => {
-    const room = req.params.room;
+	const room = req.params.room;
 
-    try {
-        const response = await db._getRoomData(room);
+	try {
+		const response = await db._getRoomData(room);
 		if (!response) {
-			return res.status(404).json({ error: 'Room not found' });		
+			return res.status(404).json({ error: 'Room not found' });
 		}
 		return res.status(200).json(response.owner);
-    } catch (error) {
+	} catch (error) {
 		console.error("Error handling GET /api/rooms/:room/owner", error);
 		res.status(500).json({ error: 'Internal server error' });
-    }
+	}
 });
 
 
 router.get('/api/rooms/:room/members', async (req, res) => {
-    const room = req.params.room;
+	const room = req.params.room;
 
-    try {
-        const response = await db._getRoomData(room);
+	try {
+		const response = await db._getRoomData(room);
 		if (!response) {
-			return res.status(404).json({ error: 'Room not found' });		
+			return res.status(404).json({ error: 'Room not found' });
 		}
 		return res.status(200).json(response.participants);
-    } catch (error) {
+	} catch (error) {
 		console.error("Error handling GET /api/rooms/:room/members", error);
 		res.status(500).json({ error: 'Internal server error' });
-    }
+	}
 });
 
 
 router.get('/api/rooms/:room', async (req, res) => {
-    const room = req.params.room;
+	const room = req.params.room;
 
-    try {
-        const response = await db._getRoomData(room);
+	try {
+		const response = await db._getRoomData(room);
 		if (!response) {
-			return res.status(404).json({ error: 'Room not found' });		
-		}	
+			return res.status(404).json({ error: 'Room not found' });
+		}
 		return res.status(200).json(response);
-    } catch (error) {
+	} catch (error) {
 		console.error("Error handling GET /api/rooms/:room", error);
 		res.status(500).json({ error: 'Internal server error' });
-    }
+	}
+});
+
+router.post('/api/rooms/public', async (req, res) => {
+	const { room, user } = req.body; // Retrieve the room name from the request body
+
+	if (!room || !user) {
+		return res.status(400).json({ error: 'Room name and user name are required' });
+	}
+
+	try {
+		const response = await db.createPublicRoom(user, room);
+		if (!response.success) {
+			return res.status(400).json({ error: 'Failed to create public room', response: response });
+		}
+		return res.status(201).json(response); // 201: Created
+	} catch (error) {
+		console.error("Error handling POST /api/rooms/public", error);
+		res.status(500).json({ error: 'Internal server error' });
+	}
+});
+
+router.get('/api/rooms/:username/owned', async (req, res) => {
+	const username = req.params.username;
+
+	try {
+		const response = await db.getOwnedRooms(username);
+		return res.status(200).json(response);
+	} catch (error) {
+		console.error(`Error handling GET /api/rooms/:${username}/owned`, error);
+		res.status(500).json({ error: error });
+	}
+});
+
+router.get('/api/users', async (req, res) => {
+	try {
+		const response = await db.getAllUsers();
+		return res.status(200).json(response.result);
+	} catch (error) {
+		console.error("Error handling GET /api/users", error);
+		res.status(500).json({ error: 'Internal server error during fetching /api/users' });
+	}
 });
 
 
+router.delete('/api/users/:username', async (req, res) => {
+	const username = req.params.username;
+
+	try {
+		const response = await db.removeUser(username);
+		return res.status(200).json(response);
+	} catch (error) {
+		console.error(`Error handling DELETE /api/users/:${username}`, error);
+		res.status(500).json({ error: error });
+	}
+});
+
+router.get('/api/users/:username/email', async (req, res) => {
+	const username = req.params.username;
+
+	try {
+		const response = await db.getEmailByUser(username);
+		return res.status(200).json(response);
+	} catch (error) {
+		console.error(`Error handling GET /api/users/:${username}/email`, error);
+		res.status(500).json({ error: error });
+	}
+});
+
+
+router.post('/api/admin', async (req, res) => {
+	const { username, email, password } = req.body;
+
+	try {
+		if (!username || !email || !password) {
+			return res.status(400).json(
+				{ error: 'Error: username, email and password are required.' });
+		}
+
+		const response = await db.createAdminUser(username, email, password);
+		return res.status(200).json(response);
+	} catch (error) {
+		console.error("Error handling POST /api/admin/create", error);
+		res.status(500).json({ error: 'Internal server error during fetching /api/users' });
+	}
+});
 
 // Catch-all route that redirects to the home page if no other route matches | MUST BE AFTER ALL DEFINED ROUTES
 router.use((req, res) => {
-    res.redirect('/');
+	res.redirect('/');
 });

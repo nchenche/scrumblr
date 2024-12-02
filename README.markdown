@@ -73,6 +73,102 @@ author
 ali asaria
 
 
+
+For developers
+---
+
+## UML diagram link
+
+https://lucid.app/lucidchart/f13a4133-f8b8-4691-a529-0345bee0e8fe/edit?beaconFlowId=9D5F9CFD8875AF34&invitationId=inv_d0959c3c-c65a-4125-8cfe-66e44c293f7a&page=0_0#
+
+## Redis keys
+
+
+| Redis Key                                | Type    | Storage usage                                         | Redis Command          |
+|------------------------------------------|---------|-----------------------------------------------|------------------------|
+| `#scrumblr#-room:{ROOM}-cards`           | Hash    | All cards-related data of the room     | `hget key field`       |
+| `#scrumblr#-room:{ROOM}-font`            | String  | Font related-data of the room          | `get key`              |
+| `#scrumblr#-room:{ROOM}-size`            | String  | Board size-related data of the room    | `get key`              |
+| `#scrumblr#-room:{ROOM}-columns`         | List    | Columns-related data of the room       | `lrange key start end` |
+| `#scrumblr#-room:{ROOM}-password`        | String  | Password-related data of the room      | `get key`              |
+| `#scrumblr#-room:{ROOM}-allowed-users-randintid`        | Set  | List of users allowed in a private room      | `smembers key`              |
+| `room:{ROOM}`                            | String  | Owners and participants of the room    | `get key`              |
+| `user:{USERNAME}:owner`                  | Set     | Rooms for which user is owner      | `smembers key`         |
+| `user:{USERNAME}:participant`            | Set     | Rooms for which user is participant| `smembers key`         |
+| `emails`                                 | Hash    | Emails/username pairs | `hget key field`       |
+| `users`                                  | Hash    | Username/password pairs | `hget key field`       |
+| `admins:users`                                  | Set    | Usernames | `smembers key`       |
+| `rooms:public`                                  | Set    | Room names | `smembers key`       |
+
+
+
+### Some Redis command lines
+
+```bash
+#scrumblr#-room:{ROOM-NAME}-cards
+hgetall "#scrumblr#-room:{ROOM-NAME}-cards"
+ 1) "card26548220"
+ 2) "{\"text\":\"Investigate impact on enzyme X on cell metabolism\",\"id\":\"card26548220\",\"x\":24.727752685546875,\"y\":97.14864349365234,\"rot\":\"7.312408064328013\",\"colour\":\"green\",\"user\":\"jdoe\",\"sticker\":null}"
+
+#scrumblr#-room:{ROOM}-font
+get "#scrumblr#-room:team1_projectX_planning-font"
+"{\"font\":\"Covered By Your Grace\",\"size\":15}"
+
+#scrumblr#-room:{ROOM}-size
+get "#scrumblr#-room:team1_projectX_planning-size"
+"{\"width\":\"1121\",\"height\":\"718\"}"
+
+#scrumblr#-room:{ROOM}-columns
+lrange "#scrumblr#-room:team1_projectX_planning-columns" 0 -1
+1) "Research Ideas"
+2) "in\nprogress"
+3) "Results"
+4) "Reports"
+
+#scrumblr#-room:{ROOM}-password
+get "#scrumblr#-room:team1_projectX_planning-password"
+"dGVzdA=="
+
+#room:{ROOM}
+get room:test
+"{\"owner\":\"jdoe\",\"participants\":[\"ksoze\"]}"
+
+#user:{USERNAME}:owner
+smembers "user:jdoe:owner"
+1) "team1_projectX_planning"
+2) "ma room"
+3) "BFA - notes mensuelles"
+
+#user:{USERNAME}:owner
+smembers "user:ksoze:participant"
+1) "test"
+
+#emails
+hgetall emails
+1) "john.doe@u-paris.fr"
+2) "jdoe"
+3) "keizer.soze@u-paris.fr"
+4) "ksoze"
+5) "jdoe@test.fr"
+6) "jdoe"
+
+#users
+hgetall users
+1) "jdoe"
+2) "$2b$10$WK/4lr.gjpvC7MutfASYveTkiM4yNcGaYir9ujUiPON1.uL2i3NQ."
+3) "ksoze"
+4) "$2b$10$vA5wHdF.LMp9/WD4Pwxh5.IR1y9KceDjptyLD2pELPPte8QiexRDy"
+5) "admin"
+
+# get all keys with the pattern "*room*test*"
+scan 0 MATCH *room*test* COUNT 100
+
+```
+
+
+
+
+
 Specific Rooms
 ---
 

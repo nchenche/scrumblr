@@ -35,7 +35,7 @@ export const accountManager = {
         .then(result => callback(result))
         .catch(error => { console.error('Resetting password error:', error); });
     },
-    sendToken: function(data, callback) {
+    sendToken: async function(data, callback) {
         fetch('/forgot-password', {
             method: 'POST',
             headers: {
